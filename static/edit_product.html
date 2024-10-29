@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактор изделий</title>
+    <!-- Подключаем локальный Bootstrap CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        function loadProduct() {
+            fetch('/get_product')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('productTableBody');
+                    tableBody.innerHTML = '';  // Очищаем таблицу
+
+                    data.forEach(product => {
+                        const row = document.createElement('tr');
+                        const nameCell = document.createElement('td');
+                        const enableCell = document.createElement('td');
+                        const pictureCell = document.createElement('td');
+                        const deleteButton = document.createElement('button');
+
+                        nameCell.innerText = product[0];
+                        enableCell.innerText = product[1];
+                        pictureCell.innerText = product[2]
+                        deleteButton.innerText = 'Удалить';
+                        deleteButton.className = 'btn btn-danger btn-sm';
+                        deleteButton.onclick = function() {
+                            deleteProduct(product[0]);
+                        };
+                        row.appendChild(nameCell);
+                        row.appendChild(enableCell);
+                        row.appendChild(pictureCell);
+                        deleteCell.appendChild(deleteButton);
+                        row.appendChild(deleteCell);
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function deleteProduct(name) {
+            fetch('/delete_product', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `name=${name}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                loadProduct();  // Перезагружаем таблицу после удаления
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        window.onload = function() {
+            loadProduct();  // Загружаем пользователей при загрузке страницы
+            setInterval(loadProduct, 1000);  // Обновляем данные каждую секунду
+        };
+    </script>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-1">
+                <a href="/admin_panel" class="btn btn-secondary btn-block btn-lg">Назад</a>
+            </div>
+            <div class="col-md-10">
+                <h2 class="text-center"><u>Редактор изделий</u></h2>
+            </div>
+            <div class="col-md-1">
+                <form action="/logout" method="post">
+                    <button type="submit" class="btn btn-danger btn-block btn-lg">Выход</button>
+                    <!--<a class="btn btn-primary btn-lg" href="/static/login.html" role="button">Выход</a>-->
+                </form>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-4">
+                <h3 class="text-center"><u>Добавить изделие</u></h3>
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <form action="/add_product" method="post">
+                            <div class="mb-2">
+                                <label for="name" class="form-label">Наименование изделия:</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="mb-2">
+                                <input type="checkbox" class="form-check-input" id="enable" name="enable" required>
+                                <label for="enable" class="form-check-label">Активация:</label>
+                            </div>
+                            <div class="input-group mb-3">
+                                <input type="file" class="form-control" id="picture">
+                                <label class="input-group-text" for="picture">Upload</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Добавить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h3 class="text-center"><u>Удалить изделие</u></h3>
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Наименование изделия</th>
+                            <th>Активация</th>
+                            <th>Изображение</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        <!-- Данные будут загружены с помощью JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Подключаем локальный Bootstrap JS и Popper.js -->
+    <script src="/static/js/bootstrap.min.js"></script>
+</body>
+</html>
