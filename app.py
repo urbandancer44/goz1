@@ -1,202 +1,33 @@
-from flask import Flask, request, redirect, send_from_directory, session, jsonify, url_for, render_template
-import psycopg2, pytz
-from datetime import datetime
+from flask import Flask, session
+from handlers import Handlers
 
 app = Flask(__name__, static_folder='static')
-app.secret_key = 'your_secret_key'  # Для использования сессий
+app.secret_key = 'your_secret_key'
 
-# Конфигурация подключения к PostgreSQL
-db_host = 'postgres'
-db_name = 'gozDB'
-db_user = 'goz_admin'
-db_pass = 'zzz1234ZZZ'
+app.config['DB_HOST'] = 'postgres'
+app.config['DB_NAME'] = 'gozDB'
+app.config['DB_USER'] = 'goz_admin'
+app.config['DB_PASS'] = 'zzz1234ZZZ'
 
-def get_db_connection():
-    return psycopg2.connect(
-        host=db_host,
-        database=db_name,
-        user=db_user,
-        password=db_pass
-    )
+handlers = Handlers(app)
 
-# Экран: авторизация
-@app.route('/')
-def index():
-    return send_from_directory(app.static_folder, 'login.html')
-
-# Действие: авторизация
-@app.route('/login', methods=['POST'])
-def login():
-    password = request.form['password']
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM users WHERE password = %s", (password,))
-    user = cur.fetchone()
-    cur.close()
-    conn.close()
-
-    if user:
-        session['username'] = user[1]  # Индекс 1 соответствует полю username
-        session['role'] = user[3]  # Индекс 3 соответствует полю role
-        if session['role'] == 'admin':
-            return redirect('/admin_panel')
-        else:
-            return redirect('/select_product')
-    else:
-        return send_from_directory(app.static_folder, 'login_ng.html')
-#        return "Введены неверные данные. <a href='/'>Назад</a>"
-
-# Экран: панель администратора
-@app.route('/admin_panel')
-def admin_panel():
-    if 'username' in session:
-        return send_from_directory(app.static_folder, 'admin_panel.html')
-    else:
-        return redirect('/')
-
-# Экран: редактор пользователей
-@app.route('/edit_user')
-def edit_user():
-    if 'username' in session:
-        return send_from_directory(app.static_folder, 'edit_user.html')
-    else:
-        return redirect('/')
-
-# Действие: добавление пользователя в таблицу 'users'
-@app.route('/add_user', methods=['POST'])
-def add_user():
-#    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        role = request.form['role']
-
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("INSERT INTO users (username, password, role) VALUES (%s, %s, %s)", (username, password, role))
-        conn.commit()
-        cur.close()
-        conn.close()
-
-        return "Пользователь успешно добавлен! <a href='/edit_user'>Назад</a>"
-
-#    return send_from_directory(app.static_folder, 'edit_user.html')
-
-# Действие: вывод данных из таблицы 'users' в JSON
-@app.route('/get_users')
-def get_users():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT username, role FROM users")
-    users = cur.fetchall()
-    cur.close()
-    conn.close()
-
-    return jsonify(users)
-
-# Действие: вывод данных из таблицы 'users' в JSON
-@app.route('/get_product')
-def get_product():
-    try:
-        conn = get_db_connection()
-        with conn.cursor() as cur:
-            cur.execute("SELECT name, enable, picture FROM product")
-            product = cur.fetchall()
-
-        # Преобразуем результат в список словарей
-        product_list = [{'name': product[0], 'enable': product[1], 'picture': product[2]} for product in product]
-
-        return jsonify(product_list)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    finally:
-        if conn:
-            conn.close()
-
-# Действие: удаление пользователя из таблицы 'users'
-@app.route('/delete_user', methods=['POST'])
-def delete_user():
-    username = request.form['username']
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("DELETE FROM users WHERE username = %s", (username,))
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    return "Пользователь успешно удалён!"
-
-# Действие: удаление изделия из таблицы 'product'
-@app.route('/delete_product', methods=['POST'])
-def delete_product():
-    name = request.form['name']
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("DELETE FROM product WHERE name = %s", (name,))
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    return "Изделие успешно удалёно!"
-
-
-# Экран: редактор изделий
-@app.route('/edit_product')
-def edit_product():
-    if 'username' in session:
-        return send_from_directory(app.static_folder, 'edit_product.html')
-    else:
-        return redirect('/')
-
-# Действие: добавление изделия в таблицу 'product'
-@app.route('/add_product', methods=['POST'])
-def add_product():
-#    if request.method == 'POST':
-        name = request.form['name']
-        enable = request.form['enable']
-        picture = request.form['picture']
-
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("INSERT INTO product (name, enable, picture) VALUES (%s, %s, %s)", (name, enable, picture))
-        conn.commit()
-        cur.close()
-        conn.close()
-
-        return "Изделие успешно добавлено! <a href='/edit_product'>Назад</a>"
-
-# Экран: выбор изделия
-@app.route('/select_product')
-def select_product():
-    if 'username' in session:
-        return send_from_directory(app.static_folder, 'select_product.html')
-    else:
-        return redirect('/')
-
-
-
-# Действие: вывод данных для экрана выбора изделия
-@app.route('/get_select_product_info')
-def get_select_product_info():
-    if 'username' in session:
-        return jsonify({
-            'username': session['username'],
-            'role': session['role'],
-            'current_date': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S') # %H:%M:%S
-        })
-    else:
-        return jsonify({'error': 'Not logged in'}), 401
-
-
-
-# Действие: выход из сессии
-@app.route('/logout', methods=['POST'])
-def logout():
-    session.pop('username', None)
-    session.pop('role', None)
-    return redirect('/')
+app.add_url_rule('/', 'index', handlers.index)
+app.add_url_rule('/login', 'login', handlers.login, methods=['POST'])
+app.add_url_rule('/admin_panel', 'admin_panel', handlers.admin_panel)
+app.add_url_rule('/edit_user', 'edit_user', handlers.edit_user)
+app.add_url_rule('/get_users', 'get_users', handlers.get_users)
+app.add_url_rule('/add_user', 'add_user', handlers.add_user, methods=['POST'])
+app.add_url_rule('/update_user', 'update_user', handlers.update_user, methods=['POST'])
+app.add_url_rule('/delete_user', 'delete_user', handlers.delete_user, methods=['POST'])
+app.add_url_rule('/edit_product', 'edit_product', handlers.edit_product)
+app.add_url_rule('/get_products', 'get_products', handlers.get_products)
+app.add_url_rule('/add_product', 'add_product', handlers.add_product, methods=['POST'])
+app.add_url_rule('/delete_product', 'delete_product', handlers.delete_product, methods=['POST'])
+app.add_url_rule('/select_product', 'select_product', handlers.select_product)
+app.add_url_rule('/get_select_product_info', 'get_select_product_info', handlers.get_select_product_info)
+app.add_url_rule('/select_order', 'select_order', handlers.select_order)
+app.add_url_rule('/set_product_name', 'set_product_name', handlers.set_product_name, methods=['POST'])
+app.add_url_rule('/logout', 'logout', handlers.logout, methods=['POST'])
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
