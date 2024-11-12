@@ -29,19 +29,20 @@
                 <h3 class="text-center"><u>Добавить изделие</u></h3>
                 <div class="card bg-light">
                     <div class="card-body">
-                        <form action="/add_product" method="post">
+                        <form id="addProductForm" autocomplete="off">
                             <div class="mb-2">
                                 <label for="product_name" class="form-label">Наименование изделия:</label>
                                 <input type="text" class="form-control" id="product_name" name="product_name" required>
                             </div>
-                            <div class="mb-2">
-                                <input type="checkbox" class="form-check-input" id="enable" name="enable" required>
-                                <label for="enable" class="form-check-label">Активация:</label>
-                            </div>
-                            <div class="input-group mb-3">
-                                <input type="file" class="form-control" id="picture">
-                                <label class="input-group-text" for="picture">Upload</label>
-                            </div>
+                            <!--<div class="mb-2">
+                                <label for="password" class="form-label">Пароль:</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <div id="passwordHelp" class="form-text">Приложите карту к считывателю RFID</div>
+                            </div>-->
+                            <!--<div class="input-group mb-3">
+                                <input type="file" class="form-control" id="picture" name="picture">
+                                <label class="input-group-text" for="picture">Загрузить:</label>
+                            </div>-->
                             <button type="submit" class="btn btn-primary btn-block">Добавить</button>
                         </form>
                     </div>

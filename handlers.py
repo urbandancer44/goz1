@@ -94,13 +94,12 @@ class Handlers:
 
     def add_product(self):
         product_name = request.form['product_name']
-        enable = request.form['enable']
-        picture = request.form['picture']
+        #picture = request.form['picture']
 
-        query = "INSERT INTO product (product_name, enable, picture) VALUES (%s, %s, %s)"
-        self.db_manager.execute_insert(query, (product_name, enable, picture))
+        query = "INSERT INTO product (product_name) VALUES (%s)"
+        self.db_manager.execute_insert(query, (product_name,))
 
-        return "Изделие успешно добавлено! <a href='/edit_product'>Назад</a>"
+        return "Изделие успешно добавлено!"
 
     def select_product(self):
         if 'username' in session:
@@ -108,13 +107,13 @@ class Handlers:
         else:
             return redirect('/')
 
-    @staticmethod
-    def set_product_name():
+
+    def set_product_name(self):
         if 'username' in session:
             product_name = request.form['product_name']
             session['product_name'] = product_name
-            return "Product name set successfully"
-            #return send_from_directory(self.app.static_folder, 'select_order.html')
+            #return "Product name set successfully"
+            return send_from_directory(self.app.static_folder, 'select_order.html')
         else:
             return redirect('/')
 
@@ -122,10 +121,36 @@ class Handlers:
         if 'username' in session:
             return send_from_directory(self.app.static_folder, 'select_order.html')
         else:
-            return redirect('/select_product')
+            return redirect('/')
+
+    def set_order_num(self):
+        if 'username' in session:
+            order_num = request.form['order_num']
+            session['order_num'] = order_num
+            #return "Product name set successfully"
+            return send_from_directory(self.app.static_folder, 'main-table.html')
+        else:
+            return redirect('/')
+
+    def main_table(self):
+        if 'username' in session:
+            return send_from_directory(self.app.static_folder, 'main_table.html')
+        else:
+            return redirect('/')
 
     @staticmethod
     def get_select_product_info():
+        if 'username' in session:
+            return jsonify({
+                'username': session['username'],
+                'role': session['role'],
+                'current_date': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
+            })
+        else:
+            return jsonify({'error': 'Not logged in'}), 401
+
+    @staticmethod
+    def get_select_order_info():
         if 'username' in session:
             return jsonify({
                 'username': session['username'],
@@ -135,9 +160,23 @@ class Handlers:
             })
         else:
             return jsonify({'error': 'Not logged in'}), 401
+    @staticmethod
+    def get_main_table_info():
+        if 'username' in session:
+            return jsonify({
+                'username': session['username'],
+                'role': session['role'],
+                'current_date': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
+                'product_name': session['product_name'],
+                'order_num': session['order_num']
+            })
+        else:
+            return jsonify({'error': 'Not logged in'}), 401
 
     @staticmethod
     def logout():
         session.pop('username', None)
         session.pop('role', None)
+        session.pop('product_name', None)
+        session.pop('order_num', None)
         return redirect('/')

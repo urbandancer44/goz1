@@ -32,6 +32,32 @@ function getProducts() {
         .catch(error => console.error('Error:', error));
 }
 
+function addProduct() {
+    const product_name = document.getElementById('product_name').value;
+    //const picture = document.getElementById('picture').value;
+    fetch('/add_product', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        //body: `product_name=${product_name}&picture=${picture}`
+        body: `product_name=${product_name}`
+
+    })
+    .then(response => response.text())
+    .then(data => {
+        alert(data);
+        getProducts();  // Перезагружаем таблицу после добавления
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+document.getElementById('addProductForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    addProduct();
+});
+
+
 function deleteProduct(product_name) {
     fetch('/delete_product', {
         method: 'POST',
@@ -50,6 +76,6 @@ function deleteProduct(product_name) {
 
 window.onload = function() {
     getProducts();  // Загружаем пользователей при загрузке страницы
-    setInterval(getProducts, 1000);  // Обновляем данные каждую секунду
+    setInterval(getProducts, 5000);  // Обновляем данные каждые 5 секунд
 };
 

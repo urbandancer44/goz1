@@ -14,13 +14,13 @@ function getProducts() {
         .then(response => response.json())
         .then(data => {
             const container = document.getElementById('buttons-container');
-            container.innerHTML = ''; // Очищаем контейнер перед добавлением новых кнопок
+            //container.innerHTML = ''; // Очищаем контейнер перед добавлением новых кнопок
 
             data.forEach(product => {
                 const product_button = document.createElement('button');
                 product_button.textContent = product[0];
                 product_button.dataset.id = product[0]; // Добавляем идентификатор к кнопке
-                product_button.classList.add('btn', 'btn-primary', 'btn-lg', 'm-4'); // Добавляем классы Bootstrap
+                product_button.classList.add('btn', 'btn-primary', 'btn-lg', 'btn-block', 'm-4'); // Добавляем классы Bootstrap
                 product_button.onclick = function () {
                     selectOrder(product[0]);
                 }
@@ -40,7 +40,7 @@ function selectOrder(product_name) {
     })
     .then(response => response.text())
     .then(data => {
-        window.location.href = '/select_order'
+        window.location.href = '/select_order';
     })
     .catch(error => console.error('Error:', error));
 }

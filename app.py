@@ -26,7 +26,11 @@ app.add_url_rule('/delete_product', 'delete_product', handlers.delete_product, m
 app.add_url_rule('/select_product', 'select_product', handlers.select_product)
 app.add_url_rule('/get_select_product_info', 'get_select_product_info', handlers.get_select_product_info)
 app.add_url_rule('/select_order', 'select_order', handlers.select_order)
+app.add_url_rule('/get_select_order_info', 'get_select_order_info', handlers.get_select_order_info)
 app.add_url_rule('/set_product_name', 'set_product_name', handlers.set_product_name, methods=['POST'])
+app.add_url_rule('/set_order_num', 'set_order_num', handlers.set_order_num, methods=['POST'])
+app.add_url_rule('/main_table', 'main_table', handlers.main_table)
+app.add_url_rule('/get_main_table_info', 'get_main_table_info', handlers.get_main_table_info)
 app.add_url_rule('/logout', 'logout', handlers.logout, methods=['POST'])
 
 if __name__ == '__main__':

@@ -100,5 +100,5 @@ document.getElementById('addUserForm').addEventListener('submit', function(event
 
 window.onload = function() {
     getUsers();  // Загружаем пользователей при загрузке страницы
-    setInterval(getUsers, 1000);  // Обновляем данные каждую секунду
+    setInterval(getUsers, 5000);  // Обновляем данные каждые 5 секунд
 };
