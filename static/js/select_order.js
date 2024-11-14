@@ -4,8 +4,8 @@ function updateSelectOrder() {
         .then(data => {
             document.getElementById('username').innerText = data.username;
             document.getElementById('role').innerText = data.role;
-            document.getElementById('current_date').innerText = data.current_date;
-            document.getElementById('product_name').innerText = data.product_name
+            document.getElementById('datetime').innerText = data.datetime;
+            document.getElementById('product_name').innerText = data.product_name;
         })
         .catch(error => console.error('Error:', error));
 }
@@ -20,7 +20,7 @@ function setOrder(order_num) {
     })
     .then(response => response.text())
     .then(data => {
-        window.location.href = '/main_table';
+        window.location.href = '/productions';
     })
     .catch(error => console.error('Error:', error));
 }

@@ -73,7 +73,7 @@ class Handlers:
         return "Пользователь успешно удалён!"
 
     def get_products(self):
-            query = "SELECT product_name FROM product"
+            query = "SELECT product_name FROM products"
             products = self.db_manager.execute_query(query)
 
             return jsonify(products)
@@ -81,7 +81,7 @@ class Handlers:
     def delete_product(self):
         product_name = request.form['product_name']
 
-        query = "DELETE FROM product WHERE product_name = %s"
+        query = "DELETE FROM products WHERE product_name = %s"
         self.db_manager.execute_delete(query, (product_name,))
 
         return "Изделие успешно удалёно!"
@@ -96,7 +96,7 @@ class Handlers:
         product_name = request.form['product_name']
         #picture = request.form['picture']
 
-        query = "INSERT INTO product (product_name) VALUES (%s)"
+        query = "INSERT INTO products (product_name) VALUES (%s)"
         self.db_manager.execute_insert(query, (product_name,))
 
         return "Изделие успешно добавлено!"
@@ -128,15 +128,34 @@ class Handlers:
             order_num = request.form['order_num']
             session['order_num'] = order_num
             #return "Product name set successfully"
-            return send_from_directory(self.app.static_folder, 'main-table.html')
+            return send_from_directory(self.app.static_folder, 'productions.html')
         else:
             return redirect('/')
 
-    def main_table(self):
+    def productions(self):
         if 'username' in session:
-            return send_from_directory(self.app.static_folder, 'main_table.html')
+            return send_from_directory(self.app.static_folder, 'productions.html')
         else:
             return redirect('/')
+
+    def get_productions(self):
+            query = "SELECT * FROM productions"
+            productions = self.db_manager.execute_query(query)
+
+            return jsonify(productions)
+
+    def add_production(self):
+        datetime = session['datetime']
+        product_name = session['product_name']
+        order_num = session['order_num']
+        product_uid = request.form['product_uid']
+        username = session['username']
+        production_status = 1
+
+        query = "INSERT INTO productions (datetime, product_name, order_num, product_uid, username, production_status) VALUES (%s, %s, %s, %s, %s, %d)"
+        self.db_manager.execute_insert(query, (datetime, product_name, order_num, product_uid, username, production_status))
+
+        #return "Запись успешно добавлена!"
 
     @staticmethod
     def get_select_product_info():
@@ -144,7 +163,7 @@ class Handlers:
             return jsonify({
                 'username': session['username'],
                 'role': session['role'],
-                'current_date': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
+                'datetime': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
             })
         else:
             return jsonify({'error': 'Not logged in'}), 401
@@ -155,18 +174,19 @@ class Handlers:
             return jsonify({
                 'username': session['username'],
                 'role': session['role'],
-                'current_date': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
+                'datetime': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
                 'product_name': session['product_name']
             })
         else:
             return jsonify({'error': 'Not logged in'}), 401
     @staticmethod
-    def get_main_table_info():
+    def get_productions_info():
         if 'username' in session:
             return jsonify({
                 'username': session['username'],
                 'role': session['role'],
-                'current_date': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
+                'datetime': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
+                #'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                 'product_name': session['product_name'],
                 'order_num': session['order_num']
             })

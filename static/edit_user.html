@@ -10,15 +10,16 @@
 <body class="bg-light">
     <div class="container-fluid">
         <div class="row justify-content-center mt-5">
-            <div class="col-md-1">
-                <a href="/admin_panel" class="btn btn-secondary btn-block btn-lg">Назад</a>
+            <div class="col-2">
+                <a href="/admin_panel" class="btn btn-secondary w-100 btn-lg">Назад</a>
             </div>
-            <div class="col-md-10">
+            <div class="col-8">
                 <h2 class="text-center"><u>Редактор пользователей</u></h2>
             </div>
-            <div class="col-md-1">
+            <div class="col-2">
                 <form action="/logout" method="post">
-                    <button type="submit" class="btn btn-danger btn-block btn-lg">Выход</button>
+                    <button type="submit" class="btn btn-danger w-100 btn-lg">Выход</button>
+                    <!--<a class="btn btn-primary btn-lg" href="/static/login.html" role="button">Выход</a>-->
                 </form>
             </div>
         </div>
@@ -49,20 +50,22 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-8">
                 <h3 class="text-center"><u>Таблица пользователей</u></h3>
-                <table class="table table-bordered table-striped">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Имя пользователя</th>
-                            <th>Роль</th>
-                            <th>Действие</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersTableBody">
-                        <!-- Данные будут загружены с помощью JavaScript -->
-                    </tbody>
-                </table>
+                <div class="table-responsive" style="max-height: 522px">
+                    <table class="table table-bordered table-striped ">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Пользователь</th>
+                                <th>Роль</th>
+                                <th>Действие</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Данные будут загружены с помощью JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

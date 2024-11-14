@@ -4,7 +4,7 @@ function updateSelectProduct() {
         .then(data => {
             document.getElementById('username').innerText = data.username;
             document.getElementById('role').innerText = data.role;
-            document.getElementById('current_date').innerText = data.current_date;
+            document.getElementById('datetime').innerText = data.datetime;
         })
         .catch(error => console.error('Error:', error));
 }
