@@ -8,6 +8,13 @@ class Handlers:
         self.app = app
         self.db_manager = DatabaseManager(app)
 
+    @staticmethod
+    def check_non_session_value(keys):
+        missing_keys = [key for key in keys if session.get(key) is None]
+        if missing_keys:
+            return f"Данные по ключам {', '.join(missing_keys)} отсутствуют в сессии"
+        return None
+
     def index(self):
         return send_from_directory(self.app.static_folder, 'login.html')
 
@@ -138,6 +145,18 @@ class Handlers:
         else:
             return redirect('/')
 
+    def productions_history(self):
+        if 'username' in session:
+            return send_from_directory(self.app.static_folder, 'productions_history.html')
+        else:
+            return redirect('/')
+
+    def edit_productions(self):
+        if 'username' in session:
+            return send_from_directory(self.app.static_folder, 'edit_productions.html')
+        else:
+            return redirect('/')
+
     def get_productions(self):
             query = "SELECT * FROM productions"
             productions = self.db_manager.execute_query(query)
@@ -145,11 +164,11 @@ class Handlers:
             return jsonify(productions)
 
     def add_production(self):
-        datetime = session['datetime']
-        product_name = session['product_name']
-        order_num = session['order_num']
+        datetime = session.get('datetime')
+        product_name = session.get('product_name')
+        order_num = session.get('order_num')
         product_uid = request.form['product_uid']
-        username = session['username']
+        username = session.get('username')
         production_status = 1
 
         query = "INSERT INTO productions (datetime, product_name, order_num, product_uid, username, production_status) VALUES (%s, %s, %s, %s, %s, %d)"

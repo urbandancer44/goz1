@@ -20,7 +20,7 @@ function getProducts() {
                 const product_button = document.createElement('button');
                 product_button.textContent = product[0];
                 product_button.dataset.id = product[0]; // Добавляем идентификатор к кнопке
-                product_button.classList.add('btn', 'btn-primary', 'btn-lg', 'btn-block', 'm-4'); // Добавляем классы Bootstrap
+                product_button.classList.add('btn', 'btn-success', 'btn-lg', 'btn-block', 'm-4'); // Добавляем классы Bootstrap
                 product_button.onclick = function () {
                     selectOrder(product[0]);
                 }

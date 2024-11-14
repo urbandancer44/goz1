@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактор производства</title>
+    <!-- Подключаем Bootstrap CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/static/js/edit_productions.js" defer></script>
+</head>
+<body class="bg-light ">
+    <div class="container-fluid">
+        <div class="row justify-content-center mt-2">
+            <div class="col-2">
+                <a href="/productions" class="btn btn-secondary w-100 btn-lg">Назад</a>
+            </div>
+            <div class="col-8">
+                <h2 class="text-center"><u>Редактор производства</u></h2>
+            </div>
+            <div class="col-2">
+                <form action="/logout" method="post">
+                    <button type="submit" class="btn btn-danger w-100 btn-lg">Выход</button>
+                    <!--<a class="btn btn-primary btn-lg" href="/static/login.html" role="button">Выход</a>-->
+                </form>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-2">
+            <div class="col-6">
+            </div>
+            <div class="col-md-6">
+                <table class="table table-primary table-bordered border-dark">
+                    <tbody>
+                        <tr>
+                            <td style="background-color: lightgray">Дата/время:</td>
+                            <td colspan="3" style="color:blue; text-align: center" id="datetime"></td>
+                        </tr>
+                        <tr>
+                            <td style="background-color: lightgray">Имя:</td>
+                            <td style="color:blue" id="username"></td>
+                            <td style="background-color: lightgray">Изделие:</td>
+                            <td style="color:blue" id="product_name"></td>
+                        </tr>
+                        <tr>
+                            <td style="background-color: lightgray">Роль:</td>
+                            <td style="color:blue" id="role"></td>
+                            <td style="background-color: lightgray">ШПЗ:</td>
+                            <td style="color:blue" id="order_num"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-5">
+            <div class="col-10">
+                <div class="table-responsive justify-content-center" style="max-height: 522px">
+                    <table class="table table-bordered table-striped table-primary border-dark">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>№</th>
+                                <th>Дата/время</th>
+                                <th>Изделие</th>
+                                <th>Номер ШПЗ</th>
+                                <th>UID изделия</th>
+                                <th>Пользователь</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productionsTableBody">
+                            <!-- Данные будут загружены с помощью JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="d-grid gap-4 col-2 mx-auto">
+                <a href="/productions" class="btn btn-warning btn-block btn-lg">Изменить время</a>
+                <a href="/productions" class="btn btn-warning btn-block btn-lg">Изменить ШПЗ</a>
+                <a href="/productions" class="btn btn-warning btn-block btn-lg">Изменить ФИО</a>
+                <a href="/productions" class="btn btn-danger btn-block btn-lg">Удалить ШПЗ</a>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-5">
+            <div class="col-2">
+                <a href="/productions" class="btn btn-primary w-100 btn-lg">Сбросить фильтр</a>
+            </div>
+            <div class="col-2">
+                <a href="/productions" class="btn btn-secondary w-100 btn-lg">Время</a>
+            </div>
+            <div class="col-2">
+                <a href="/productions" class="btn btn-secondary w-100 btn-lg">Изделие</a>
+            </div>
+            <div class="col-2">
+                <a href="/productions" class="btn btn-secondary w-100 btn-lg">ШПЗ</a>
+            </div>
+            <div class="col-2">
+                <a href="/productions" class="btn btn-secondary w-100 btn-lg">UID</a>
+            </div>
+            <div class="col-2">
+                <a href="/productions" class="btn btn-secondary w-100 btn-lg">ФИО</a>
+            </div>
+            <div class="col-4">
+            </div>
+        </div>
+    </div>
+    <!-- Подключаем Bootstrap JS и Popper.js -->
+     <script src="/static/js/bootstrap.min.js"></script>
+</body>
+</html>
