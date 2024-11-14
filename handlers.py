@@ -3,6 +3,7 @@ from datetime import datetime
 import pytz
 from db import DatabaseManager
 
+
 class Handlers:
     def __init__(self, app):
         self.app = app
@@ -80,10 +81,10 @@ class Handlers:
         return "Пользователь успешно удалён!"
 
     def get_products(self):
-            query = "SELECT product_name FROM products"
-            products = self.db_manager.execute_query(query)
+        query = "SELECT product_name FROM products"
+        products = self.db_manager.execute_query(query)
 
-            return jsonify(products)
+        return jsonify(products)
 
     def delete_product(self):
         product_name = request.form['product_name']
@@ -101,7 +102,7 @@ class Handlers:
 
     def add_product(self):
         product_name = request.form['product_name']
-        #picture = request.form['picture']
+        # picture = request.form['picture']
 
         query = "INSERT INTO products (product_name) VALUES (%s)"
         self.db_manager.execute_insert(query, (product_name,))
@@ -114,12 +115,11 @@ class Handlers:
         else:
             return redirect('/')
 
-
     def set_product_name(self):
         if 'username' in session:
             product_name = request.form['product_name']
             session['product_name'] = product_name
-            #return "Product name set successfully"
+            # return "Product name set successfully"
             return send_from_directory(self.app.static_folder, 'select_order.html')
         else:
             return redirect('/')
@@ -134,7 +134,7 @@ class Handlers:
         if 'username' in session:
             order_num = request.form['order_num']
             session['order_num'] = order_num
-            #return "Product name set successfully"
+            # return "Product name set successfully"
             return send_from_directory(self.app.static_folder, 'productions.html')
         else:
             return redirect('/')
@@ -158,10 +158,10 @@ class Handlers:
             return redirect('/')
 
     def get_productions(self):
-            query = "SELECT * FROM productions"
-            productions = self.db_manager.execute_query(query)
+        query = "SELECT * FROM productions"
+        productions = self.db_manager.execute_query(query)
 
-            return jsonify(productions)
+        return jsonify(productions)
 
     def add_production(self):
         datetime = session.get('datetime')
@@ -174,7 +174,7 @@ class Handlers:
         query = "INSERT INTO productions (datetime, product_name, order_num, product_uid, username, production_status) VALUES (%s, %s, %s, %s, %s, %d)"
         self.db_manager.execute_insert(query, (datetime, product_name, order_num, product_uid, username, production_status))
 
-        #return "Запись успешно добавлена!"
+        # return "Запись успешно добавлена!"
 
     @staticmethod
     def get_select_product_info():
@@ -198,6 +198,7 @@ class Handlers:
             })
         else:
             return jsonify({'error': 'Not logged in'}), 401
+
     @staticmethod
     def get_productions_info():
         if 'username' in session:
@@ -205,7 +206,7 @@ class Handlers:
                 'username': session['username'],
                 'role': session['role'],
                 'datetime': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
-                #'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                # 'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                 'product_name': session['product_name'],
                 'order_num': session['order_num']
             })
