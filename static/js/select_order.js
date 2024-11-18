@@ -34,7 +34,7 @@ document.getElementById('addOrderForm').addEventListener('submit', function(even
     const orderNumInput = document.getElementById('order_num')
     const order_num = orderNumInput.value
 
-    const cyrillicPattern = /^[А-Яа-я0-90-9\s-._]*$/;
+    const cyrillicPattern = /^[А-Яа-я0-9\s-._]*$/;
 
     if (!cyrillicPattern.test(order_num)) {
         event.preventDefault();

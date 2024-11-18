@@ -45,11 +45,18 @@ function getProductions() {
                 tableBody.appendChild(row);
 
                 row.dataset.uid = production[4];
-                tr.addEventListener(onclick())
-
+                row.addEventListener("click", (event) => {
+                    //alert(production[4]);
+                    activateRow(event.currentTarget);
+                });
             });
         })
         .catch(error => console.error('Error:', error));
+}
+
+function activateRow(row) {
+    document.querySelectorAll('#productionsTableBody tr').forEach(r => r.classList.remove('table-active'));
+    row.classList.add('table-active')
 }
 
 window.onload = function() {
