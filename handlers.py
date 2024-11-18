@@ -2,7 +2,8 @@ from flask import request, redirect, send_from_directory, session, jsonify
 from datetime import datetime
 import pytz
 from db import DatabaseManager
-
+from werkzeug.utils import secure_filename
+import os
 
 class Handlers:
     def __init__(self, app):
@@ -48,14 +49,17 @@ class Handlers:
             return redirect('/')
 
     def add_user(self):
-        username = request.form['username']
-        password = request.form['password']
-        role = request.form['role']
+        if 'username' in session:
+            username = request.form['username']
+            password = request.form['password']
+            role = request.form['role']
 
-        query = "INSERT INTO users (username, password, role) VALUES (%s, %s, %s)"
-        self.db_manager.execute_insert(query, (username, password, role))
+            query = "INSERT INTO users (username, password, role) VALUES (%s, %s, %s)"
+            self.db_manager.execute_insert(query, (username, password, role))
 
-        return "Пользователь успешно добавлен!"
+            return "Пользователь успешно добавлен!"
+        else:
+            return redirect('/')
 
     def get_users(self):
         query = "SELECT username, role FROM users"
@@ -64,21 +68,27 @@ class Handlers:
         return jsonify(users)
 
     def update_user(self):
-        username = request.form['username']
-        new_password = request.form['new_password']
+        if 'username' in session:
+            username = request.form['username']
+            new_password = request.form['new_password']
 
-        query = "UPDATE users SET password = %s WHERE username = %s"
-        self.db_manager.execute_insert(query, (new_password, username))
+            query = "UPDATE users SET password = %s WHERE username = %s"
+            self.db_manager.execute_insert(query, (new_password, username))
 
-        return "Пароль успешно изменен!"
+            return "Пароль успешно изменен!"
+        else:
+            return redirect('/')
 
     def delete_user(self):
-        username = request.form['username']
+        if 'username' in session:
+            username = request.form['username']
 
-        query = "DELETE FROM users WHERE username = %s"
-        self.db_manager.execute_delete(query, (username,))
+            query = "DELETE FROM users WHERE username = %s"
+            self.db_manager.execute_delete(query, (username,))
 
-        return "Пользователь успешно удалён!"
+            return "Пользователь успешно удалён!"
+        else:
+            return redirect('/')
 
     def get_products(self):
         query = "SELECT product_name FROM products"
@@ -87,12 +97,15 @@ class Handlers:
         return jsonify(products)
 
     def delete_product(self):
-        product_name = request.form['product_name']
+        if 'username' in session:
+            product_name = request.form['product_name']
 
-        query = "DELETE FROM products WHERE product_name = %s"
-        self.db_manager.execute_delete(query, (product_name,))
+            query = "DELETE FROM products WHERE product_name = %s"
+            self.db_manager.execute_delete(query, (product_name,))
 
-        return "Изделие успешно удалёно!"
+            return "Изделие успешно удалёно!"
+        else:
+            return redirect('/')
 
     def edit_product(self):
         if 'username' in session:
@@ -101,13 +114,23 @@ class Handlers:
             return redirect('/')
 
     def add_product(self):
-        product_name = request.form['product_name']
-        # picture = request.form['picture']
+        if 'username'in session:
+            product_name = request.form['product_name']
+            picture = request.files['picture']
 
-        query = "INSERT INTO products (product_name) VALUES (%s)"
-        self.db_manager.execute_insert(query, (product_name,))
+            if picture:
+                picture_name = secure_filename(picture.filename)
+                picture_path = os.path.join(self.app.config['UPLOAD_FOLDER'], picture_name)
+                picture.save(os.getcwd() + picture_path)
+            else:
+                picture_name = None
 
-        return "Изделие успешно добавлено!"
+            query = "INSERT INTO products (product_name, picture_path) VALUES (%s, %s)"
+            self.db_manager.execute_insert(query, (product_name, picture_name))
+
+            return "Изделие успешно добавлено"
+        else:
+            return redirect('/')
 
     def select_product(self):
         if 'username' in session:
@@ -164,17 +187,21 @@ class Handlers:
         return jsonify(productions)
 
     def add_production(self):
-        datetime = session.get('datetime')
-        product_name = session.get('product_name')
-        order_num = session.get('order_num')
-        product_uid = request.form['product_uid']
-        username = session.get('username')
-        production_status = 1
+        if 'username' in session:
+            datetime_value = datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S')
+            product_name = session.get('product_name')
+            order_num = session.get('order_num')
+            product_uid = str(request.form.get('product_uid'))
+            username = session.get('username')
+            production_status = 1
 
-        query = "INSERT INTO productions (datetime, product_name, order_num, product_uid, username, production_status) VALUES (%s, %s, %s, %s, %s, %d)"
-        self.db_manager.execute_insert(query, (datetime, product_name, order_num, product_uid, username, production_status))
+            query = "INSERT INTO productions (datetime, product_name, order_num, product_uid, username, production_status) VALUES (%s, %s, %s, %s, %s, %s)"
+            self.db_manager.execute_insert(query, (datetime_value, product_name, order_num, product_uid, username, production_status))
+            return "Запись успешно добавлена!"
+        else:
+            return redirect('/')
 
-        # return "Запись успешно добавлена!"
+        #return "Запись успешно добавлена!"
 
     @staticmethod
     def get_select_product_info():
@@ -182,7 +209,7 @@ class Handlers:
             return jsonify({
                 'username': session['username'],
                 'role': session['role'],
-                'datetime': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
+                'datetime_value': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
             })
         else:
             return jsonify({'error': 'Not logged in'}), 401
@@ -193,7 +220,7 @@ class Handlers:
             return jsonify({
                 'username': session['username'],
                 'role': session['role'],
-                'datetime': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
+                'datetime_value': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
                 'product_name': session['product_name']
             })
         else:
@@ -205,10 +232,31 @@ class Handlers:
             return jsonify({
                 'username': session['username'],
                 'role': session['role'],
-                'datetime': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
-                # 'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'datetime_value': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
                 'product_name': session['product_name'],
                 'order_num': session['order_num']
+            })
+        else:
+            return jsonify({'error': 'Not logged in'}), 401
+
+    @staticmethod
+    def get_productions_history_info():
+        if 'username' in session:
+            return jsonify({
+                'username': session['username'],
+                'role': session['role'],
+                'datetime_value': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
+            })
+        else:
+            return jsonify({'error': 'Not logged in'}), 401
+
+    @staticmethod
+    def get_edit_productions_info():
+        if 'username' in session:
+            return jsonify({
+                'username': session['username'],
+                'role': session['role'],
+                'datetime_value': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
             })
         else:
             return jsonify({'error': 'Not logged in'}), 401

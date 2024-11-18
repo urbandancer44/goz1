@@ -8,6 +8,7 @@ app.config['DB_HOST'] = 'postgres'
 app.config['DB_NAME'] = 'gozDB'
 app.config['DB_USER'] = 'goz_admin'
 app.config['DB_PASS'] = 'zzz1234ZZZ'
+app.config['UPLOAD_FOLDER'] = '/static/img/products'
 
 handlers = Handlers(app)
 
@@ -34,6 +35,8 @@ app.add_url_rule('/get_productions', 'get_productions', handlers.get_productions
 app.add_url_rule('/get_productions_info', 'get_productions_info', handlers.get_productions_info)
 app.add_url_rule('/add_production', 'add_production', handlers.add_production, methods=['POST'])
 app.add_url_rule('/productions_history', 'productions_history', handlers.productions_history)
+app.add_url_rule('/get_productions_history_info', 'get_productions_history_info', handlers.get_productions_history_info)
+app.add_url_rule('/get_edit_productions_info', 'get_edit_productions_info', handlers.get_edit_productions_info)
 app.add_url_rule('/edit_productions', 'edit_productions', handlers.edit_productions)
 app.add_url_rule('/logout', 'logout', handlers.logout, methods=['POST'])
 

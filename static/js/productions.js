@@ -4,7 +4,7 @@ function updateProductions() {
         .then(data => {
             document.getElementById('username').innerText = data.username;
             document.getElementById('role').innerText = data.role;
-            document.getElementById('datetime').innerText = data.datetime;
+            document.getElementById('datetime').innerText = data.datetime_value;
             document.getElementById('product_name').innerText = data.product_name;
             document.getElementById('order_num').innerText = data.order_num;
         })
@@ -17,6 +17,8 @@ function getProductions() {
         .then(data => {
             const tableBody = document.getElementById('productionsTableBody');
             tableBody.innerHTML = '';  // Очищаем таблицу
+
+            data.sort((a,b) => new Date(b[1]) - new Date(a[1]));
 
             data.forEach((production, index) => {
                 const row = document.createElement('tr');
@@ -43,6 +45,7 @@ function getProductions() {
                 row.appendChild(usernameCell);
                 row.appendChild(production_statusCell);
                 tableBody.appendChild(row);
+
             });
         })
         .catch(error => console.error('Error:', error));
@@ -59,7 +62,8 @@ function addProduction(product_uid) {
     .then(response => response.text())
     .then(data => {
         alert(data);
-        getProductions()
+        getProductions();
+        document.getElementById("hiddenInput").value = '';
     })
     .catch(error => console.error('Error:', error));
 }
@@ -75,7 +79,7 @@ function focusHiddenInput() {
 }
 
 window.onload = function() {
-    focusHiddenInput()
+    focusHiddenInput();
     updateProductions();  // Вызываем функцию при загрузке страницы
     getProductions();
     setInterval(updateProductions, 1000);  // Обновляем данные каждую секунду

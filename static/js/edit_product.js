@@ -33,21 +33,23 @@ function getProducts() {
 }
 
 function addProduct() {
-    const product_name = document.getElementById('product_name').value;
-    //const picture = document.getElementById('picture').value;
+    //const product_name = document.getElementById('product_name').value;
+    const formData = new FormData(document.getElementById('addProductForm'));
     fetch('/add_product', {
         method: 'POST',
-        headers: {
+        /*headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        //body: `product_name=${product_name}&picture=${picture}`
-        body: `product_name=${product_name}`
+        body: `product_name=${product_name}&picture=${picture}`*/
+        body: formData
 
     })
     .then(response => response.text())
     .then(data => {
         alert(data);
         getProducts();  // Перезагружаем таблицу после добавления
+        document.getElementById('product_name').value = '';
+        document.getElementById('picture').value = '';
     })
     .catch(error => console.error('Error:', error));
 }
