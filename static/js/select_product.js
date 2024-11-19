@@ -5,6 +5,13 @@ function updateSelectProduct() {
             document.getElementById('username').innerText = data.username;
             document.getElementById('role').innerText = data.role;
             document.getElementById('datetime').innerText = data.datetime_value;
+
+            const editProductionsButton = document.getElementById('editProductionsButton');
+            if (data.role === 'manager') {
+                editProductionsButton.classList.remove('disabled');
+            } else {
+                editProductionsButton.classList.add('disabled');
+            }
         })
         .catch(error => console.error('Error:', error));
 }

@@ -176,7 +176,10 @@ class Handlers:
 
     def edit_productions(self):
         if 'username' in session:
-            return send_from_directory(self.app.static_folder, 'edit_productions.html')
+            if session['role'] == 'manager' or session['role'] == 'admin':
+                return send_from_directory(self.app.static_folder, 'edit_productions.html')
+            else:
+                return "Недостаточно прав для отображения контента!"
         else:
             return redirect('/')
 
@@ -202,6 +205,53 @@ class Handlers:
             return redirect('/')
 
         #return "Запись успешно добавлена!"
+
+    def update_production_time(self):
+        if 'username' in session:
+            production_uid = request.json['productionUid']
+            new_datetime = request.json['newDatetime']
+
+            query = "UPDATE productions SET datetime = %s WHERE product_uid = %s"
+            self.db_manager.execute_insert(query, (new_datetime, production_uid))
+
+            return jsonify({'message': 'Время успешно изменено!'})
+        else:
+            return redirect('/')
+
+    def update_production_order(self):
+        if 'username' in session:
+            production_uid = request.json['productionUid']
+            new_order_num = request.json['newOrder']
+
+            query = "UPDATE productions SET order_num = %s WHERE product_uid = %s"
+            self.db_manager.execute_insert(query, (new_order_num, production_uid))
+
+            return jsonify({'message': 'Номер ШПЗ успешно изменен!'})
+        else:
+            return redirect('/')
+
+    def update_production_user(self):
+        if 'username' in session:
+            production_uid = request.json['productionUid']
+            new_username = request.json['newUser']
+
+            query = "UPDATE productions SET username = %s WHERE product_uid = %s"
+            self.db_manager.execute_insert(query, (new_username, production_uid))
+
+            return jsonify({'message': 'Пользователь успешно изменен!'})
+        else:
+            return redirect('/')
+
+    def delete_production(self):
+        if 'username' in session:
+            production_uid = request.json['productionUid']
+
+            query = "DELETE FROM productions WHERE product_uid = %s"
+            self.db_manager.execute_delete(query, (production_uid,))
+
+            return jsonify({'message': 'Запись успешно удалена!'})
+        else:
+            return redirect('/')
 
     @staticmethod
     def get_select_product_info():

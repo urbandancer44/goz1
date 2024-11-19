@@ -7,6 +7,13 @@ function updateProductions() {
             document.getElementById('datetime').innerText = data.datetime_value;
             document.getElementById('product_name').innerText = data.product_name;
             document.getElementById('order_num').innerText = data.order_num;
+
+            const editProductionsButton = document.getElementById('editProductionsButton');
+            if (data.role === 'manager') {
+                editProductionsButton.classList.remove('disabled');
+            } else {
+                editProductionsButton.classList.add('disabled');
+            }
         })
         .catch(error => console.error('Error:', error));
 }

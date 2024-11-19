@@ -20,7 +20,6 @@
             <div class="col-2">
                 <form action="/logout" method="post">
                     <button type="submit" class="btn btn-danger w-100 btn-lg">Выход</button>
-                    <!--<a class="btn btn-primary btn-lg" href="/static/login.html" role="button">Выход</a>-->
                 </form>
             </div>
         </div>
@@ -68,10 +67,14 @@
                 </div>
             </div>
             <div class="d-grid gap-3 col-2 mx-auto">
-                <a href="/productions" class="btn btn-warning w-100 btn-lg">Изменить время</a>
-                <a href="/productions" class="btn btn-warning w-100 btn-lg">Изменить ШПЗ</a>
-                <a href="/productions" class="btn btn-warning w-100 btn-lg">Изменить ФИО</a>
-                <a href="/productions" class="btn btn-danger w-100 btn-lg">Удалить ШПЗ</a>
+                <button type="button" id="editProductionTimeButton" class="btn btn-warning w-100 btn-lg">Изменить время</button>
+                <button type="button" id="editProductionOrderButton" class="btn btn-warning w-100 btn-lg">Изменить ШПЗ</button>
+                <button type="button" id="editProductionUserButton" class="btn btn-warning w-100 btn-lg">Изменить ФИО</button>
+                <button type="button" id="deleteProductionButton" class="btn btn-danger w-100 btn-lg">Удалить запись</button>
+                <!--<a href="/productions" id="editProductionTimeButton" class="btn btn-warning w-100 btn-lg">Изменить время</a>
+                <a href="/productions" id="editProductionOrderButton" class="btn btn-warning w-100 btn-lg">Изменить ШПЗ</a>
+                <a href="/productions" id="editProductionUserButton" class="btn btn-warning w-100 btn-lg">Изменить ФИО</a>
+                <a href="/productions" id="deleteProductionButton" class="btn btn-danger w-100 btn-lg">Удалить</a>-->
             </div>
         </div>
         <div class="row justify-content-center mt-5">
@@ -97,6 +100,77 @@
             </div>
         </div>
     </div>
+    <!-- Модальное окно для редактирования времени -->
+    <div class="modal fade" id="editTimeModal" tabindex="-1" aria-labelledby="editTimeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTimeModalLabel">Изменить время</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editTimeForm">
+                        <div class="mb-3">
+                            <label for="newDatetime" class="form-label">Новое время</label>
+                            <input type="datetime-local" class="form-control" id="newDatetime" required>
+                        </div>
+                        <!--<input type="hidden" id="productionUid" name="productionUid">-->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="saveTimeButton">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- Модальное окно для редактирования номера ШПЗ -->
+    <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editOrderModalLabel">Изменить номер ШПЗ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editOrderForm">
+                        <div class="mb-3">
+                            <label for="newOrder" class="form-label">Новый номер ШПЗ</label>
+                            <input type="text" class="form-control" id="newOrder" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="saveOrderButton">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- Модальное окно для редактирования ФИО -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">Изменить пользователя</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <div class="mb-3">
+                            <label for="newUser" class="form-label">Новый пользователь</label>
+                            <input type="text" class="form-control" id="newUser" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="saveUserButton">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Подключаем Bootstrap JS и Popper.js -->
      <script src="/static/js/bootstrap.min.js"></script>
 </body>

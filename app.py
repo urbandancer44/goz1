@@ -38,6 +38,10 @@ app.add_url_rule('/productions_history', 'productions_history', handlers.product
 app.add_url_rule('/get_productions_history_info', 'get_productions_history_info', handlers.get_productions_history_info)
 app.add_url_rule('/get_edit_productions_info', 'get_edit_productions_info', handlers.get_edit_productions_info)
 app.add_url_rule('/edit_productions', 'edit_productions', handlers.edit_productions)
+app.add_url_rule('/update_production_time', 'update_production_time', handlers.update_production_time, methods=['POST'])
+app.add_url_rule('/update_production_order', 'update_production_order', handlers.update_production_order, methods=['POST'])
+app.add_url_rule('/update_production_user', 'update_production_user', handlers.update_production_user, methods=['POST'])
+app.add_url_rule('/delete_production', 'delete_production', handlers.delete_production, methods=['POST'])
 app.add_url_rule('/logout', 'logout', handlers.logout, methods=['POST'])
 
 if __name__ == '__main__':

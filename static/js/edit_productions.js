@@ -1,3 +1,8 @@
+let productionUid = null;
+let editTimeModal = null;
+let editOrderModal = null;
+let editUserModal = null;
+
 function updateEditProductions() {
     fetch('/get_edit_productions_info')
         .then(response => response.json())
@@ -57,7 +62,157 @@ function getProductions() {
 function activateRow(row) {
     document.querySelectorAll('#productionsTableBody tr').forEach(r => r.classList.remove('table-active'));
     row.classList.add('table-active')
+    productionUid = row.dataset.uid;
+    //alert(productionUid);
 }
+//---изменение времени в таблице---
+document.getElementById('editProductionTimeButton').addEventListener('click', function() {
+    const activeRow = document.querySelector('#productionsTableBody tr.table-active');
+    if (activeRow) {
+        //productionUid = activeRow.dataset.uid;
+        editTimeModal = new bootstrap. Modal(document.getElementById('editTimeModal'));
+        editTimeModal.show();
+    } else {
+        productionUid = null;
+        editTimeModal = null;
+        alert('Выберите строку для редактирования!');
+    }
+});
+document.getElementById('saveTimeButton').addEventListener('click', function () {
+    const newDatetime = document.getElementById('newDatetime').value;
+    if (newDatetime) {
+        fetch('/update_production_time', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productionUid: productionUid,
+                newDatetime: newDatetime
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            //const editTimeModal = new bootstrap.Modal(document.getElementById('editTimeModal'));
+            editTimeModal.hide();
+            editTimeModal = null;
+            productionUid = null;
+            getProductions();  // Перезагружаем таблицу после изменения
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+        alert('Пустое поле ввода!')
+    }
+});
+
+//---изменение номера ШПЗ в таблице---
+document.getElementById('editProductionOrderButton').addEventListener('click', function() {
+    const activeRow = document.querySelector('#productionsTableBody tr.table-active');
+    if (activeRow) {
+        //productionUid = activeRow.dataset.uid;
+        editOrderModal = new bootstrap. Modal(document.getElementById('editOrderModal'));
+        editOrderModal.show();
+    } else {
+        productionUid = null;
+        editOrderModal = null;
+        alert('Выберите строку для редактирования!');
+    }
+});
+document.getElementById('saveOrderButton').addEventListener('click', function () {
+    const newOrder = document.getElementById('newOrder').value;
+    if (newOrder) {
+        fetch('/update_production_order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productionUid: productionUid,
+                newOrder: newOrder
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            //const editTimeModal = new bootstrap.Modal(document.getElementById('editTimeModal'));
+            editOrderModal.hide();
+            editOrderModal = null;
+            productionUid = null;
+            getProductions();  // Перезагружаем таблицу после изменения
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+        alert('Пустое поле ввода!')
+    }
+});
+
+//---изменение пользователя в таблице---
+document.getElementById('editProductionUserButton').addEventListener('click', function() {
+    const activeRow = document.querySelector('#productionsTableBody tr.table-active');
+    if (activeRow) {
+        //productionUid = activeRow.dataset.uid;
+        editUserModal = new bootstrap. Modal(document.getElementById('editUserModal'));
+        editUserModal.show();
+    } else {
+        productionUid = null;
+        editUserModal = null;
+        alert('Выберите строку для редактирования!');
+    }
+});
+document.getElementById('saveUserButton').addEventListener('click', function () {
+    const newUser = document.getElementById('newUser').value;
+    if (newUser) {
+        fetch('/update_production_user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productionUid: productionUid,
+                newUser: newUser
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            //const editTimeModal = new bootstrap.Modal(document.getElementById('editTimeModal'));
+            editUserModal.hide();
+            editUserModal = null;
+            productionUid = null;
+            getProductions();  // Перезагружаем таблицу после изменения
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+        alert('Пустое поле ввода!')
+    }
+});
+
+//---удаление записи в таблице---
+document.getElementById('deleteProductionButton').addEventListener('click', function () {
+    const activeRow = document.querySelector('#productionsTableBody tr.table-active');
+    if (activeRow) {
+        fetch('/delete_production', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productionUid: productionUid,
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            //const editTimeModal = new bootstrap.Modal(document.getElementById('editTimeModal'));
+            productionUid = null;
+            getProductions();  // Перезагружаем таблицу после изменения
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+        alert('Выберите строку для удаления!')
+    }
+});
 
 window.onload = function() {
     updateEditProductions();  // Вызываем функцию при загрузке страницы
