@@ -25,11 +25,11 @@ function getProducts() {
 
             data.forEach(product => {
                 const product_button = document.createElement('button');
-                product_button.textContent = product[0];
-                product_button.dataset.id = product[0]; // Добавляем идентификатор к кнопке
+                product_button.textContent = product[1];
+                product_button.dataset.id = product[1]; // Добавляем идентификатор к кнопке
                 product_button.classList.add('btn', 'btn-success', 'btn-lg', 'btn-block', 'm-4'); // Добавляем классы Bootstrap
                 product_button.onclick = function () {
-                    selectOrder(product[0]);
+                    selectOrder(product[1]);
                 }
                 container.appendChild(product_button);
             });
@@ -43,7 +43,7 @@ function selectOrder(product_name) {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: `product_name=${product_name}`
+        body: `product_name=${encodeURIComponent(product_name)}`
     })
     .then(response => response.text())
     .then(data => {

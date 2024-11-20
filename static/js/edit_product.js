@@ -1,3 +1,6 @@
+let product_name = null;
+let editPictureModal = null;
+
 function getProducts() {
     fetch('/get_products')
         .then(response => response.json())
@@ -5,28 +8,25 @@ function getProducts() {
             const tableBody = document.getElementById('productsTableBody');
             tableBody.innerHTML = '';  // Очищаем таблицу
 
-            data.forEach(product => {
+            data.forEach((product, index) => {
                 const row = document.createElement('tr');
-                const nameCell = document.createElement('td');
-                const actionCell = document.createElement('td');
-                //const enableCell = document.createElement('td');
-                //const pictureCell = document.createElement('td');
-                const deleteButton = document.createElement('button');
+                const numberCell = document.createElement('td');
+                const product_nameCell = document.createElement('td');
+                const pictureCell = document.createElement('td');
 
-                nameCell.innerText = product[0];
-                //enableCell.innerText = product[1];
-                //pictureCell.innerText = product[2]
-                deleteButton.innerText = 'Удалить';
-                deleteButton.className = 'btn btn-danger btn-sm';
-                deleteButton.onclick = function() {
-                    deleteProduct(product[0]);
-                };
-                row.appendChild(nameCell);
-                //row.appendChild(enableCell);
-                //row.appendChild(pictureCell);
-                actionCell.appendChild(deleteButton);
-                row.appendChild(actionCell);
+                numberCell.innerText = index + 1;
+                product_nameCell.innerText = product[1];
+                pictureCell.innerText = product[2];
+                row.appendChild(numberCell);
+                row.appendChild(product_nameCell);
+                row.appendChild(pictureCell);
                 tableBody.appendChild(row);
+
+                row.dataset.name = product[1];
+                row.addEventListener("click", (event) => {
+                    //alert(product[1]);
+                    activateRow(event.currentTarget);
+                });
             });
         })
         .catch(error => console.error('Error:', error));
@@ -34,15 +34,10 @@ function getProducts() {
 
 function addProduct() {
     //const product_name = document.getElementById('product_name').value;
-    const formData = new FormData(document.getElementById('addProductForm'));
+    const addFormData = new FormData(document.getElementById('addProductForm'));
     fetch('/add_product', {
         method: 'POST',
-        /*headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: `product_name=${product_name}&picture=${picture}`*/
-        body: formData
-
+        body: addFormData
     })
     .then(response => response.text())
     .then(data => {
@@ -59,25 +54,78 @@ document.getElementById('addProductForm').addEventListener('submit', function(ev
     addProduct();
 });
 
-
-function deleteProduct(product_name) {
-    fetch('/delete_product', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: `product_name=${product_name}`
-    })
+function activateRow(row) {
+    document.querySelectorAll('#productsTableBody tr').forEach(r => r.classList.remove('table-active'));
+    row.classList.add('table-active')
+    product_name = row.dataset.name;
+    //alert(product_name);
+}
+//---изменение фото в таблице---
+document.getElementById('editProductPictureButton').addEventListener('click', function() {
+    const activeRow = document.querySelector('#productsTableBody tr.table-active');
+    if (activeRow) {
+        document.getElementById('productName').value = product_name;
+        editPictureModal = new bootstrap. Modal(document.getElementById('editPictureModal'));
+        editPictureModal.show();
+    } else {
+        product_name = null;
+        editPictureModal = null;
+        document.getElementById('productName').value = '';
+        alert('Выберите строку для редактирования!');
+    }
+});
+document.getElementById('savePictureButton').addEventListener('click', function () {
+    const newPicture = document.getElementById('newPicture').value;
+    const updateFormData = new FormData(document.getElementById('editPictureForm'));
+    if (newPicture) {
+        fetch('/update_product_picture', {
+            method: 'POST',
+            body: updateFormData
+        })
         .then(response => response.text())
         .then(data => {
             alert(data);
-            getProducts();  // Перезагружаем таблицу после удаления
+            editPictureModal.hide();
+            editPictureModal = null;
+            product_name = null;
+            document.getElementById('productName').value = '';
+            getProducts();  // Перезагружаем таблицу после изменения
         })
         .catch(error => console.error('Error:', error));
-}
+    } else {
+        alert('Пустое поле ввода!')
+    }
+    document.getElementById('newPicture').value = '';
+});
+
+//---удаление записи в таблице---
+document.getElementById('deleteProductButton').addEventListener('click', function () {
+    const activeRow = document.querySelector('#productsTableBody tr.table-active');
+    if (activeRow) {
+        fetch('/delete_product', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                product_name: product_name,
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            product_name = null;
+            getProducts();  // Перезагружаем таблицу после изменения
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+        alert('Выберите строку для удаления!')
+    }
+});
 
 window.onload = function() {
     getProducts();  // Загружаем пользователей при загрузке страницы
-    setInterval(getProducts, 5000);  // Обновляем данные каждые 5 секунд
+    //setInterval(getProducts, 5000);  // Обновляем данные каждые 5 секунд
 };
+
 

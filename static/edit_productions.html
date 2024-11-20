@@ -71,10 +71,6 @@
                 <button type="button" id="editProductionOrderButton" class="btn btn-warning w-100 btn-lg">Изменить ШПЗ</button>
                 <button type="button" id="editProductionUserButton" class="btn btn-warning w-100 btn-lg">Изменить ФИО</button>
                 <button type="button" id="deleteProductionButton" class="btn btn-danger w-100 btn-lg">Удалить запись</button>
-                <!--<a href="/productions" id="editProductionTimeButton" class="btn btn-warning w-100 btn-lg">Изменить время</a>
-                <a href="/productions" id="editProductionOrderButton" class="btn btn-warning w-100 btn-lg">Изменить ШПЗ</a>
-                <a href="/productions" id="editProductionUserButton" class="btn btn-warning w-100 btn-lg">Изменить ФИО</a>
-                <a href="/productions" id="deleteProductionButton" class="btn btn-danger w-100 btn-lg">Удалить</a>-->
             </div>
         </div>
         <div class="row justify-content-center mt-5">
@@ -109,7 +105,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editTimeForm">
+                    <form id="editTimeForm" autocomplete="off">
                         <div class="mb-3">
                             <label for="newDatetime" class="form-label">Новое время</label>
                             <input type="datetime-local" class="form-control" id="newDatetime" required>
@@ -133,7 +129,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editOrderForm">
+                    <form id="editOrderForm" autocomplete="off">
                         <div class="mb-3">
                             <label for="newOrder" class="form-label">Новый номер ШПЗ</label>
                             <input type="text" class="form-control" id="newOrder" required>

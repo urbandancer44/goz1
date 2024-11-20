@@ -64,7 +64,7 @@ function addProduction(product_uid) {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: `product_uid=${product_uid}`
+        body: `product_uid=${encodeURIComponent(product_uid)}`
     })
     .then(response => response.text())
     .then(data => {

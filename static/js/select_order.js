@@ -16,7 +16,7 @@ function setOrder(order_num) {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: `order_num=${order_num}`
+        body: `order_num=${encodeURIComponent(order_num)}`
     })
     .then(response => response.text())
     .then(data => {
@@ -31,14 +31,15 @@ window.onload = function() {
     //getProducts();  // Загружаем продукты при загрузке страницы
 };
 document.getElementById('addOrderForm').addEventListener('submit', function(event) {
+    event.preventDefault();
     const orderNumInput = document.getElementById('order_num')
     const order_num = orderNumInput.value
 
     const cyrillicPattern = /^[А-Яа-я0-9\s-._]*$/;
 
     if (!cyrillicPattern.test(order_num)) {
-        event.preventDefault();
         alert('Запрещено использовать латиницу!');
+        document.getElementById('order_num').value = '';
     }
     else {
         setOrder(order_num);

@@ -104,6 +104,7 @@ document.getElementById('saveTimeButton').addEventListener('click', function () 
     } else {
         alert('Пустое поле ввода!')
     }
+    document.getElementById('newDatetime').value = '';
 });
 
 //---изменение номера ШПЗ в таблице---
@@ -145,6 +146,7 @@ document.getElementById('saveOrderButton').addEventListener('click', function ()
     } else {
         alert('Пустое поле ввода!')
     }
+    document.getElementById('newOrder').value = '';
 });
 
 //---изменение пользователя в таблице---
@@ -186,6 +188,7 @@ document.getElementById('saveUserButton').addEventListener('click', function () 
     } else {
         alert('Пустое поле ввода!')
     }
+    document.getElementById('newUser').value = '';
 });
 
 //---удаление записи в таблице---
