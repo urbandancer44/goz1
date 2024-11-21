@@ -19,6 +19,7 @@ app.add_url_rule('/edit_user', 'edit_user', handlers.edit_user)
 app.add_url_rule('/get_users', 'get_users', handlers.get_users)
 app.add_url_rule('/add_user', 'add_user', handlers.add_user, methods=['POST'])
 app.add_url_rule('/update_user_password', 'update_user_password', handlers.update_user_password, methods=['POST'])
+app.add_url_rule('/update_user_role', 'update_user_role', handlers.update_user_role, methods=['POST'])
 app.add_url_rule('/delete_user', 'delete_user', handlers.delete_user, methods=['POST'])
 app.add_url_rule('/edit_product', 'edit_product', handlers.edit_product)
 app.add_url_rule('/get_products', 'get_products', handlers.get_products)
@@ -43,6 +44,7 @@ app.add_url_rule('/update_production_time', 'update_production_time', handlers.u
 app.add_url_rule('/update_production_order', 'update_production_order', handlers.update_production_order, methods=['POST'])
 app.add_url_rule('/update_production_user', 'update_production_user', handlers.update_production_user, methods=['POST'])
 app.add_url_rule('/delete_production', 'delete_production', handlers.delete_production, methods=['POST'])
+app.add_url_rule('/get_time', 'get_time', handlers.get_time)
 app.add_url_rule('/logout', 'logout', handlers.logout, methods=['POST'])
 
 if __name__ == '__main__':

@@ -8,6 +8,8 @@ function getProducts() {
             const tableBody = document.getElementById('productsTableBody');
             tableBody.innerHTML = '';  // Очищаем таблицу
 
+            data.sort((a, b) => a[1].localeCompare(b[1]));
+
             data.forEach((product, index) => {
                 const row = document.createElement('tr');
                 const numberCell = document.createElement('td');
@@ -124,8 +126,7 @@ document.getElementById('deleteProductButton').addEventListener('click', functio
 });
 
 window.onload = function() {
-    getProducts();  // Загружаем пользователей при загрузке страницы
-    //setInterval(getProducts, 5000);  // Обновляем данные каждые 5 секунд
+    getProducts();  // Загружаем изделия при загрузке страницы
 };
 
 

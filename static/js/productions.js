@@ -1,12 +1,14 @@
-function updateProductions() {
+function productionsInfo() {
     fetch('/get_productions_info')
         .then(response => response.json())
         .then(data => {
             document.getElementById('username').innerText = data.username;
             document.getElementById('role').innerText = data.role;
-            document.getElementById('datetime').innerText = data.datetime_value;
             document.getElementById('product_name').innerText = data.product_name;
             document.getElementById('order_num').innerText = data.order_num;
+
+            const picture_name = data.picture_name;
+            document.getElementById('product_img').src = "/static/img/products/" + picture_name;
 
             const editProductionsButton = document.getElementById('editProductionsButton');
             if (data.role === 'manager') {
@@ -85,10 +87,20 @@ function focusHiddenInput() {
     document.getElementById('hiddenInput').focus();
 }
 
+function getTime() {
+    fetch('/get_time')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('datetime').innerText = data.datetime_value;
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+
 window.onload = function() {
     focusHiddenInput();
-    updateProductions();  // Вызываем функцию при загрузке страницы
+    productionsInfo();  // Вызываем функцию при загрузке страницы
     getProductions();
-    setInterval(updateProductions, 1000);  // Обновляем данные каждую секунду
+    setInterval(getTime, 1000);  // Обновляем данные каждую секунду
     setInterval(focusHiddenInput, 1000);  // Обновляем данные каждую секунду
 };

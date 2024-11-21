@@ -1,10 +1,9 @@
-function updateSelectOrder() {
+function selectOrderInfo() {
     fetch('/get_select_order_info')
         .then(response => response.json())
         .then(data => {
             document.getElementById('username').innerText = data.username;
             document.getElementById('role').innerText = data.role;
-            document.getElementById('datetime').innerText = data.datetime_value;
             document.getElementById('product_name').innerText = data.product_name;
         })
         .catch(error => console.error('Error:', error));
@@ -25,11 +24,20 @@ function setOrder(order_num) {
     .catch(error => console.error('Error:', error));
 }
 
+function getTime() {
+    fetch('/get_time')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('datetime').innerText = data.datetime_value;
+        })
+        .catch(error => console.error('Error:', error));
+}
+
 window.onload = function() {
-    updateSelectOrder();  // Вызываем функцию при загрузке страницы
-    setInterval(updateSelectOrder, 1000);  // Обновляем данные каждую секунду
-    //getProducts();  // Загружаем продукты при загрузке страницы
+    selectOrderInfo();  // Вызываем функцию при загрузке страницы
+    setInterval(getTime, 1000);  // Обновляем данные каждую секунду
 };
+
 document.getElementById('addOrderForm').addEventListener('submit', function(event) {
     event.preventDefault();
     const orderNumInput = document.getElementById('order_num')

@@ -32,8 +32,8 @@
                             <div class="mb-2">
                                 <label for="role" class="form-label">Роль:</label>
                                 <select class="form-select" id="role" name="role" required>
+                                    <option value="master">master - мастер участка (недоступно "редактирование")</option>
                                     <option value="manager">manager - начальник участка (полный функционал)</option>
-                                    <option value="master">master - мастер участка (недоступен экран "редактирование")</option>
                                 </select>
                             </div>
                             <div class="mb-2">
@@ -52,7 +52,7 @@
             </div>
             <div class="col-md-6">
                 <h3 class="text-center"><u>Таблица пользователей</u></h3>
-                <div class="table-responsive" style="max-height: 522px">
+                <div class="table-responsive" style="min-height: 247px; max-height: 522px">
                     <table class="table table-bordered table-primary border-dark">
                         <thead class="table-secondary border-dark">
                             <tr>
@@ -70,7 +70,8 @@
             </div>
             <div class="d-grid gap-3 col-2 mx-auto mt-5">
                 <button type="button" id="editUserPasswordButton" class="btn btn-warning w-100 btn-lg">Изменить пароль</button>
-                <button type="button" id="deleteUserButton" class="btn btn-danger w-100 btn-lg">Удалить пользователя</button>
+                <button type="button" id="editUserRoleButton" class="btn btn-warning w-100 btn-lg">Изменить роль</button>
+                <button type="button" id="deleteUserButton" class="btn btn-danger w-100 btn-lg">Удалить запись</button>
             </div>
         </div>
     </div>
@@ -99,6 +100,31 @@
             </div>
         </div>
     </div>
+    <!-- Модальное окно для редактирования роли -->
+    <div class="modal fade" id="editRoleModal" tabindex="-1" aria-labelledby="editRoleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editRoleModalLabel">Изменить роль пользователя</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editRoleForm" autocomplete="off">
+                        <div class="mb-3">
+                                <label for="newRole" class="form-label">Роль:</label>
+                                <select class="form-select" id="newRole" name="newRole" required>
+                                    <option value="master">master - мастер участка (недоступно "редактирование")</option>
+                                    <option value="manager">manager - начальник участка (полный функционал)</option>
+                                </select>
+                        </div>
+                        <!--<input type="hidden" id="productionUid" name="productionUid">-->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="saveRoleButton">Сохранить</button>
+                </div>
+            </div>
         </div>
     </div>
     <script src="/static/js/bootstrap.min.js"></script>

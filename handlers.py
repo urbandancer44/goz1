@@ -82,12 +82,24 @@ class Handlers:
     def update_user_password(self):
         if 'username' in session:
             username = request.json['username']
-            newPassword = request.json['newPassword']
+            new_password = request.json['newPassword']
 
             query = "UPDATE users SET password = %s WHERE username = %s"
-            self.db_manager.execute_insert(query, (newPassword, username))
+            self.db_manager.execute_insert(query, (new_password, username))
 
             return jsonify({'message': 'Пароль успешно изменен!'})
+        else:
+            return redirect('/')
+
+    def update_user_role(self):
+        if 'username' in session:
+            username = request.json['username']
+            new_role = request.json['newRole']
+
+            query = "UPDATE users SET role = %s WHERE username = %s"
+            self.db_manager.execute_insert(query, (new_role, username))
+
+            return jsonify({'message': 'Роль успешно изменена!'})
         else:
             return redirect('/')
 
@@ -185,7 +197,9 @@ class Handlers:
     def set_product_name(self):
         if 'username' in session:
             product_name = str(request.form.get('product_name'))
+            picture_name = str(request.form.get('picture_name'))
             session['product_name'] = product_name
+            session['picture_name'] = picture_name
 
             return send_from_directory(self.app.static_folder, 'select_order.html')
         else:
@@ -328,6 +342,7 @@ class Handlers:
                 'role': session.get('role'),
                 'datetime_value': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
                 'product_name': session.get('product_name'),
+                'picture_name': session.get('picture_name'),
                 'order_num': session.get('order_num')
             })
         else:
@@ -356,9 +371,19 @@ class Handlers:
             return jsonify({'error': 'Not logged in'}), 401
 
     @staticmethod
+    def get_time():
+        if 'username' in session:
+            return jsonify({
+                'datetime_value': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
+            })
+        else:
+            return jsonify({'error': 'Not logged in'}), 401
+
+    @staticmethod
     def logout():
         session.pop('username', None)
         session.pop('role', None)
         session.pop('product_name', None)
         session.pop('order_num', None)
+        session.pop('picture_path', None)
         return redirect('/')

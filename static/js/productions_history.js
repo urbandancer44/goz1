@@ -1,10 +1,9 @@
-function updateProductionsHistory() {
+function productionsHistoryInfo() {
     fetch('/get_productions_history_info')
         .then(response => response.json())
         .then(data => {
             document.getElementById('username').innerText = data.username;
             document.getElementById('role').innerText = data.role;
-            document.getElementById('datetime').innerText = data.datetime_value;
         })
         .catch(error => console.error('Error:', error));
 }
@@ -48,8 +47,17 @@ function getProductions() {
         .catch(error => console.error('Error:', error));
 }
 
+function getTime() {
+    fetch('/get_time')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('datetime').innerText = data.datetime_value;
+        })
+        .catch(error => console.error('Error:', error));
+}
+
 window.onload = function() {
-    updateProductionsHistory();  // Вызываем функцию при загрузке страницы
-    setInterval(updateProductionsHistory, 1000);  // Обновляем данные каждую секунду
+    productionsHistoryInfo();  // Вызываем функцию при загрузке страницы
+    setInterval(getTime, 1000);  // Обновляем данные каждую секунду
     getProductions();  // Загружаем продукты при загрузке страницы
 };

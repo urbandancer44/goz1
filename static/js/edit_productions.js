@@ -3,13 +3,12 @@ let editTimeModal = null;
 let editOrderModal = null;
 let editUserModal = null;
 
-function updateEditProductions() {
+function editProductionsInfo() {
     fetch('/get_edit_productions_info')
         .then(response => response.json())
         .then(data => {
             document.getElementById('username').innerText = data.username;
             document.getElementById('role').innerText = data.role;
-            document.getElementById('datetime').innerText = data.datetime_value;
         })
         .catch(error => console.error('Error:', error));
 }
@@ -217,8 +216,18 @@ document.getElementById('deleteProductionButton').addEventListener('click', func
     }
 });
 
+function getTime() {
+    fetch('/get_time')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('datetime').innerText = data.datetime_value;
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+
 window.onload = function() {
-    updateEditProductions();  // Вызываем функцию при загрузке страницы
-    setInterval(updateEditProductions, 1000);  // Обновляем данные каждую секунду
+    editProductionsInfo();  // Вызываем функцию при загрузке страницы
+    setInterval(getTime, 1000);  // Обновляем данные каждую секунду
     getProductions();  // Загружаем продукты при загрузке страницы
 };
