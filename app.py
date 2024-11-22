@@ -1,5 +1,6 @@
 from flask import Flask, session
 from handlers import Handlers
+import os
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = 'your_secret_key'
@@ -8,7 +9,7 @@ app.config['DB_HOST'] = 'postgres'
 app.config['DB_NAME'] = 'gozDB'
 app.config['DB_USER'] = 'goz_admin'
 app.config['DB_PASS'] = 'zzz1234ZZZ'
-app.config['UPLOAD_FOLDER'] = '/static/img/products'
+app.config['UPLOAD_FOLDER'] = os.getcwd() + '/static/img/products'
 
 handlers = Handlers(app)
 

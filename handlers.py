@@ -2,8 +2,10 @@ from flask import request, redirect, send_from_directory, session, jsonify
 from datetime import datetime
 import pytz
 from db import DatabaseManager
-from werkzeug.utils import secure_filename
+#from werkzeug.utils import secure_filename
 import os
+import uuid
+import hashlib
 
 class Handlers:
     def __init__(self, app):
@@ -22,9 +24,10 @@ class Handlers:
 
     def login(self):
         password = str(request.form.get('password'))
+        hashed_password = hashlib.md5(password.encode()).hexdigest()
 
         query = "SELECT * FROM users WHERE password = %s"
-        user = self.db_manager.execute_query(query, (password,))
+        user = self.db_manager.execute_query(query, (hashed_password,))
 
         if user:
             session['username'] = user[0][1]
@@ -53,9 +56,11 @@ class Handlers:
             username = str(request.form.get('username'))
             password = str(request.form.get('password'))
             role = str(request.form.get('role'))
+            # Хешируем пароль перед сохранением
+            hashed_password = hashlib.md5(password.encode('utf-8')).hexdigest()
 
             query = "INSERT INTO users (username, password, role) VALUES (%s, %s, %s)"
-            self.db_manager.execute_insert(query, (username, password, role))
+            self.db_manager.execute_insert(query, (username, hashed_password, role))
 
             return "Пользователь успешно добавлен!"
         else:
@@ -67,27 +72,17 @@ class Handlers:
 
         return jsonify(users)
 
-    # def update_user(self):
-    #     if 'username' in session:
-    #         username = str(request.form.get('username'))
-    #         new_password = str(request.form.get('new_password'))
-    #
-    #         query = "UPDATE users SET password = %s WHERE username = %s"
-    #         self.db_manager.execute_insert(query, (new_password, username))
-    #
-    #         return "Пароль успешно изменен!"
-    #     else:
-    #         return redirect('/')
-
     def update_user_password(self):
         if 'username' in session:
-            username = request.json['username']
-            new_password = request.json['newPassword']
+            username = str(request.form.get('username'))
+            new_password = str(request.form.get('new_password'))
+            # Хешируем пароль перед сохранением
+            new_hashed_password = hashlib.md5(new_password.encode('utf-8')).hexdigest()
 
             query = "UPDATE users SET password = %s WHERE username = %s"
-            self.db_manager.execute_insert(query, (new_password, username))
+            self.db_manager.execute_insert(query, (new_hashed_password, username))
 
-            return jsonify({'message': 'Пароль успешно изменен!'})
+            return "Пароль успешно изменен!"
         else:
             return redirect('/')
 
@@ -125,7 +120,6 @@ class Handlers:
         else:
             return redirect('/')
 
-
     def get_products(self):
         query = "SELECT * FROM products"
         products = self.db_manager.execute_query(query)
@@ -155,9 +149,15 @@ class Handlers:
             picture = request.files.get('picture')
 
             if picture:
-                picture_name = secure_filename(picture.filename)
+                # picture_name = secure_filename(picture.filename)
+
+                # Генерируем уникальный UUID
+                unique_id = uuid.uuid4().hex
+                # Создаем хэш из UUID
+                short_hash = hashlib.sha256(unique_id.encode('utf-8')) .hexdigest()[:6] #Берем первые 6 символов хэша
+                picture_name = f"{short_hash}_{picture.filename}"
                 picture_path = os.path.join(self.app.config['UPLOAD_FOLDER'], picture_name)
-                picture.save(os.getcwd() + picture_path)
+                picture.save(picture_path)
             else:
                 picture_name = None
 
@@ -174,9 +174,13 @@ class Handlers:
             new_picture = request.files.get('newPicture')
 
             if new_picture:
-                picture_name = secure_filename(new_picture.filename)
+                # Генерируем уникальный UUID
+                unique_id = uuid.uuid4().hex
+                # Создаем хэш из UUID
+                short_hash = hashlib.sha256(unique_id.encode('utf-8')) .hexdigest()[:6] #Берем первые 6 символов хэша
+                picture_name = f"{short_hash}_{new_picture.filename}"
                 picture_path = os.path.join(self.app.config['UPLOAD_FOLDER'], picture_name)
-                new_picture.save(os.getcwd() + picture_path)
+                new_picture.save(picture_path)
             else:
                 picture_name = None
 
@@ -186,7 +190,6 @@ class Handlers:
             return "Изображение изделия успешно изменено!"
         else:
             return redirect('/')
-
 
     def select_product(self):
         if 'username' in session:
@@ -385,5 +388,5 @@ class Handlers:
         session.pop('role', None)
         session.pop('product_name', None)
         session.pop('order_num', None)
-        session.pop('picture_path', None)
+        session.pop('picture_name', None)
         return redirect('/')
