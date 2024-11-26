@@ -61,9 +61,15 @@ function clearFilter() {
 }
 
 function filterByTime() {
-    const datetime = prompt('Введите дату и время (например, 2023-10-01 12:00:00):');
-    if (datetime) {
-        filterProductions((production) => production[1].includes(datetime));
+    const startTime = prompt('Введите дату и время начала интервала (например, 2023-10-01 12:00:00):');
+    const endTime = prompt('Введите дату и время конца интервала (например, 2023-10-01 12:00:00):');
+    if (startTime && endTime) {
+        const startDate = new Date(startTime);
+        const endDate = new Date(endTime);
+        filterProductions((production) => {
+            const productionDate = new Date(production[1]);
+            return productionDate >= startDate && productionDate <= endDate
+        });
     }
 }
 
@@ -83,8 +89,9 @@ function filterByOrder() {
 
 function filterByUid() {
     const productUid = prompt('Введите UID изделия:');
+    const transliterateUid = transliterate(productUid)
     if (productUid) {
-        filterProductions((production) => production[4].includes(productUid));
+        filterProductions((production) => production[4].includes(transliterateUid));
     }
 }
 
@@ -142,6 +149,22 @@ document.getElementById('productFilterButton').addEventListener('click', filterB
 document.getElementById('orderFilterButton').addEventListener('click', filterByOrder);
 document.getElementById('uidFilterButton').addEventListener('click', filterByUid);
 document.getElementById('userFilterButton').addEventListener('click', filterByUser);
+
+function transliterate(text) {
+    const translitMap = {
+        'й': 'q', 'ц': 'w', 'у': 'e', 'к': 'r', 'е': 't', 'н': 'y', 'г': 'u', 'ш': 'i', 'щ': 'o', 'з': 'p',
+        'х': '[', 'ъ': ']', 'ф': 'a', 'ы': 's', 'в': 'd', 'а': 'f', 'п': 'g', 'р': 'h', 'о': 'j', 'л': 'k',
+        'д': 'l', 'ж': ';', 'э': '\'', 'я': 'z', 'ч': 'x', 'с': 'c', 'м': 'v', 'и': 'b', 'т': 'n', 'ь': 'm',
+        'б': ',', 'ю': '.', 'ё': '`',
+        'Й': 'Q', 'Ц': 'W', 'У': 'E', 'К': 'R', 'Е': 'T', 'Н': 'Y', 'Г': 'U', 'Ш': 'I', 'Щ': 'O', 'З': 'P',
+        'Х': '{', 'Ъ': '}', 'Ф': 'A', 'Ы': 'S', 'В': 'D', 'А': 'F', 'П': 'G', 'Р': 'H', 'О': 'J', 'Л': 'K',
+        'Д': 'L', 'Ж': ':', 'Э': '"', 'Я': 'Z', 'Ч': 'X', 'С': 'C', 'М': 'V', 'И': 'B', 'Т': 'N', 'Ь': 'M',
+        'Б': '<', 'Ю': '>', 'Ё': '~'
+    };
+
+    return text.split('').map(char => translitMap[char] || char).join('');
+}
+
 
 window.onload = function() {
     productionsHistoryInfo();  // Вызываем функцию при загрузке страницы

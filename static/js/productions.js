@@ -61,12 +61,13 @@ function getProductions() {
 }
 
 function addProduction(product_uid) {
+    const transliteratedUid = transliterate(product_uid)
     fetch('/add_production', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: `product_uid=${encodeURIComponent(product_uid)}`
+        body: `product_uid=${encodeURIComponent(transliteratedUid)}`
     })
     .then(response => response.text())
     .then(data => {
@@ -96,6 +97,20 @@ function getTime() {
         .catch(error => console.error('Error:', error));
 }
 
+function transliterate(text) {
+    const translitMap = {
+        'й': 'q', 'ц': 'w', 'у': 'e', 'к': 'r', 'е': 't', 'н': 'y', 'г': 'u', 'ш': 'i', 'щ': 'o', 'з': 'p',
+        'х': '[', 'ъ': ']', 'ф': 'a', 'ы': 's', 'в': 'd', 'а': 'f', 'п': 'g', 'р': 'h', 'о': 'j', 'л': 'k',
+        'д': 'l', 'ж': ';', 'э': '\'', 'я': 'z', 'ч': 'x', 'с': 'c', 'м': 'v', 'и': 'b', 'т': 'n', 'ь': 'm',
+        'б': ',', 'ю': '.', 'ё': '`',
+        'Й': 'Q', 'Ц': 'W', 'У': 'E', 'К': 'R', 'Е': 'T', 'Н': 'Y', 'Г': 'U', 'Ш': 'I', 'Щ': 'O', 'З': 'P',
+        'Х': '{', 'Ъ': '}', 'Ф': 'A', 'Ы': 'S', 'В': 'D', 'А': 'F', 'П': 'G', 'Р': 'H', 'О': 'J', 'Л': 'K',
+        'Д': 'L', 'Ж': ':', 'Э': '"', 'Я': 'Z', 'Ч': 'X', 'С': 'C', 'М': 'V', 'И': 'B', 'Т': 'N', 'Ь': 'M',
+        'Б': '<', 'Ю': '>', 'Ё': '~'
+    };
+
+    return text.split('').map(char => translitMap[char] || char).join('');
+}
 
 window.onload = function() {
     focusHiddenInput();
