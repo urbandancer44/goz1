@@ -55,6 +55,7 @@
                         <th>Изделие</th>
                         <th>Номер ШПЗ</th>
                         <th>UID изделия</th>
+                        <th>S/N изделия</th>
                         <th>Пользователь</th>
                         <th>Статус</th>
                     </tr>
@@ -65,28 +66,152 @@
             </table>
         </div>
         <div class="row justify-content-center mt-4">
-            <div class="col-2">
-                <button type="button" id="clearFilterButton" class="btn btn-primary w-100 btn-lg">Сбросить фильтр</button>
-            </div>
-            <div class="col-2">
-                <button type="button" id="timeFilterButton" class="btn btn-secondary w-100 btn-lg">Время</button>
-            </div>
-            <div class="col-2">
-                <button type="button" id="productFilterButton" class="btn btn-secondary w-100 btn-lg">Изделие</button>
-            </div>
-            <div class="col-2">
-                <button type="button" id="orderFilterButton" class="btn btn-secondary w-100 btn-lg">ШПЗ</button>
-            </div>
-            <div class="col-2">
-                <button type="button" id="uidFilterButton" class="btn btn-secondary w-100 btn-lg">UID</button>
-            </div>
-            <div class="col-2">
-                <button type="button" id="userFilterButton" class="btn btn-secondary w-100 btn-lg">ФИО</button>
-            </div>
-            <div class="col-4">
+            <div class="d-grid gap-2 d-md-block mb-2">
+                <button style="min-width: 120px" type="button" id="clearFilterButton" class="btn btn-primary btn-lg mb-2">Сбросить фильтр</button>
+                <button style="min-width: 120px" type="button" id="timeFilterButton" class="btn btn-secondary btn-lg mb-2">Время</button>
+                <button style="min-width: 120px" type="button" id="productFilterButton" class="btn btn-secondary btn-lg mb-2">Изделие</button>
+                <button style="min-width: 120px" type="button" id="orderFilterButton" class="btn btn-secondary btn-lg mb-2">ШПЗ</button>
+                <button style="min-width: 120px" type="button" id="uidFilterButton" class="btn btn-secondary btn-lg mb-2">UID</button>
+                <button style="min-width: 120px" type="button" id="serialNumFilterButton" class="btn btn-secondary btn-lg mb-2">S/N</button>
+                <button style="min-width: 120px" type="button" id="userFilterButton" class="btn btn-secondary btn-lg mb-2">ФИО</button>
             </div>
         </div>
     </div>
+    <!-- Модальное окно для фильтра времени -->
+    <div class="modal fade" id="timeFilterModal" tabindex="-1" aria-labelledby="timeFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="timeFilterModalLabel">Фильтр по времени</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="filterTimeForm" autocomplete="off">
+                        <div class="mb-3">
+                            <label for="startDatetime" class="form-label">Время начала интервала:</label>
+                            <input type="datetime-local" class="form-control" id="startDatetime" required>
+                            <label for="endDatetime" class="form-label">Время окончания интервала:</label>
+                            <input type="datetime-local" class="form-control" id="endDatetime" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="applyTimeFilterButton">Применить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Модальное окно для фильтра по изделию -->
+    <div class="modal fade" id="productFilterModal" tabindex="-1" aria-labelledby="productFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productFilterModalLabel">Фильтр по изделию</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="productSelect" class="form-label">Выберите изделие из списка:</label>
+                    <select class="form-select" id="productSelect">
+                    <!-- Список будет загружен с помощью JavaScript -->
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="applyProductFilterButton">Применить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- Модальное окно для фильтра по ШПЗ -->
+    <div class="modal fade" id="orderFilterModal" tabindex="-1" aria-labelledby="orderFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderFilterModalLabel">Фильтр по номеру ШПЗ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="orderSelect" class="form-label">Выберите ШПЗ из списка:</label>
+                    <select class="form-select" id="orderSelect">
+                    <!-- Список будет загружен с помощью JavaScript -->
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="applyOrderFilterButton">Применить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Модальное окно для фильтра по UID -->
+    <div class="modal fade" id="uidFilterModal" tabindex="-1" aria-labelledby="uidFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uidFilterModalLabel">Фильтр по UID</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="filterUidForm" autocomplete="off">
+                        <div class="mb-3">
+                            <label for="filterUid" class="form-label">Введите или сканируйте UID изделия:</label>
+                            <input type="text" class="form-control" id="filterUid" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="applyUidFilterButton">Применить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- Модальное окно для фильтра по s/n -->
+    <div class="modal fade" id="serialNumFilterModal" tabindex="-1" aria-labelledby="serialNumFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="serialNumFilterModalLabel">Фильтр по серийному номеру изделия</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="filterSerialNumForm" autocomplete="off">
+                        <div class="mb-3">
+                            <label for="filterSerialNum" class="form-label">Введите S/N изделия:</label>
+                            <input type="text" class="form-control" id="filterSerialNum" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="applySerialNumFilterButton">Применить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- Модальное окно для фильтра по пользователю -->
+    <div class="modal fade" id="userFilterModal" tabindex="-1" aria-labelledby="userFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userFilterModalLabel">Фильтр по имени пользователя</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="userSelect" class="form-label">Выберите пользователя из списка:</label>
+                    <select class="form-select" id="userSelect">
+                    <!-- Список будет загружен с помощью JavaScript -->
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" id="applyUserFilterButton">Применить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Подключаем Bootstrap JS и Popper.js -->
      <script src="/static/js/bootstrap.min.js"></script>
 </body>

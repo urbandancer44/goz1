@@ -1,3 +1,6 @@
+let transliteratedUid = null;
+let setSerialNumModal = null;
+
 function productionsInfo() {
     fetch('/get_productions_info')
         .then(response => response.json())
@@ -36,6 +39,7 @@ function getProductions() {
                 const product_nameCell = document.createElement('td');
                 const order_numCell = document.createElement('td');
                 const product_uidCell = document.createElement('td');
+                const serial_numCell = document.createElement('td');
                 const usernameCell = document.createElement('td');
                 const production_statusCell = document.createElement('td');
 
@@ -44,6 +48,7 @@ function getProductions() {
                 product_nameCell.innerText = production[2];
                 order_numCell.innerText = production[3];
                 product_uidCell.innerText = production[4];
+                serial_numCell.innerText = production[7];
                 usernameCell.innerText = production[5];
                 production_statusCell.innerText = production[6]
                 row.appendChild(numberCell);
@@ -51,6 +56,7 @@ function getProductions() {
                 row.appendChild(product_nameCell);
                 row.appendChild(order_numCell);
                 row.appendChild(product_uidCell);
+                row.appendChild(serial_numCell);
                 row.appendChild(usernameCell);
                 row.appendChild(production_statusCell);
                 tableBody.appendChild(row);
@@ -60,28 +66,67 @@ function getProductions() {
         .catch(error => console.error('Error:', error));
 }
 
-function addProduction(product_uid) {
-    const transliteratedUid = transliterate(product_uid)
-    fetch('/add_production', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: `product_uid=${encodeURIComponent(transliteratedUid)}`
-    })
-    .then(response => response.text())
-    .then(data => {
-        alert(data);
-        getProductions();
-        document.getElementById("hiddenInput").value = '';
-    })
-    .catch(error => console.error('Error:', error));
-}
+// function addProduction(product_uid) {
+//     const transliteratedUid = transliterate(product_uid);
+//     fetch('/add_production', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/x-www-form-urlencoded'
+//         },
+//         body: `product_uid=${encodeURIComponent(transliteratedUid)}`
+//     })
+//     .then(response => response.text())
+//     .then(data => {
+//         alert(data);
+//         getProductions();
+//         document.getElementById("hiddenInput").value = '';
+//     })
+//     .catch(error => console.error('Error:', error));
+// }
 
-document.getElementById('addProductionForm').addEventListener('submit', function(event) {
+document.getElementById('setProductUidForm').addEventListener('submit', function(event) {
     event.preventDefault();
     const product_uid = document.getElementById('hiddenInput').value;
-    addProduction(product_uid);
+    transliteratedUid = transliterate(product_uid);
+    setSerialNumModal = new bootstrap. Modal(document.getElementById('setSerialNumModal'));
+    setSerialNumModal.show();
+    // addProduction(product_uid);
+});
+
+document.getElementById('saveSerialNumButton').addEventListener('click', function () {
+    const serialNum = document.getElementById('serialNum').value;
+    if (serialNum) {
+        fetch('/add_production', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productUid: transliteratedUid,
+                serialNum: serialNum
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            setSerialNumModal.hide();
+            document.getElementById('hiddenInput').value = '';
+            document.getElementById('serialNum').value = '';
+            setSerialNumModal = null;
+            transliteratedUid = null;
+            getProductions();  // Перезагружаем таблицу после изменения
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+        alert('Пустое поле ввода!')
+    }
+});
+
+document.addEventListener('click', function(event) {
+    // Проверяем, что клик был не по модальному окну
+    if (!event.target.closest('.modal')) {
+        focusHiddenInput();
+    }
 });
 
 function focusHiddenInput() {
@@ -117,5 +162,4 @@ window.onload = function() {
     productionsInfo();  // Вызываем функцию при загрузке страницы
     getProductions();
     setInterval(getTime, 1000);  // Обновляем данные каждую секунду
-    setInterval(focusHiddenInput, 1000);  // Обновляем данные каждую секунду
 };

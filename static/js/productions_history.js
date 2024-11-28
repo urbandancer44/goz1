@@ -1,3 +1,10 @@
+let productFilterModal = null;
+let timeFilterModal = null;
+let orderFilterModal = null;
+let uidFilterModal = null;
+let userFilterModal = null;
+let serialNumFilterModal = null;
+
 function productionsHistoryInfo() {
     fetch('/get_productions_history_info')
         .then(response => response.json())
@@ -24,6 +31,7 @@ function getProductions() {
                 const product_nameCell = document.createElement('td');
                 const order_numCell = document.createElement('td');
                 const product_uidCell = document.createElement('td');
+                const serial_numCell = document.createElement('td');
                 const usernameCell = document.createElement('td');
                 const production_statusCell = document.createElement('td');
 
@@ -32,6 +40,7 @@ function getProductions() {
                 product_nameCell.innerText = production[2];
                 order_numCell.innerText = production[3];
                 product_uidCell.innerText = production[4];
+                serial_numCell.innerText = production[7];
                 usernameCell.innerText = production[5];
                 production_statusCell.innerText = production[6]
                 row.appendChild(numberCell);
@@ -39,6 +48,7 @@ function getProductions() {
                 row.appendChild(product_nameCell);
                 row.appendChild(order_numCell);
                 row.appendChild(product_uidCell);
+                row.appendChild(serial_numCell);
                 row.appendChild(usernameCell);
                 row.appendChild(production_statusCell);
                 tableBody.appendChild(row);
@@ -56,52 +66,230 @@ function getTime() {
         .catch(error => console.error('Error:', error));
 }
 
+// ---Сброс фильтра---
+document.getElementById('clearFilterButton').addEventListener('click', clearFilter);
+
 function clearFilter() {
     getProductions();  // Сбрасываем фильтр, загружая все данные
 }
 
-function filterByTime() {
-    const startTime = prompt('Введите дату и время начала интервала (например, 2023-10-01 12:00:00):');
-    const endTime = prompt('Введите дату и время конца интервала (например, 2023-10-01 12:00:00):');
-    if (startTime && endTime) {
-        const startDate = new Date(startTime);
-        const endDate = new Date(endTime);
-        filterProductions((production) => {
-            const productionDate = new Date(production[1]);
-            return productionDate >= startDate && productionDate <= endDate
-        });
+// ---Фильтрация по времени---
+document.getElementById('timeFilterButton').addEventListener('click', function() {
+    timeFilterModal = new bootstrap.Modal(document.getElementById('timeFilterModal'));
+    timeFilterModal.show();
+});
+
+document.getElementById('applyTimeFilterButton').addEventListener('click', function () {
+    const startDatetime = document.getElementById('startDatetime').value;
+    const endDatetime = document.getElementById('endDatetime').value;
+    if (startDatetime && endDatetime) {
+        filterByTime(startDatetime, endDatetime);
+        timeFilterModal.hide();
+        document.getElementById('startDatetime').value = '';
+        document.getElementById('endDatetime').value = '';
+        timeFilterModal = null;
+    } else {
+        alert('Установите временной интервал!');
     }
+});
+
+function filterByTime(startDatetime, endDatetime) {
+    const startDate = new Date(startDatetime);
+    const endDate = new Date(endDatetime);
+    filterProductions((production) => {
+        const productionDate = new Date(production[1]);
+        return productionDate >= startDate && productionDate <= endDate
+    });
 }
 
-function filterByProduct() {
-    const productName = prompt('Введите название изделия:');
-    if (productName) {
-        filterProductions((production) => production[2].includes(productName));
-    }
+// ---Фильтрация по изделию---
+function getProductionsProducts() {
+    fetch('/get_productions')
+        .then(response => response.json())
+        .then(data => {
+            const productSelect = document.getElementById('productSelect');
+            productSelect.innerHTML = '';  // Очищаем список
+
+            // Создаем Set для хранения уникальных номеров ШПЗ
+            const uniqueProducts = new Set();
+
+            data.forEach(production => {
+                const productName = production[2];  // Предполагаем, что production[2] содержит наименование изделия
+                if (!uniqueProducts.has(productName)) {
+                    uniqueProducts.add(productName);
+                    const option = document.createElement('option');
+                    option.value = productName;
+                    option.innerText = productName;
+                    productSelect.appendChild(option);
+                }
+            });
+        })
+        .catch(error => console.error('Error:', error));
 }
 
-function filterByOrder() {
-    const orderNum = prompt('Введите номер ШПЗ:');
-    if (orderNum) {
-        filterProductions((production) => production[3].includes(orderNum));
+document.getElementById('productFilterButton').addEventListener('click', function() {
+    productFilterModal = new bootstrap.Modal(document.getElementById('productFilterModal'));
+    productFilterModal.show();
+    getProductionsProducts();  // Загружаем список изделий
+});
+
+document.getElementById('applyProductFilterButton').addEventListener('click', function() {
+    const selectedProduct = document.getElementById('productSelect').value;
+    if (selectedProduct) {
+        filterByProduct(selectedProduct);
+        productFilterModal.hide();
+        document.getElementById('productSelect').value = '';
+        productFilterModal = null;
+    } else {
+        alert('Выберите изделие из списка!');
     }
+});
+
+function filterByProduct(productName) {
+    filterProductions((production) => production[2].includes(productName));
 }
 
-function filterByUid() {
-    const productUid = prompt('Введите UID изделия:');
+// ---Фильтрация по номеру ШПЗ---
+function getProductionsOrders() {
+    fetch('/get_productions')
+        .then(response => response.json())
+        .then(data => {
+            const orderSelect = document.getElementById('orderSelect');
+            orderSelect.innerHTML = '';  // Очищаем список
+
+            // Создаем Set для хранения уникальных номеров ШПЗ
+            const uniqueOrders = new Set();
+
+            data.forEach(production => {
+                const orderNum = production[3];  // Предполагаем, что production[3] содержит номер ШПЗ
+                if (!uniqueOrders.has(orderNum)) {
+                    uniqueOrders.add(orderNum);
+                    const option = document.createElement('option');
+                    option.value = orderNum;
+                    option.innerText = orderNum;
+                    orderSelect.appendChild(option);
+                }
+            });
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+document.getElementById('orderFilterButton').addEventListener('click', function() {
+    orderFilterModal = new bootstrap.Modal(document.getElementById('orderFilterModal'));
+    orderFilterModal.show();
+    getProductionsOrders();  // Загружаем список ШПЗ
+});
+
+document.getElementById('applyOrderFilterButton').addEventListener('click', function() {
+    const selectedOrder = document.getElementById('orderSelect').value;
+    if (selectedOrder) {
+        filterByOrder(selectedOrder);
+        orderFilterModal.hide();
+        document.getElementById('orderSelect').value = '';
+        orderFilterModal = null;
+    } else {
+        alert('Выберите номер ШПЗ из списка!');
+    }
+});
+
+function filterByOrder(orderNum) {
+    filterProductions((production) => production[3].includes(orderNum));
+}
+
+// ---Фильтрация по UID---
+document.getElementById('uidFilterButton').addEventListener('click', function() {
+    uidFilterModal = new bootstrap.Modal(document.getElementById('uidFilterModal'));
+    uidFilterModal.show();
+});
+
+document.getElementById('applyUidFilterButton').addEventListener('click', function () {
+    const filterUid = document.getElementById('filterUid').value;
+    if (filterUid) {
+        filterByUid(filterUid);
+        uidFilterModal.hide();
+        document.getElementById('filterUid').value = '';
+        uidFilterModal = null;
+    } else {
+        alert('Введите UID изделия!');
+    }
+});
+
+function filterByUid(productUid) {
     const transliterateUid = transliterate(productUid)
-    if (productUid) {
-        filterProductions((production) => production[4].includes(transliterateUid));
-    }
+    filterProductions((production) => production[4].includes(transliterateUid));
 }
 
-function filterByUser() {
-    const username = prompt('Введите ФИО пользователя:');
-    if (username) {
-        filterProductions((production) => production[5].includes(username));
+// ---Фильтрация по S/N---
+document.getElementById('serialNumFilterButton').addEventListener('click', function() {
+    serialNumFilterModal = new bootstrap.Modal(document.getElementById('serialNumFilterModal'));
+    serialNumFilterModal.show();
+});
+
+document.getElementById('applySerialNumFilterButton').addEventListener('click', function () {
+    const filterSerialNum = document.getElementById('filterSerialNum').value;
+    if (filterSerialNum) {
+        filterBySerialNum(filterSerialNum);
+        serialNumFilterModal.hide();
+        document.getElementById('filterSerialNum').value = '';
+        serialNumFilterModal = null;
+    } else {
+        alert('Введите серийный номер изделия!');
     }
+});
+
+function filterBySerialNum(serialNum) {
+    filterProductions((production) => production[7].includes(serialNum));
 }
 
+
+// ---Фильтрация по пользователю---
+function getProductionsUsers() {
+    fetch('/get_productions')
+        .then(response => response.json())
+        .then(data => {
+            const userSelect = document.getElementById('userSelect');
+            userSelect.innerHTML = '';  // Очищаем список
+
+            // Создаем Set для хранения уникальных имён
+            const uniqueUsers = new Set();
+
+            data.forEach(production => {
+                const username = production[5];  // Предполагаем, что production[5] содержит имя пользователя
+                if (!uniqueUsers.has(username)) {
+                    uniqueUsers.add(username);
+                    const option = document.createElement('option');
+                    option.value = username;
+                    option.innerText = username;
+                    userSelect.appendChild(option);
+                }
+            });
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+document.getElementById('userFilterButton').addEventListener('click', function() {
+    userFilterModal = new bootstrap.Modal(document.getElementById('userFilterModal'));
+    userFilterModal.show();
+    getProductionsUsers();  // Загружаем список ШПЗ
+});
+
+document.getElementById('applyUserFilterButton').addEventListener('click', function() {
+    const selectedUser = document.getElementById('userSelect').value;
+    if (selectedUser) {
+        filterByUser(selectedUser);
+        userFilterModal.hide();
+        document.getElementById('userSelect').value = '';
+        userFilterModal = null;
+    } else {
+        alert('Выберите пользователя из списка!');
+    }
+});
+
+function filterByUser(username) {
+    filterProductions((production) => production[5].includes(username));
+}
+
+// ---Общая функция для фильтрации---
 function filterProductions(filterFunction) {
     fetch('/get_productions')
         .then(response => response.json())
@@ -119,6 +307,7 @@ function filterProductions(filterFunction) {
                     const product_nameCell = document.createElement('td');
                     const order_numCell = document.createElement('td');
                     const product_uidCell = document.createElement('td');
+                    const serial_numCell = document.createElement('td');
                     const usernameCell = document.createElement('td');
                     const production_statusCell = document.createElement('td');
 
@@ -127,6 +316,7 @@ function filterProductions(filterFunction) {
                     product_nameCell.innerText = production[2];
                     order_numCell.innerText = production[3];
                     product_uidCell.innerText = production[4];
+                    serial_numCell.innerText = production[7];
                     usernameCell.innerText = production[5];
                     production_statusCell.innerText = production[6];
                     row.appendChild(numberCell);
@@ -134,6 +324,7 @@ function filterProductions(filterFunction) {
                     row.appendChild(product_nameCell);
                     row.appendChild(order_numCell);
                     row.appendChild(product_uidCell);
+                    row.appendChild(serial_numCell);
                     row.appendChild(usernameCell);
                     row.appendChild(production_statusCell);
                     tableBody.appendChild(row);
@@ -142,13 +333,6 @@ function filterProductions(filterFunction) {
         })
         .catch(error => console.error('Error:', error));
 }
-
-document.getElementById('clearFilterButton').addEventListener('click', clearFilter);
-document.getElementById('timeFilterButton').addEventListener('click', filterByTime);
-document.getElementById('productFilterButton').addEventListener('click', filterByProduct);
-document.getElementById('orderFilterButton').addEventListener('click', filterByOrder);
-document.getElementById('uidFilterButton').addEventListener('click', filterByUid);
-document.getElementById('userFilterButton').addEventListener('click', filterByUser);
 
 function transliterate(text) {
     const translitMap = {
@@ -164,7 +348,6 @@ function transliterate(text) {
 
     return text.split('').map(char => translitMap[char] || char).join('');
 }
-
 
 window.onload = function() {
     productionsHistoryInfo();  // Вызываем функцию при загрузке страницы

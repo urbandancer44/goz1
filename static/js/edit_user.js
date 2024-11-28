@@ -1,6 +1,7 @@
 let username = null;
 let editPasswordModal = null;
 let editRoleModal = null;
+let deleteUserModal = null;
 
 
 function getUsers() {
@@ -100,6 +101,7 @@ document.getElementById('savePasswordButton').addEventListener('click', function
         .then(data => {
             alert(data.message);
             editPasswordModal.hide();
+            document.getElementById('newPassword').value = '';
             editPasswordModal = null;
             username = null;
             getUsers();  // Перезагружаем таблицу после изменения
@@ -108,7 +110,6 @@ document.getElementById('savePasswordButton').addEventListener('click', function
     } else {
         alert('Пустое поле ввода!')
     }
-    document.getElementById('newPassword').value = '';
 });
 
 //---изменение роли пользователя---
@@ -140,6 +141,7 @@ document.getElementById('saveRoleButton').addEventListener('click', function () 
         .then(data => {
             alert(data.message);
             editRoleModal.hide();
+            document.getElementById('newRole').value = '';
             editRoleModal = null;
             username = null;
             getUsers();  // Перезагружаем таблицу после изменения
@@ -148,32 +150,39 @@ document.getElementById('saveRoleButton').addEventListener('click', function () 
     } else {
         alert('Пустое поле ввода!')
     }
-    document.getElementById('newRole').value = '';
 });
 
-//---удаление записи в таблице---
-document.getElementById('deleteUserButton').addEventListener('click', function () {
+// ---Удаление записи в таблице---
+document.getElementById('deleteUserButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#usersTableBody tr.table-active');
     if (activeRow) {
-        fetch('/delete_user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: username,
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            username = null;
-            getUsers();  // Перезагружаем таблицу после изменения
-        })
-        .catch(error => console.error('Error:', error));
+        deleteUserModal = new bootstrap. Modal(document.getElementById('deleteUserModal'));
+        deleteUserModal.show();
     } else {
-        alert('Выберите строку для удаления!')
+        username = null;
+        deleteUserModal = null;
+        alert('Выберите строку для удаления!');
     }
+});
+document.getElementById('applyDeleteUserButton').addEventListener('click', function () {
+    fetch('/delete_user', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: username,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        deleteUserModal.hide();
+        deleteUserModal = null;
+        username = null;
+        getUsers();  // Перезагружаем таблицу после изменения
+    })
+    .catch(error => console.error('Error:', error));
 });
 
 window.onload = function() {

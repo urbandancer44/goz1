@@ -250,22 +250,40 @@ class Handlers:
 
         return jsonify(productions)
 
+    # def add_production(self):
+    #     if 'username' in session:
+    #         datetime_value = datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S')
+    #         product_name = session.get('product_name')
+    #         order_num = session.get('order_num')
+    #         product_uid = str(request.form.get('product_uid'))
+    #         username = session.get('username')
+    #         production_status = 1
+    #
+    #         query = "INSERT INTO productions (datetime, product_name, order_num, product_uid, username, production_status) VALUES (%s, %s, %s, %s, %s, %s)"
+    #         self.db_manager.execute_insert(query, (datetime_value, product_name, order_num, product_uid, username, production_status))
+    #         return "Запись успешно добавлена!"
+    #     else:
+    #         return redirect('/')
+    #
+    #     #return "Запись успешно добавлена!"
+
     def add_production(self):
         if 'username' in session:
             datetime_value = datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S')
             product_name = session.get('product_name')
             order_num = session.get('order_num')
-            product_uid = str(request.form.get('product_uid'))
+            product_uid = request.json['productUid']
+            serial_num = request.json['serialNum']
             username = session.get('username')
             production_status = 1
 
-            query = "INSERT INTO productions (datetime, product_name, order_num, product_uid, username, production_status) VALUES (%s, %s, %s, %s, %s, %s)"
-            self.db_manager.execute_insert(query, (datetime_value, product_name, order_num, product_uid, username, production_status))
-            return "Запись успешно добавлена!"
+            query = "INSERT INTO productions (datetime, product_name, order_num, product_uid, serial_num, username, production_status) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            self.db_manager.execute_insert(query, (datetime_value, product_name, order_num, product_uid, serial_num, username, production_status))
+
+            return jsonify({'message': 'Серийный номер успешно добавлен!'})
         else:
             return redirect('/')
 
-        #return "Запись успешно добавлена!"
 
     def update_production_time(self):
         if 'username' in session:

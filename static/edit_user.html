@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Редактор пользователей</title>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet">
     <script src="/static/js/edit_user.js" defer></script>
 </head>
 <body class="bg-light">
@@ -68,7 +69,7 @@
                     </table>
                 </div>
             </div>
-            <div class="d-grid gap-3 col-2 mx-auto mt-5">
+            <div class="d-grid gap-3 col-2 mx-auto mt-5 btn-grid">
                 <button type="button" id="editUserPasswordButton" class="btn btn-warning w-100 btn-lg">Изменить RFID</button>
                 <button type="button" id="editUserRoleButton" class="btn btn-warning w-100 btn-lg">Изменить роль</button>
                 <button type="button" id="deleteUserButton" class="btn btn-danger w-100 btn-lg">Удалить запись</button>
@@ -127,6 +128,31 @@
             </div>
         </div>
     </div>
+        <!-- Модальное окно для удаления пользователя -->
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteUserModalLabel">Удаление пользователя</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="deleteUserForm">
+                        <div class="mb-3">
+                            <h6>Вы уверены, что хотите удалить пользователя?</h6>
+<!--                            <label for="newUser" class="form-label">Новый пользователь</label>-->
+<!--                            <input type="text" class="form-control" id="newUser" required>-->
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+                    <button type="button" class="btn btn-primary" id="applyDeleteUserButton">Да</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Подключаем локальный Bootstrap JS и Popper.js -->
     <script src="/static/js/bootstrap.min.js"></script>
 </body>
 </html>

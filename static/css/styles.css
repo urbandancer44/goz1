@@ -1,0 +1,10 @@
+.btn-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: fit-content; /* Ограничиваем высоту контейнера */
+}
+
+.btn-grid .btn {
+    flex: 0 0 auto; /* Предотвращаем растягивание кнопок */
+}

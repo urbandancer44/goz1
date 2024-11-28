@@ -1,5 +1,6 @@
 let product_name = null;
 let editPictureModal = null;
+let deleteProductModal = null;
 
 function getProducts() {
     fetch('/get_products')
@@ -88,6 +89,7 @@ document.getElementById('savePictureButton').addEventListener('click', function 
         .then(data => {
             alert(data);
             editPictureModal.hide();
+            document.getElementById('newPicture').value = '';
             editPictureModal = null;
             product_name = null;
             document.getElementById('productName').value = '';
@@ -97,32 +99,39 @@ document.getElementById('savePictureButton').addEventListener('click', function 
     } else {
         alert('Пустое поле ввода!')
     }
-    document.getElementById('newPicture').value = '';
 });
 
-//---удаление записи в таблице---
-document.getElementById('deleteProductButton').addEventListener('click', function () {
+// ---Удаление записи в таблице---
+document.getElementById('deleteProductButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#productsTableBody tr.table-active');
     if (activeRow) {
-        fetch('/delete_product', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                product_name: product_name,
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            product_name = null;
-            getProducts();  // Перезагружаем таблицу после изменения
-        })
-        .catch(error => console.error('Error:', error));
+        deleteProductModal = new bootstrap. Modal(document.getElementById('deleteProductModal'));
+        deleteProductModal.show();
     } else {
-        alert('Выберите строку для удаления!')
+        product_name = null;
+        deleteProductModal = null;
+        alert('Выберите строку для удаления!');
     }
+});
+document.getElementById('applyDeleteProductButton').addEventListener('click', function () {
+    fetch('/delete_product', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            product_name: product_name,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        deleteProductModal.hide();
+        deleteProductModal = null;
+        product_name = null;
+        getProducts();  // Перезагружаем таблицу после изменения
+    })
+    .catch(error => console.error('Error:', error));
 });
 
 window.onload = function() {
