@@ -91,12 +91,10 @@
                             <input type="password" class="form-control" id="newPassword" name="newPassword" required>
                             <div id="newPasswordHelp" class="form-text">Приложите карту к считывателю RFID</div>
                         </div>
-                        <!--<input type="hidden" id="productionUid" name="productionUid">-->
+                        <div class="d-flex mt-2 justify-content-end">
+                            <button type="submit" class="btn btn-primary" id="savePasswordButton">Подтвердить</button>
+                        </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                    <button type="button" class="btn btn-primary" id="savePasswordButton">Сохранить</button>
                 </div>
             </div>
         </div>
@@ -112,18 +110,16 @@
                 <div class="modal-body">
                     <form id="editRoleForm" autocomplete="off">
                         <div class="mb-3">
-                                <label for="newRole" class="form-label">Роль:</label>
+                                <label for="newRole" class="form-label">Выберите роль из списка ниже:</label>
                                 <select class="form-select" id="newRole" name="newRole" required>
                                     <option value="master">master - мастер участка (недоступно "редактирование")</option>
                                     <option value="manager">manager - начальник участка (полный функционал)</option>
                                 </select>
                         </div>
-                        <!--<input type="hidden" id="productionUid" name="productionUid">-->
+                        <div class="d-flex mt-2 justify-content-end">
+                            <button type="button" class="btn btn-primary" id="saveRoleButton">Подтвердить</button>
+                        </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                    <button type="button" class="btn btn-primary" id="saveRoleButton">Сохранить</button>
                 </div>
             </div>
         </div>
@@ -140,15 +136,16 @@
                     <form id="deleteUserForm">
                         <div class="mb-3">
                             <h6>Вы уверены, что хотите удалить пользователя?</h6>
-<!--                            <label for="newUser" class="form-label">Новый пользователь</label>-->
-<!--                            <input type="text" class="form-control" id="newUser" required>-->
+                        </div>
+                        <div class="d-flex mt-2 justify-content-end">
+                            <button type="button" class="btn btn-primary" id="applyDeleteUserButton">Подтвердить</button>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
-                    <button type="button" class="btn btn-primary" id="applyDeleteUserButton">Да</button>
-                </div>
+<!--                <div class="modal-footer">-->
+<!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>-->
+<!--                    <button type="button" class="btn btn-primary" id="applyDeleteUserButton">Да</button>-->
+<!--                </div>-->
             </div>
         </div>
     </div>

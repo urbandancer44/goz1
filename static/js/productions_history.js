@@ -57,6 +57,7 @@ function getProductions() {
         .catch(error => console.error('Error:', error));
 }
 
+// --- Отображение времени ---
 function getTime() {
     fetch('/get_time')
         .then(response => response.json())
@@ -68,31 +69,31 @@ function getTime() {
 
 // ---Сброс фильтра---
 document.getElementById('clearFilterButton').addEventListener('click', clearFilter);
-
+// Фильтр
 function clearFilter() {
     getProductions();  // Сбрасываем фильтр, загружая все данные
 }
 
-// ---Фильтрация по времени---
+// --- Фильтрация по времени ---
 document.getElementById('timeFilterButton').addEventListener('click', function() {
+    // document.getElementById('startDatetime').value = '';
+    // document.getElementById('endDatetime').value = '';
     timeFilterModal = new bootstrap.Modal(document.getElementById('timeFilterModal'));
     timeFilterModal.show();
 });
-
+// При нажатии кнопки модального окна
 document.getElementById('applyTimeFilterButton').addEventListener('click', function () {
     const startDatetime = document.getElementById('startDatetime').value;
     const endDatetime = document.getElementById('endDatetime').value;
     if (startDatetime && endDatetime) {
         filterByTime(startDatetime, endDatetime);
         timeFilterModal.hide();
-        document.getElementById('startDatetime').value = '';
-        document.getElementById('endDatetime').value = '';
         timeFilterModal = null;
     } else {
         alert('Установите временной интервал!');
     }
 });
-
+// Фильтр
 function filterByTime(startDatetime, endDatetime) {
     const startDate = new Date(startDatetime);
     const endDate = new Date(endDatetime);
@@ -102,7 +103,7 @@ function filterByTime(startDatetime, endDatetime) {
     });
 }
 
-// ---Фильтрация по изделию---
+// --- Фильтрация по изделию ---
 function getProductionsProducts() {
     fetch('/get_productions')
         .then(response => response.json())
@@ -126,30 +127,29 @@ function getProductionsProducts() {
         })
         .catch(error => console.error('Error:', error));
 }
-
+// Открытие модального окна
 document.getElementById('productFilterButton').addEventListener('click', function() {
     productFilterModal = new bootstrap.Modal(document.getElementById('productFilterModal'));
     productFilterModal.show();
     getProductionsProducts();  // Загружаем список изделий
 });
-
+// При нажатии кнопки модального окна
 document.getElementById('applyProductFilterButton').addEventListener('click', function() {
     const selectedProduct = document.getElementById('productSelect').value;
     if (selectedProduct) {
         filterByProduct(selectedProduct);
         productFilterModal.hide();
-        document.getElementById('productSelect').value = '';
         productFilterModal = null;
     } else {
         alert('Выберите изделие из списка!');
     }
 });
-
+// Фильтр
 function filterByProduct(productName) {
     filterProductions((production) => production[2].includes(productName));
 }
 
-// ---Фильтрация по номеру ШПЗ---
+// --- Фильтрация по номеру ШПЗ ---
 function getProductionsOrders() {
     fetch('/get_productions')
         .then(response => response.json())
@@ -173,74 +173,84 @@ function getProductionsOrders() {
         })
         .catch(error => console.error('Error:', error));
 }
-
+// Открытие модального кона
 document.getElementById('orderFilterButton').addEventListener('click', function() {
     orderFilterModal = new bootstrap.Modal(document.getElementById('orderFilterModal'));
     orderFilterModal.show();
     getProductionsOrders();  // Загружаем список ШПЗ
 });
-
+// При нажатии кнопки модального окна
 document.getElementById('applyOrderFilterButton').addEventListener('click', function() {
     const selectedOrder = document.getElementById('orderSelect').value;
     if (selectedOrder) {
         filterByOrder(selectedOrder);
         orderFilterModal.hide();
-        document.getElementById('orderSelect').value = '';
         orderFilterModal = null;
     } else {
         alert('Выберите номер ШПЗ из списка!');
     }
 });
-
+// Фильтр
 function filterByOrder(orderNum) {
     filterProductions((production) => production[3].includes(orderNum));
 }
 
-// ---Фильтрация по UID---
+// --- Фильтрация по UID ---
+// Открытие модального окна
 document.getElementById('uidFilterButton').addEventListener('click', function() {
+    document.getElementById('filterUid').value = '';
     uidFilterModal = new bootstrap.Modal(document.getElementById('uidFilterModal'));
     uidFilterModal.show();
 });
-
-document.getElementById('applyUidFilterButton').addEventListener('click', function () {
+// При открытии модального окна
+document.getElementById('uidFilterModal').addEventListener('shown.bs.modal', function () {
+    document.getElementById('filterUid').focus();
+})
+// При нажатии кнопки модального окна
+document.getElementById('filterUidForm').addEventListener('submit', function (event) {
+    event.preventDefault();
     const filterUid = document.getElementById('filterUid').value;
     if (filterUid) {
         filterByUid(filterUid);
         uidFilterModal.hide();
-        document.getElementById('filterUid').value = '';
         uidFilterModal = null;
     } else {
         alert('Введите UID изделия!');
     }
 });
-
+// Фильтр
 function filterByUid(productUid) {
     const transliterateUid = transliterate(productUid)
     filterProductions((production) => production[4].includes(transliterateUid));
 }
 
 // ---Фильтрация по S/N---
+// Открытие модального окна
 document.getElementById('serialNumFilterButton').addEventListener('click', function() {
+    document.getElementById('filterSerialNum').value = '';
     serialNumFilterModal = new bootstrap.Modal(document.getElementById('serialNumFilterModal'));
     serialNumFilterModal.show();
 });
-
-document.getElementById('applySerialNumFilterButton').addEventListener('click', function () {
+// При открытии модального окна
+document.getElementById('serialNumFilterModal').addEventListener('shown.bs.modal', function () {
+    document.getElementById('filterSerialNum').focus();
+})
+// При нажатии кнопки модального окна
+document.getElementById('filterSerialNumForm').addEventListener('submit', function (event) {
+    event.preventDefault();
     const filterSerialNum = document.getElementById('filterSerialNum').value;
     if (filterSerialNum) {
         filterBySerialNum(filterSerialNum);
         serialNumFilterModal.hide();
-        document.getElementById('filterSerialNum').value = '';
         serialNumFilterModal = null;
     } else {
         alert('Введите серийный номер изделия!');
     }
 });
-
+// Фильтр
 function filterBySerialNum(serialNum) {
     filterProductions((production) => production[7].includes(serialNum));
 }
-
 
 // ---Фильтрация по пользователю---
 function getProductionsUsers() {
@@ -266,13 +276,13 @@ function getProductionsUsers() {
         })
         .catch(error => console.error('Error:', error));
 }
-
+// Открытие модального окна
 document.getElementById('userFilterButton').addEventListener('click', function() {
     userFilterModal = new bootstrap.Modal(document.getElementById('userFilterModal'));
     userFilterModal.show();
     getProductionsUsers();  // Загружаем список ШПЗ
 });
-
+// При нажатии кнопки модального окна
 document.getElementById('applyUserFilterButton').addEventListener('click', function() {
     const selectedUser = document.getElementById('userSelect').value;
     if (selectedUser) {
@@ -284,7 +294,7 @@ document.getElementById('applyUserFilterButton').addEventListener('click', funct
         alert('Выберите пользователя из списка!');
     }
 });
-
+// Фильтр
 function filterByUser(username) {
     filterProductions((production) => production[5].includes(username));
 }

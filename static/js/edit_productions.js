@@ -75,10 +75,10 @@ function activateRow(row) {
     //alert(productionUid);
 }
 // ---Изменение времени в таблице---
+// Открытие модального окна
 document.getElementById('editProductionTimeButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#productionsTableBody tr.table-active');
     if (activeRow) {
-        //productionUid = activeRow.dataset.uid;
         editTimeModal = new bootstrap. Modal(document.getElementById('editTimeModal'));
         editTimeModal.show();
     } else {
@@ -87,6 +87,7 @@ document.getElementById('editProductionTimeButton').addEventListener('click', fu
         alert('Выберите строку для редактирования!');
     }
 });
+// При нажатии кнопки модального окна
 document.getElementById('saveTimeButton').addEventListener('click', function () {
     const newDatetime = document.getElementById('newDatetime').value;
     if (newDatetime) {
@@ -104,7 +105,6 @@ document.getElementById('saveTimeButton').addEventListener('click', function () 
         .then(data => {
             alert(data.message);
             editTimeModal.hide();
-            document.getElementById('newDatetime').value = '';
             editTimeModal = null;
             productionUid = null;
             getProductions();  // Перезагружаем таблицу после изменения
@@ -116,10 +116,11 @@ document.getElementById('saveTimeButton').addEventListener('click', function () 
 });
 
 // ---Изменение номера ШПЗ в таблице---
+// Открытие модального окна
 document.getElementById('editProductionOrderButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#productionsTableBody tr.table-active');
     if (activeRow) {
-        //productionUid = activeRow.dataset.uid;
+        document.getElementById('newOrder').value = '';
         editOrderModal = new bootstrap. Modal(document.getElementById('editOrderModal'));
         editOrderModal.show();
     } else {
@@ -128,7 +129,13 @@ document.getElementById('editProductionOrderButton').addEventListener('click', f
         alert('Выберите строку для редактирования!');
     }
 });
-document.getElementById('saveOrderButton').addEventListener('click', function () {
+// При открытии модального окна
+document.getElementById('editOrderModal').addEventListener('shown.bs.modal', function () {
+    document.getElementById('newOrder').focus();
+})
+// При нажатии кнопки модального окна
+document.getElementById('editOrderForm').addEventListener('submit', function (event) {
+    event.preventDefault();
     const newOrder = document.getElementById('newOrder').value;
     if (newOrder) {
         fetch('/update_production_order', {
@@ -145,7 +152,6 @@ document.getElementById('saveOrderButton').addEventListener('click', function ()
         .then(data => {
             alert(data.message);
             editOrderModal.hide();
-            document.getElementById('newOrder').value = '';
             editOrderModal = null;
             productionUid = null;
             getProductions();  // Перезагружаем таблицу после изменения
@@ -175,13 +181,13 @@ function getUsers() {
         })
         .catch(error => console.error('Error:', error));
 }
-
+// Открытие модального окна
 document.getElementById('editProductionUserButton').addEventListener('click', function() {
     editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
     editUserModal.show();
     getUsers();  // Загружаем список пользователей
 });
-
+// При нажатии кнопки модального окна
 document.getElementById('saveUserButton').addEventListener('click', function() {
     const selectedUser = document.getElementById('newUser').value;
     if (selectedUser) {
@@ -199,7 +205,6 @@ document.getElementById('saveUserButton').addEventListener('click', function() {
         .then(data => {
             alert(data.message);
             editUserModal.hide();
-            document.getElementById('newUser').value = '';
             editUserModal = null;
             productionUid = null;
             getProductions();  // Перезагружаем таблицу после изменения
@@ -211,6 +216,7 @@ document.getElementById('saveUserButton').addEventListener('click', function() {
 });
 
 // ---Удаление записи в таблице---
+// Открытие модального окна
 document.getElementById('deleteProductionButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#productionsTableBody tr.table-active');
     if (activeRow) {
@@ -222,6 +228,7 @@ document.getElementById('deleteProductionButton').addEventListener('click', func
         alert('Выберите строку для редактирования!');
     }
 });
+// При нажатии кнопки модального окна
 document.getElementById('applyDeleteProductionButton').addEventListener('click', function () {
     fetch('/delete_production', {
         method: 'POST',
@@ -243,7 +250,7 @@ document.getElementById('applyDeleteProductionButton').addEventListener('click',
     .catch(error => console.error('Error:', error));
 });
 
-// ---Отображение времени---
+// --- Отображение времени ---
 function getTime() {
     fetch('/get_time')
         .then(response => response.json())
@@ -253,33 +260,33 @@ function getTime() {
         .catch(error => console.error('Error:', error));
 }
 
-// ---Сброс фильтра---
+// --- Сброс фильтра ---
 document.getElementById('clearFilterButton').addEventListener('click', clearFilter);
-
+// Фильтр
 function clearFilter() {
     getProductions();  // Сбрасываем фильтр, загружая все данные
 }
 
-// ---Фильтрация по времени---
+// --- Фильтрация по времени ---
 document.getElementById('timeFilterButton').addEventListener('click', function() {
+    // document.getElementById('startDatetime').value = '';
+    // document.getElementById('endDatetime').value = '';
     timeFilterModal = new bootstrap.Modal(document.getElementById('timeFilterModal'));
     timeFilterModal.show();
 });
-
+// При нажатии кнопки модального окна
 document.getElementById('applyTimeFilterButton').addEventListener('click', function () {
     const startDatetime = document.getElementById('startDatetime').value;
     const endDatetime = document.getElementById('endDatetime').value;
     if (startDatetime && endDatetime) {
         filterByTime(startDatetime, endDatetime);
         timeFilterModal.hide();
-        document.getElementById('startDatetime').value = '';
-        document.getElementById('endDatetime').value = '';
         timeFilterModal = null;
     } else {
         alert('Установите временной интервал!');
     }
 });
-
+// Фильтр
 function filterByTime(startDatetime, endDatetime) {
     const startDate = new Date(startDatetime);
     const endDate = new Date(endDatetime);
@@ -289,8 +296,8 @@ function filterByTime(startDatetime, endDatetime) {
     });
 }
 
-// ---Фильтрация по изделию---
-function getProducts() {
+// --- Фильтрация по изделию ---
+function getProductionsProducts() {
     fetch('/get_productions')
         .then(response => response.json())
         .then(data => {
@@ -313,31 +320,30 @@ function getProducts() {
         })
         .catch(error => console.error('Error:', error));
 }
-
+// Открытие модального окна
 document.getElementById('productFilterButton').addEventListener('click', function() {
     productFilterModal = new bootstrap.Modal(document.getElementById('productFilterModal'));
     productFilterModal.show();
-    getProducts();  // Загружаем список изделий
+    getProductionsProducts();  // Загружаем список изделий
 });
-
+// При нажатии кнопки модального окна
 document.getElementById('applyProductFilterButton').addEventListener('click', function() {
     const selectedProduct = document.getElementById('productSelect').value;
     if (selectedProduct) {
         filterByProduct(selectedProduct);
         productFilterModal.hide();
-        document.getElementById('productSelect').value = '';
         productFilterModal = null;
     } else {
         alert('Выберите изделие из списка!');
     }
 });
-
+// Фильтр
 function filterByProduct(productName) {
     filterProductions((production) => production[2].includes(productName));
 }
 
-// ---Фильтрация по номеру ШПЗ---
-function getOrders() {
+// --- Фильтрация по номеру ШПЗ ---
+function getProductionsOrders() {
     fetch('/get_productions')
         .then(response => response.json())
         .then(data => {
@@ -360,74 +366,84 @@ function getOrders() {
         })
         .catch(error => console.error('Error:', error));
 }
-
+// Открытие модального кона
 document.getElementById('orderFilterButton').addEventListener('click', function() {
     orderFilterModal = new bootstrap.Modal(document.getElementById('orderFilterModal'));
     orderFilterModal.show();
-    getOrders();  // Загружаем список ШПЗ
+    getProductionsOrders();  // Загружаем список ШПЗ
 });
-
+// При нажатии кнопки модального окна
 document.getElementById('applyOrderFilterButton').addEventListener('click', function() {
     const selectedOrder = document.getElementById('orderSelect').value;
     if (selectedOrder) {
         filterByOrder(selectedOrder);
         orderFilterModal.hide();
-        document.getElementById('orderSelect').value = '';
         orderFilterModal = null;
     } else {
         alert('Выберите номер ШПЗ из списка!');
     }
 });
-
+// Фильтр
 function filterByOrder(orderNum) {
     filterProductions((production) => production[3].includes(orderNum));
 }
 
-// ---Фильтрация по UID---
+// --- Фильтрация по UID ---
+// Открытие модального окна
 document.getElementById('uidFilterButton').addEventListener('click', function() {
+    document.getElementById('filterUid').value = '';
     uidFilterModal = new bootstrap.Modal(document.getElementById('uidFilterModal'));
     uidFilterModal.show();
 });
-
-document.getElementById('applyUidFilterButton').addEventListener('click', function () {
+// При открытии модального окна
+document.getElementById('uidFilterModal').addEventListener('shown.bs.modal', function () {
+    document.getElementById('filterUid').focus();
+})
+// При нажатии кнопки модального окна
+document.getElementById('filterUidForm').addEventListener('submit', function (event) {
+    event.preventDefault();
     const filterUid = document.getElementById('filterUid').value;
     if (filterUid) {
         filterByUid(filterUid);
         uidFilterModal.hide();
-        document.getElementById('filterUid').value = '';
         uidFilterModal = null;
     } else {
         alert('Введите UID изделия!');
     }
 });
-
+// Фильтр
 function filterByUid(productUid) {
     const transliterateUid = transliterate(productUid)
     filterProductions((production) => production[4].includes(transliterateUid));
 }
 
 // ---Фильтрация по S/N---
+// Открытие модального окна
 document.getElementById('serialNumFilterButton').addEventListener('click', function() {
+    document.getElementById('filterSerialNum').value = '';
     serialNumFilterModal = new bootstrap.Modal(document.getElementById('serialNumFilterModal'));
     serialNumFilterModal.show();
 });
-
-document.getElementById('applySerialNumFilterButton').addEventListener('click', function () {
+// При открытии модального окна
+document.getElementById('serialNumFilterModal').addEventListener('shown.bs.modal', function () {
+    document.getElementById('filterSerialNum').focus();
+})
+// При нажатии кнопки модального окна
+document.getElementById('filterSerialNumForm').addEventListener('submit', function (event) {
+    event.preventDefault();
     const filterSerialNum = document.getElementById('filterSerialNum').value;
     if (filterSerialNum) {
         filterBySerialNum(filterSerialNum);
         serialNumFilterModal.hide();
-        document.getElementById('filterSerialNum').value = '';
         serialNumFilterModal = null;
     } else {
         alert('Введите серийный номер изделия!');
     }
 });
-
+// Фильтр
 function filterBySerialNum(serialNum) {
     filterProductions((production) => production[7].includes(serialNum));
 }
-
 
 // ---Фильтрация по пользователю---
 function getProductionsUsers() {
@@ -453,13 +469,13 @@ function getProductionsUsers() {
         })
         .catch(error => console.error('Error:', error));
 }
-
+// Открытие модального окна
 document.getElementById('userFilterButton').addEventListener('click', function() {
     userFilterModal = new bootstrap.Modal(document.getElementById('userFilterModal'));
     userFilterModal.show();
     getProductionsUsers();  // Загружаем список ШПЗ
 });
-
+// При нажатии кнопки модального окна
 document.getElementById('applyUserFilterButton').addEventListener('click', function() {
     const selectedUser = document.getElementById('userSelect').value;
     if (selectedUser) {
@@ -471,7 +487,7 @@ document.getElementById('applyUserFilterButton').addEventListener('click', funct
         alert('Выберите пользователя из списка!');
     }
 });
-
+// Фильтр
 function filterByUser(username) {
     filterProductions((production) => production[5].includes(username));
 }

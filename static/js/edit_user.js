@@ -72,10 +72,11 @@ function activateRow(row) {
     username = row.dataset.user;
     //alert(product_name);
 }
-//---изменение пароля пользователя---
+// --- Изменение пароля пользователя ---
 document.getElementById('editUserPasswordButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#usersTableBody tr.table-active');
     if (activeRow) {
+        document.getElementById('newPassword').value = '';
         editPasswordModal = new bootstrap. Modal(document.getElementById('editPasswordModal'));
         editPasswordModal.show();
     } else {
@@ -84,7 +85,17 @@ document.getElementById('editUserPasswordButton').addEventListener('click', func
         alert('Выберите строку для редактирования!');
     }
 });
-document.getElementById('savePasswordButton').addEventListener('click', function () {
+// При открытии модального окна
+document.getElementById('editPasswordModal').addEventListener('shown.bs.modal', function () {
+    document.getElementById('newPassword').focus();
+})
+// При закрытии модального окна
+// document.getElementById('editPasswordModal').addEventListener('hidden.bs.modal', function () {
+//     document.getElementById('newPassword').value = '';
+// })
+// При нажатии кнопки модального окна
+document.getElementById('editPasswordForm').addEventListener('submit', function (event) {
+    event.preventDefault();
     const newPassword = document.getElementById('newPassword').value;
     if (newPassword) {
         fetch('/update_user_password', {
@@ -101,7 +112,6 @@ document.getElementById('savePasswordButton').addEventListener('click', function
         .then(data => {
             alert(data.message);
             editPasswordModal.hide();
-            document.getElementById('newPassword').value = '';
             editPasswordModal = null;
             username = null;
             getUsers();  // Перезагружаем таблицу после изменения
@@ -112,7 +122,7 @@ document.getElementById('savePasswordButton').addEventListener('click', function
     }
 });
 
-//---изменение роли пользователя---
+// --- Изменение роли пользователя ---
 document.getElementById('editUserRoleButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#usersTableBody tr.table-active');
     if (activeRow) {
@@ -124,6 +134,11 @@ document.getElementById('editUserRoleButton').addEventListener('click', function
         alert('Выберите строку для редактирования!');
     }
 });
+// При закрытии модального окна
+// document.getElementById('editRoleModal').addEventListener('hidden.bs.modal', function () {
+//     document.getElementById('newRole').value = '';
+// })
+// При нажатии кнопки модального окна
 document.getElementById('saveRoleButton').addEventListener('click', function () {
     const newRole = document.getElementById('newRole').value;
     if (newRole) {
@@ -141,7 +156,6 @@ document.getElementById('saveRoleButton').addEventListener('click', function () 
         .then(data => {
             alert(data.message);
             editRoleModal.hide();
-            document.getElementById('newRole').value = '';
             editRoleModal = null;
             username = null;
             getUsers();  // Перезагружаем таблицу после изменения

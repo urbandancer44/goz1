@@ -26,7 +26,7 @@
         </div>
         <div class="row justify-content-center mt-2">
             <div class="col-2">
-                <div class="card-body" style="position: absolute; left: -9999px;">
+                <div class="card-body" style="position: absolute; left: 5px;">
                     <form id="setProductUidForm" autocomplete="off">
                         <input type="text" class="form-control" id="hiddenInput" name="hiddenInput">
                         <button type="submit" class="btn btn-primary btn-block"></button>
@@ -106,12 +106,15 @@
                             <label for="serialNum" class="form-label">Серийный номер</label>
                             <input type="text" class="form-control" id="serialNum" required>
                         </div>
+                        <div class="d-flex mt-2 justify-content-end">
+                            <button type="submit" class="btn btn-primary" id="saveSerialNumButton">Подтвердить</button>
+                        </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                    <button type="button" class="btn btn-primary" id="saveSerialNumButton">Сохранить</button>
-                </div>
+<!--                <div class="modal-footer">-->
+<!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
+<!--                    <button type="submit" class="btn btn-primary" id="saveSerialNumButton">Сохранить</button>-->
+<!--                </div>-->
             </div>
         </div>
     </div>

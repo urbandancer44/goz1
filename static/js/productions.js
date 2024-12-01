@@ -65,25 +65,7 @@ function getProductions() {
         })
         .catch(error => console.error('Error:', error));
 }
-
-// function addProduction(product_uid) {
-//     const transliteratedUid = transliterate(product_uid);
-//     fetch('/add_production', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/x-www-form-urlencoded'
-//         },
-//         body: `product_uid=${encodeURIComponent(transliteratedUid)}`
-//     })
-//     .then(response => response.text())
-//     .then(data => {
-//         alert(data);
-//         getProductions();
-//         document.getElementById("hiddenInput").value = '';
-//     })
-//     .catch(error => console.error('Error:', error));
-// }
-
+// --- Модальное окно ввода серийного номера ---
 document.getElementById('setProductUidForm').addEventListener('submit', function(event) {
     event.preventDefault();
     const product_uid = document.getElementById('hiddenInput').value;
@@ -92,8 +74,19 @@ document.getElementById('setProductUidForm').addEventListener('submit', function
     setSerialNumModal.show();
     // addProduction(product_uid);
 });
-
-document.getElementById('saveSerialNumButton').addEventListener('click', function () {
+// При открытии модального окна
+document.getElementById('setSerialNumModal').addEventListener('shown.bs.modal', function () {
+    document.getElementById('serialNum').focus();
+})
+// При закрытии модального окна
+document.getElementById('setSerialNumModal').addEventListener('hidden.bs.modal', function () {
+    document.getElementById('hiddenInput').value = '';
+    document.getElementById('serialNum').value = '';
+    focusHiddenInput();
+})
+// При нажатии на кнопку модального окна
+document.getElementById('setSerialNumForm').addEventListener('submit', function (event) {
+    event.preventDefault();
     const serialNum = document.getElementById('serialNum').value;
     if (serialNum) {
         fetch('/add_production', {
@@ -106,17 +99,25 @@ document.getElementById('saveSerialNumButton').addEventListener('click', functio
                 serialNum: serialNum
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка при добавлении изделия!\n\nПроверьте данные UID и S/N (возможно уже есть в БД).\nПовторно сканируйте UID и введите S/N.')
+            }
+            return response.json();
+        })
         .then(data => {
             alert(data.message);
             setSerialNumModal.hide();
-            document.getElementById('hiddenInput').value = '';
-            document.getElementById('serialNum').value = '';
             setSerialNumModal = null;
             transliteratedUid = null;
             getProductions();  // Перезагружаем таблицу после изменения
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message);
+            setSerialNumModal.hide();
+        })
+        // .catch(error => console.error('Error:', error));
     } else {
         alert('Пустое поле ввода!')
     }

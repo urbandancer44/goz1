@@ -74,15 +74,15 @@ class Handlers:
 
     def update_user_password(self):
         if 'username' in session:
-            username = str(request.form.get('username'))
-            new_password = str(request.form.get('new_password'))
+            username = request.json['username']
+            new_password = request.json['newPassword']
             # Хешируем пароль перед сохранением
             new_hashed_password = hashlib.md5(new_password.encode('utf-8')).hexdigest()
 
             query = "UPDATE users SET password = %s WHERE username = %s"
             self.db_manager.execute_insert(query, (new_hashed_password, username))
 
-            return "Пароль успешно изменен!"
+            return jsonify({'message': 'Пароль успешно изменён!'})
         else:
             return redirect('/')
 
@@ -249,23 +249,6 @@ class Handlers:
         productions = self.db_manager.execute_query(query)
 
         return jsonify(productions)
-
-    # def add_production(self):
-    #     if 'username' in session:
-    #         datetime_value = datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S')
-    #         product_name = session.get('product_name')
-    #         order_num = session.get('order_num')
-    #         product_uid = str(request.form.get('product_uid'))
-    #         username = session.get('username')
-    #         production_status = 1
-    #
-    #         query = "INSERT INTO productions (datetime, product_name, order_num, product_uid, username, production_status) VALUES (%s, %s, %s, %s, %s, %s)"
-    #         self.db_manager.execute_insert(query, (datetime_value, product_name, order_num, product_uid, username, production_status))
-    #         return "Запись успешно добавлена!"
-    #     else:
-    #         return redirect('/')
-    #
-    #     #return "Запись успешно добавлена!"
 
     def add_production(self):
         if 'username' in session:
