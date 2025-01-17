@@ -13,6 +13,7 @@ app.config['UPLOAD_FOLDER'] = os.getcwd() + '/static/img/products'
 
 handlers = Handlers(app)
 
+
 app.add_url_rule('/', 'index', handlers.index)
 app.add_url_rule('/login', 'login', handlers.login, methods=['POST'])
 app.add_url_rule('/admin_panel', 'admin_panel', handlers.admin_panel)
