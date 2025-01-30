@@ -12,10 +12,12 @@ function getProducts() {
             data.sort((a, b) => a[1].localeCompare(b[1]));
 
             data.forEach((product, index) => {
-                const row = document.createElement('tr');
-                const numberCell = document.createElement('td');
-                const product_nameCell = document.createElement('td');
-                const pictureCell = document.createElement('td');
+                const row = document.createElement('div');
+                row.classList.add('grid-row');
+
+                const numberCell = document.createElement('div');
+                const product_nameCell = document.createElement('div');
+                const pictureCell = document.createElement('div');
 
                 numberCell.innerText = index + 1;
                 product_nameCell.innerText = product[1];
@@ -58,14 +60,14 @@ document.getElementById('addProductForm').addEventListener('submit', function(ev
 });
 
 function activateRow(row) {
-    document.querySelectorAll('#productsTableBody tr').forEach(r => r.classList.remove('table-active'));
-    row.classList.add('table-active')
+    document.querySelectorAll('#productsTableBody .grid-row').forEach(r => r.classList.remove('active-row'));
+    row.classList.add('active-row')
     product_name = row.dataset.name;
     //alert(product_name);
 }
 //---изменение фото в таблице---
 document.getElementById('editProductPictureButton').addEventListener('click', function() {
-    const activeRow = document.querySelector('#productsTableBody tr.table-active');
+    const activeRow = document.querySelector('#productsTableBody .grid-row.active-row');
     if (activeRow) {
         document.getElementById('productName').value = product_name;
         editPictureModal = new bootstrap. Modal(document.getElementById('editPictureModal'));
@@ -103,7 +105,7 @@ document.getElementById('savePictureButton').addEventListener('click', function 
 
 // ---Удаление записи в таблице---
 document.getElementById('deleteProductButton').addEventListener('click', function() {
-    const activeRow = document.querySelector('#productsTableBody tr.table-active');
+    const activeRow = document.querySelector('#productsTableBody .grid-row.active-row');
     if (activeRow) {
         deleteProductModal = new bootstrap. Modal(document.getElementById('deleteProductModal'));
         deleteProductModal.show();
