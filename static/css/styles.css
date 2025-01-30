@@ -8,3 +8,47 @@
 .btn-grid .btn {
     flex: 0 0 auto; /* Предотвращаем растягивание кнопок */
 }
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr 2fr; /* Три колонки */
+    gap: 1px;
+    background-color: rgba(0,0,0,.125);
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem; /* Скругление углов */
+    overflow: hidden; /* Чтобы скругление углов работало корректно */
+}
+
+.grid-header {
+    display: contents; /* Заголовки будут частью grid-контейнера */
+}
+
+.grid-header > div {
+    background-color: #e9ecef;
+    padding: 8px;
+    font-weight: bold;
+    text-align: center;
+    border: 1px rgba(0,0,0,.125);
+    position: sticky; /* Заголовки будут прилипать при прокрутке */
+    top: 0; /* Прилипание к верхней части контейнера */
+    z-index: 1; /* Заголовки поверх контента */
+}
+
+.grid-body {
+    display: contents; /* Данные будут частью grid-контейнера */
+}
+
+.grid-row {
+    display: contents; /* Каждая строка будет частью grid-контейнера */
+}
+
+.grid-row > div {
+    padding: 8px;
+    border: 1px rgba(0,0,0,.125);
+    background-color: white;
+    text-align: center;
+}
+
+.active-row > div {
+    background-color: #cfe2ff !important;
+}

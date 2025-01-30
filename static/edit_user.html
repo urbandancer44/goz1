@@ -51,7 +51,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <!--<div class="col-md-6">
                 <h3 class="text-center"><u>Таблица пользователей</u></h3>
                 <div class="table-responsive" style="min-height: 247px; max-height: 522px">
                     <table class="table table-bordered table-primary border-dark">
@@ -60,13 +60,25 @@
                                 <th>№</th>
                                 <th>Пользователь</th>
                                 <th>Роль</th>
-<!--                                <th>Действие</th>-->
                             </tr>
                         </thead>
-                        <tbody id="usersTableBody">
+                        <tbody id="usersTableBody"> -->
                             <!-- Данные будут загружены с помощью JavaScript -->
-                        </tbody>
+                        <!--</tbody>
                     </table>
+                </div>
+            </div> -->
+            <div class="col-md-6">
+                <h3 class="text-center"><u>Таблица пользователей</u></h3>
+                <div class="grid-container" style="max-height: 200px; overflow-y: auto;">
+                    <div class="grid-header">
+                        <div>№</div>
+                        <div>Пользователь</div>
+                        <div>Роль</div>
+                    </div>
+                    <div class="grid-body" id="usersTableBody">
+                        <!-- Данные будут загружены с помощью JavaScript -->
+                    </div>
                 </div>
             </div>
             <div class="d-grid gap-3 col-2 mx-auto mt-5 btn-grid">
