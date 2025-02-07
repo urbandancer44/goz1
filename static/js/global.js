@@ -1,0 +1,78 @@
+// --- productions.js ---
+let serverTime = null; // Глобальная переменная для хранения времени с сервера
+let transliteratedUid = null;
+let setSerialNumModal = null;
+// ---
+
+// --- productions_history.js ---
+let productFilterModal = null;
+let timeFilterModal = null;
+let orderFilterModal = null;
+let uidFilterModal = null;
+let userFilterModal = null;
+let serialNumFilterModal = null;
+// ---
+
+// --- edit_productions.js ---
+let productionUid = null;
+let editTimeModal = null;
+let editOrderModal = null;
+let editUserModal = null;
+let deleteProductionModal = null;
+// ---
+
+// --- edit_workplace.js ---
+let workplaceID = null;
+let editWorkplaceNameModal = null;
+let deleteWorkplaceModal = null;
+// ---
+
+let sessionUsername = null;
+let sessionRole = null;
+let sessionProductName = null;
+let sessionOrderNum = null;
+;
+// Функция для получения значения куки по имени
+let currentWorkplaceID = getCookie('workplace_id');
+function getCookie(name) {
+    let matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+// Функция для получения времени с сервера (один раз в час)
+function getTime() {
+    fetch('/get_time')
+        .then(response => response.json())
+        .then(data => {
+            serverTime = new Date(data.datetime_value); // Сохраняем время с сервера
+            updateTimeDisplay(); // Обновляем отображение времени
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// Функция для увеличения времени локально каждую секунду
+function incrementLocalTime() {
+    if (serverTime) {
+        serverTime.setSeconds(serverTime.getSeconds() + 1); // Увеличиваем время на 1 секунду
+        updateTimeDisplay(); // Обновляем отображение времени
+    }
+}
+
+function transliterate(text) {
+    const translitMap = {
+        'й': 'q', 'ц': 'w', 'у': 'e', 'к': 'r', 'е': 't', 'н': 'y', 'г': 'u', 'ш': 'i', 'щ': 'o', 'з': 'p',
+        'х': '[', 'ъ': ']', 'ф': 'a', 'ы': 's', 'в': 'd', 'а': 'f', 'п': 'g', 'р': 'h', 'о': 'j', 'л': 'k',
+        'д': 'l', 'ж': ';', 'э': '\'', 'я': 'z', 'ч': 'x', 'с': 'c', 'м': 'v', 'и': 'b', 'т': 'n', 'ь': 'm',
+        'б': ',', 'ю': '.', 'ё': '`',
+        'Й': 'Q', 'Ц': 'W', 'У': 'E', 'К': 'R', 'Е': 'T', 'Н': 'Y', 'Г': 'U', 'Ш': 'I', 'Щ': 'O', 'З': 'P',
+        'Х': '{', 'Ъ': '}', 'Ф': 'A', 'Ы': 'S', 'В': 'D', 'А': 'F', 'П': 'G', 'Р': 'H', 'О': 'J', 'Л': 'K',
+        'Д': 'L', 'Ж': ':', 'Э': '"', 'Я': 'Z', 'Ч': 'X', 'С': 'C', 'М': 'V', 'И': 'B', 'Т': 'N', 'Ь': 'M',
+        'Б': '<', 'Ю': '>', 'Ё': '~'
+    };
+
+    return text.split('').map(char => translitMap[char] || char).join('');
+}
+
+

@@ -28,6 +28,13 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
             alert(error.message);
         });
 });
+// Клик по любому объекту, кроме модального окна
+document.addEventListener('click', function(event) {
+
+    if (!event.target.closest('.modal')) {
+        focusPassword();
+    }
+});
 
 function focusPassword() {
     document.getElementById('password').focus();
@@ -35,5 +42,4 @@ function focusPassword() {
 
 window.onload = function() {
     focusPassword();
-    setInterval(focusPassword, 1000);  // Обновляем данные каждую секунду
 };

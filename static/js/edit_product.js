@@ -6,8 +6,8 @@ function getProducts() {
     fetch('/get_products')
         .then(response => response.json())
         .then(data => {
-            const tableBody = document.getElementById('productsTableBody');
-            tableBody.innerHTML = '';  // Очищаем таблицу
+            const gridBody = document.getElementById('productsTableBody');
+            gridBody.innerHTML = '';  // Очищаем таблицу
 
             data.sort((a, b) => a[1].localeCompare(b[1]));
 
@@ -25,7 +25,7 @@ function getProducts() {
                 row.appendChild(numberCell);
                 row.appendChild(product_nameCell);
                 row.appendChild(pictureCell);
-                tableBody.appendChild(row);
+                gridBody.appendChild(row);
 
                 row.dataset.name = product[1];
                 row.addEventListener("click", (event) => {

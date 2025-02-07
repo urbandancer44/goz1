@@ -1,10 +1,20 @@
 function selectOrderInfo() {
-    fetch('/get_select_order_info')
+    // fetch('/get_select_order_info')
+    fetch('/get_info')
         .then(response => response.json())
         .then(data => {
-            document.getElementById('username').innerText = data.username;
-            document.getElementById('role').innerText = data.role;
-            document.getElementById('product_name').innerText = data.product_name;
+            sessionUsername = data.username;
+            document.getElementById('username').innerText = sessionUsername;
+            sessionRole = data.role;
+            document.getElementById('role').innerText = sessionRole;
+
+            if ((data.product_name) != null) {
+                sessionProductName = data.product_name;
+                document.getElementById('product_name').innerText = sessionProductName;
+            }
+            if ((data.order_num) != null) {
+                sessionOrderNum = data.order_num;
+            }
         })
         .catch(error => console.error('Error:', error));
 }
@@ -24,20 +34,6 @@ function setOrder(order_num) {
     .catch(error => console.error('Error:', error));
 }
 
-function getTime() {
-    fetch('/get_time')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('datetime').innerText = data.datetime_value;
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-window.onload = function() {
-    selectOrderInfo();  // Вызываем функцию при загрузке страницы
-    setInterval(getTime, 1000);  // Обновляем данные каждую секунду
-};
-
 document.getElementById('addOrderForm').addEventListener('submit', function(event) {
     event.preventDefault();
     const orderNumInput = document.getElementById('order_num')
@@ -53,4 +49,27 @@ document.getElementById('addOrderForm').addEventListener('submit', function(even
         setOrder(order_num);
     }
 });
+
 document.getElementById("order_num").focus();
+
+// Функция для отображения времени
+function updateTimeDisplay() {
+    const datetimeElement = document.getElementById('datetime');
+    if (datetimeElement && serverTime) {
+        datetimeElement.innerText = serverTime.toLocaleString(); // Отображаем время в локальном формате
+    }
+}
+
+window.onload = function() {
+    if (currentWorkplaceID) {
+    document.getElementById('current_workplace_id').innerText = currentWorkplaceID;
+    } else {
+        console.log('Куки ID рабочего места не найдено')
+    }
+
+    getTime()
+    selectOrderInfo();  // Вызываем функцию при загрузке страницы
+    setInterval(getTime, 3600000);  // Запрашиваем время с сервера каждые 60 минут (3600000 миллисекунд)
+    setInterval(incrementLocalTime, 1000);  // Обновляем время локально каждую секунду
+};
+

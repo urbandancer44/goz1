@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактор рабочих мест</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <script src="/static/js/global.js"></script>
+    <script src="/static/js/edit_workplace.js" defer></script>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row justify-content-center mt-2">
+            <div class="col-2">
+                <a href="/admin_panel" class="btn btn-secondary w-100 btn-lg">Назад</a>
+            </div>
+            <div class="col-7">
+                <h2 class="text-center"><u>Редактор рабочих мест</u></h2>
+            </div>
+            <div class="col-md-1" style="display: grid; grid-template-columns: auto auto; align-items: center;">
+                <div class="grid_info-header">ИРМ:</div>
+                <div class="grid_info-cell" style="color:blue" id="current_workplace_id"></div>
+            </div>
+            <div class="col-2">
+                <form action="/logout" method="post">
+                    <button type="submit" class="btn btn-danger w-100 btn-lg">Выход</button>
+                </form>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-4">
+                <h3 class="text-center"><u>Добавить рабочее место</u></h3>
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <form id="addWorkplaceForm" autocomplete="off">
+                            <div class="mb-2">
+                                <label for="workplace_id" class="form-label">ID рабочего места:</label>
+                                <input type="number" class="form-control" id="workplace_id" name="workplace_id" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="workplace_name" class="form-label">Имя рабочего места:</label>
+                                <input type="text" class="form-control" id="workplace_name" name="workplace_name" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Добавить</button>
+                        </form>
+                    </div>
+                </div>
+                <h3 class="text-center"><u>Установить рабочее место для ПК</u></h3>
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <form id="setWorkplaceForm" autocomplete="off">
+                            <div class="mb-2">
+                                <label class="form-label" for="workplaceSet">ID рабочего места:</label>
+                                <input type="number" class="form-control" id="workplaceSet" name="workplaceSet" required>
+                                <!--<select class="form-select" id="workplaceSelect" name="workplaceSelect" required>-->
+                                    <!-- Опции будут загружаться динамически через JavaScript -->
+                                <!--</select>-->
+                            </div>
+                                <button type="submit" class="btn btn-primary btn-block">Установить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h3 class="text-center"><u>Таблица рабочих мест</u></h3>
+                <div class="grid-container" style="max-height: 517px; overflow-y: auto;">
+                    <div class="grid-header">
+                        <div>№</div>
+                        <div>Имя рабочего места</div>
+                        <div>ID рабочего места</div>
+                    </div>
+                    <div class="grid-body" id="workplacesTableBody">
+                        <!-- Данные будут загружены с помощью JavaScript -->
+                    </div>
+                </div>
+            </div>
+            <div class="d-grid gap-3 col-2 mx-auto mt-5 btn-grid">
+                <button type="button" id="editWorkplaceNameButton" class="btn btn-warning w-100 btn-lg">Изменить имя</button>
+                <button type="button" id="deleteWorkplaceButton" class="btn btn-danger w-100 btn-lg">Удалить запись</button>
+            </div>
+        </div>
+    </div>
+    <!-- Модальное окно для редактирования имени рабочего места -->
+    <div class="modal fade" id="editWorkplaceNameModal" tabindex="-1" aria-labelledby="editWorkplaceNameModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editWorkplaceNameModalLabel">Изменить имя рабочего места</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editWorkplaceNameForm" autocomplete="off">
+                        <div class="mb-3">
+                            <label for="newWorkplaceName" class="form-label">Изменить имя:</label>
+                            <input type="text" class="form-control" id="newWorkplaceName" name="newWorkplaceName" required>
+                        </div>
+                        <div class="d-flex mt-2 justify-content-end">
+                            <button type="submit" class="btn btn-primary" id="saveWorkplaceNameButton">Подтвердить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- Модальное окно для удаления рабочего места -->
+    <div class="modal fade" id="deleteWorkplaceModal" tabindex="-1" aria-labelledby="deleteWorkplaceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteWorkplaceModalLabel">Удаление рабочего места</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="deleteWorkplaceForm">
+                        <div class="mb-3">
+                            <h6>Вы уверены, что хотите удалить рабочее место?</h6>
+                        </div>
+                        <div class="d-flex mt-2 justify-content-end">
+                            <button type="button" class="btn btn-primary" id="applyDeleteWorkplaceButton">Подтвердить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Подключаем локальный Bootstrap JS и Popper.js -->
+    <script src="/static/js/bootstrap.min.js"></script>
+</body>
+</html>

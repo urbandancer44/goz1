@@ -6,6 +6,7 @@
     <title>Редактор пользователей</title>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/styles.css" rel="stylesheet">
+    <script src="/static/js/global.js"></script>
     <script src="/static/js/edit_user.js" defer></script>
 </head>
 <body class="bg-light">
@@ -35,6 +36,7 @@
                                 <select class="form-select" id="role" name="role" required>
                                     <option value="master">master - мастер участка (недоступно "редактирование")</option>
                                     <option value="manager">manager - начальник участка (полный функционал)</option>
+                                    <option value="otk">otk - проверка качества (полный функционал)</option>
                                 </select>
                             </div>
                             <div class="mb-2">
@@ -51,23 +53,6 @@
                     </div>
                 </div>
             </div>
-            <!--<div class="col-md-6">
-                <h3 class="text-center"><u>Таблица пользователей</u></h3>
-                <div class="table-responsive" style="min-height: 247px; max-height: 522px">
-                    <table class="table table-bordered table-primary border-dark">
-                        <thead class="table-secondary border-dark">
-                            <tr>
-                                <th>№</th>
-                                <th>Пользователь</th>
-                                <th>Роль</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersTableBody"> -->
-                            <!-- Данные будут загружены с помощью JavaScript -->
-                        <!--</tbody>
-                    </table>
-                </div>
-            </div> -->
             <div class="col-md-6">
                 <h3 class="text-center"><u>Таблица пользователей</u></h3>
                 <div class="grid-container" style="max-height: 517px; overflow-y: auto;">
@@ -126,6 +111,7 @@
                                 <select class="form-select" id="newRole" name="newRole" required>
                                     <option value="master">master - мастер участка (недоступно "редактирование")</option>
                                     <option value="manager">manager - начальник участка (полный функционал)</option>
+                                    <option value="otk">otk - проверка качества (полный функционал)</option>
                                 </select>
                         </div>
                         <div class="d-flex mt-2 justify-content-end">

@@ -12,6 +12,11 @@ class Handlers:
         self.app = app
         self.db_manager = DatabaseManager(app)
 
+        # Добавляем маршрут для всех статических файлов
+        # @app.route('/static/<path:filename>')
+        # def serve_static(filename):
+        #     return send_from_directory(self.app.static_folder, filename)
+
     @staticmethod
     def check_non_session_value(keys):
         missing_keys = [key for key in keys if session.get(key) is None]
@@ -24,7 +29,10 @@ class Handlers:
 
     def login(self):
         password = str(request.form.get('password'))
+        # Хэшируем пароль
         hashed_password = hashlib.md5(password.encode()).hexdigest()
+        # Проверяем наличие куки workplace_id
+        current_workplace_id = request.cookies.get('workplace_id')
 
         query = "SELECT * FROM users WHERE password = %s"
         user = self.db_manager.execute_query(query, (hashed_password,))
@@ -34,8 +42,13 @@ class Handlers:
             session['role'] = user[0][3]
             if session['role'] == 'admin':
                 return jsonify({'message': 'Успешная авторизация!', 'redirect': '/admin_panel'})
+
             else:
-                return jsonify({'message': 'Успешная авторизация!', 'redirect': '/select_product'})
+                # Если куки currentWorkplaceID равно 5, перенаправляем на select_product
+                if current_workplace_id == '5':
+                    return jsonify({'message': 'Успешная авторизация!', 'redirect': '/select_product'})
+                else:
+                    return jsonify({'message': 'Рабочее место не задано, обратитесь к администратору!'})
         else:
             return jsonify({'message': 'Отказ доступа!'}), 401
 
@@ -97,17 +110,6 @@ class Handlers:
             return jsonify({'message': 'Роль успешно изменена!'})
         else:
             return redirect('/')
-
-    # def delete_user(self):
-    #     if 'username' in session:
-    #         username = str(request.form.get('username'))
-    #
-    #         query = "DELETE FROM users WHERE username = %s"
-    #         self.db_manager.execute_delete(query, (username,))
-    #
-    #         return "Пользователь успешно удалён!"
-    #     else:
-    #         return redirect('/')
 
     def delete_user(self):
         if 'username' in session:
@@ -208,6 +210,53 @@ class Handlers:
         else:
             return redirect('/')
 
+    def edit_workplace(self):
+        if 'username' in session:
+            return send_from_directory(self.app.static_folder, 'edit_workplace.html')
+        else:
+            return redirect('/')
+
+    def get_workplaces(self):
+        query = "SELECT * FROM workplaces"
+        workplaces = self.db_manager.execute_query(query)
+
+        return jsonify(workplaces)
+
+    def add_workplace(self):
+        if 'username' in session:
+            workplace_name = str(request.form.get('workplace_name'))
+            workplace_id = str(request.form.get('workplace_id'))
+
+            query = "INSERT INTO workplaces (workplace_name, workplace_id) VALUES (%s, %s)"
+            self.db_manager.execute_insert(query, (workplace_name, workplace_id))
+
+            return "Рабочее место успешно добавлено!"
+        else:
+            return redirect('/')
+
+    def update_workplace_name(self):
+        if 'username' in session:
+            workplace_id = request.json['workplaceID']
+            new_workplace_name = request.json['newWorkplaceName']
+
+            query = "UPDATE workplaces SET workplace_name = %s WHERE workplace_id = %s"
+            self.db_manager.execute_insert(query, (new_workplace_name, workplace_id))
+
+            return jsonify({'message': 'Имя успешно изменено!'})
+        else:
+            return redirect('/')
+
+    def delete_workplace(self):
+        if 'username' in session:
+            workplace_id = request.json['workplaceID']
+
+            query = "DELETE FROM workplaces WHERE workplace_id = %s"
+            self.db_manager.execute_delete(query, (workplace_id,))
+
+            return jsonify({'message': 'Рабочее место успешно удалено!'})
+        else:
+            return redirect('/')
+
     def select_order(self):
         if 'username' in session:
             return send_from_directory(self.app.static_folder, 'select_order.html')
@@ -237,7 +286,7 @@ class Handlers:
 
     def edit_productions(self):
         if 'username' in session:
-            if session.get('role') == 'manager' or session.get('role') == 'admin':
+            if session.get('role') == 'manager' or session.get('role') == 'otk' or session.get('role') == 'admin':
                 return send_from_directory(self.app.static_folder, 'edit_productions.html')
             else:
                 return "Недостаточно прав для отображения контента!"
@@ -252,13 +301,14 @@ class Handlers:
 
     def add_production(self):
         if 'username' in session:
-            datetime_value = datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S')
+            # datetime_value = datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')
+            datetime_value = datetime.now()
             product_name = session.get('product_name')
             order_num = session.get('order_num')
             product_uid = request.json['productUid']
             serial_num = request.json['serialNum']
             username = session.get('username')
-            production_status = 1
+            production_status = 5
 
             query = "INSERT INTO productions (datetime, product_name, order_num, product_uid, serial_num, username, production_status) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             self.db_manager.execute_insert(query, (datetime_value, product_name, order_num, product_uid, serial_num, username, production_status))
@@ -316,69 +366,89 @@ class Handlers:
             return redirect('/')
 
     @staticmethod
-    def get_select_product_info():
+    def get_info():
         if 'username' in session:
             return jsonify({
                 'username': session.get('username'),
                 'role': session.get('role'),
-                'datetime_value': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
-            })
-        else:
-            return jsonify({'error': 'Not logged in'}), 401
-
-    @staticmethod
-    def get_select_order_info():
-        if 'username' in session:
-            return jsonify({
-                'username': session.get('username'),
-                'role': session.get('role'),
-                'datetime_value': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
-                'product_name': session.get('product_name')
-            })
-        else:
-            return jsonify({'error': 'Not logged in'}), 401
-
-    @staticmethod
-    def get_productions_info():
-        if 'username' in session:
-            return jsonify({
-                'username': session.get('username'),
-                'role': session.get('role'),
-                'datetime_value': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
                 'product_name': session.get('product_name'),
-                'picture_name': session.get('picture_name'),
-                'order_num': session.get('order_num')
+                'order_num': session.get('order_num'),
+                'picture_name': session.get('picture_name')
             })
         else:
             return jsonify({'error': 'Not logged in'}), 401
 
-    @staticmethod
-    def get_productions_history_info():
-        if 'username' in session:
-            return jsonify({
-                'username': session.get('username'),
-                'role': session.get('role'),
-                'datetime_value': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
-            })
-        else:
-            return jsonify({'error': 'Not logged in'}), 401
-
-    @staticmethod
-    def get_edit_productions_info():
-        if 'username' in session:
-            return jsonify({
-                'username': session.get('username'),
-                'role': session.get('role'),
-                'datetime_value': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
-            })
-        else:
-            return jsonify({'error': 'Not logged in'}), 401
+    # @staticmethod
+    # def get_select_product_info():
+    #     if 'username' in session:
+    #         return jsonify({
+    #             'username': session.get('username'),
+    #             'role': session.get('role'),
+    #             'product_name': session.get('product_name'),
+    #             'order_num': session.get('order_num'),
+    #             'picture_name': session.get('picture_name')
+    #         })
+    #     else:
+    #         return jsonify({'error': 'Not logged in'}), 401
+    #
+    # @staticmethod
+    # def get_select_order_info():
+    #     if 'username' in session:
+    #         return jsonify({
+    #             'username': session.get('username'),
+    #             'role': session.get('role'),
+    #             'product_name': session.get('product_name'),
+    #             'order_num': session.get('order_num'),
+    #             'picture_name': session.get('picture_name')
+    #         })
+    #     else:
+    #         return jsonify({'error': 'Not logged in'}), 401
+    #
+    # @staticmethod
+    # def get_productions_info():
+    #     if 'username' in session:
+    #         return jsonify({
+    #             'username': session.get('username'),
+    #             'role': session.get('role'),
+    #             'product_name': session.get('product_name'),
+    #             'order_num': session.get('order_num'),
+    #             'picture_name': session.get('picture_name')
+    #         })
+    #     else:
+    #         return jsonify({'error': 'Not logged in'}), 401
+    #
+    # @staticmethod
+    # def get_productions_history_info():
+    #     if 'username' in session:
+    #         return jsonify({
+    #             'username': session.get('username'),
+    #             'role': session.get('role'),
+    #             'product_name': session.get('product_name'),
+    #             'order_num': session.get('order_num'),
+    #             'picture_name': session.get('picture_name')
+    #         })
+    #     else:
+    #         return jsonify({'error': 'Not logged in'}), 401
+    #
+    # @staticmethod
+    # def get_edit_productions_info():
+    #     if 'username' in session:
+    #         return jsonify({
+    #             'username': session.get('username'),
+    #             'role': session.get('role'),
+    #             'product_name': session.get('product_name'),
+    #             'order_num': session.get('order_num'),
+    #             'picture_name': session.get('picture_name')
+    #         })
+    #     else:
+    #         return jsonify({'error': 'Not logged in'}), 401
 
     @staticmethod
     def get_time():
         if 'username' in session:
             return jsonify({
-                'datetime_value': datetime.now(pytz.timezone('Etc/GMT-3')).strftime('%Y-%m-%d %H:%M:%S'),
+                # 'datetime_value': datetime.now(pytz.timezone('Europe/Moscow')).strftime('%d.%m.%Y, %H:%M:%S'),
+                'datetime_value': datetime.now()
             })
         else:
             return jsonify({'error': 'Not logged in'}), 401

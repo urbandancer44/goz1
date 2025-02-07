@@ -6,6 +6,8 @@
     <title>Выбор изделия</title>
     <!-- Подключаем Bootstrap CSS -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <script src="/static/js/global.js"></script>
     <script src="/static/js/select_product.js" ></script>
 </head>
 <body class="bg-light ">
@@ -26,27 +28,21 @@
         <div class="row justify-content-center mt-2">
             <div class="col-6">
             </div>
-            <div class="col-md-6">
-                <table class="table table-primary table-bordered border-dark table-sm">
-                    <tbody>
-                        <tr>
-                            <td style="background-color: lightgray">Дата:</td>
-                            <td colspan="3" style="color:blue; text-align: center" id="datetime"></td>
-                        </tr>
-                        <tr>
-                            <td style="background-color: lightgray">Имя:</td>
-                            <td style="color:blue" id="username"></td>
-                            <td style="background-color: lightgray">Изделие:</td>
-                            <td>Изделие</td>
-                        </tr>
-                        <tr>
-                            <td style="background-color: lightgray">Роль:</td>
-                            <td style="color:blue" id="role"></td>
-                            <td style="background-color: lightgray">ШПЗ:</td>
-                            <td>Номер ШПЗ</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="col-lg-6">
+                <div class="grid_info-container">
+                    <div class="grid_info-header">Дата:</div>
+                    <div class="grid_info-cell" style="color:blue" id="datetime"></div>
+                    <div class="grid_info-header">ИРМ:</div>
+                    <div class="grid_info-cell" style="color:blue" id="current_workplace_id"></div>
+                    <div class="grid_info-header">Имя:</div>
+                    <div class="grid_info-cell" style="color:blue" id="username"></div>
+                    <div class="grid_info-header">Роль:</div>
+                    <div class="grid_info-cell" style="color:blue" id="role"></div>
+                    <div class="grid_info-header">Изделие:</div>
+                    <div class="grid_info-cell">Изделие</div>
+                    <div class="grid_info-header">ШПЗ:</div>
+                    <div class="grid_info-cell">Номер ШПЗ</div>
+                </div>
             </div>
         </div>
         <div id="buttons-container" class="d-flex flex-wrap justify-content-center mt-4">

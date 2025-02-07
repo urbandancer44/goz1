@@ -3,40 +3,6 @@ let editPasswordModal = null;
 let editRoleModal = null;
 let deleteUserModal = null;
 
-// function getUsers() {
-//     fetch('/get_users')
-//         .then(response => response.json())
-//         .then(data => {
-//             const tableBody = document.getElementById('usersTableBody');
-//             tableBody.innerHTML = '';  // Очищаем таблицу
-//
-//             data.sort((a, b) => a[1].localeCompare(b[1]));
-//
-//             data.forEach((user, index) => {
-//                 if (user[3] !== 'admin') {
-//                     const row = document.createElement('tr');
-//                     const numberCell = document.createElement('td');
-//                     const usernameCell = document.createElement('td');
-//                     const roleCell = document.createElement('td');
-//
-//                     numberCell.innerText = index + 1;
-//                     usernameCell.innerText = user[1];
-//                     roleCell.innerText = user[3];
-//                     row.appendChild(numberCell);
-//                     row.appendChild(usernameCell);
-//                     row.appendChild(roleCell);
-//                     tableBody.appendChild(row);
-//
-//                     row.dataset.user = user[1];
-//                     row.addEventListener("click", (event) => {
-//                         //alert(product[1]);
-//                         activateRow(event.currentTarget);
-//                     });
-//                 }
-//             });
-//         })
-//         .catch(error => console.error('Error:', error));
-// }
 function getUsers() {
     fetch('/get_users')
         .then(response => response.json())

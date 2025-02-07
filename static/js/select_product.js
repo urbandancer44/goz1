@@ -1,12 +1,19 @@
 function selectProductInfo() {
-    fetch('/get_select_product_info')
+    // fetch('/get_select_product_info')
+    fetch('/get_info')
         .then(response => response.json())
         .then(data => {
-            document.getElementById('username').innerText = data.username;
-            document.getElementById('role').innerText = data.role;
+            sessionUsername = data.username;
+            document.getElementById('username').innerText = sessionUsername;
+            sessionRole = data.role;
+            document.getElementById('role').innerText = sessionRole;
+
+            if (sessionProductName != null) {
+                document.getElementById('product_name').innerText = sessionProductName;
+            }
 
             const editProductionsButton = document.getElementById('editProductionsButton');
-            if (data.role === 'manager') {
+            if (sessionRole === 'manager') {
                 editProductionsButton.classList.remove('disabled');
             } else {
                 editProductionsButton.classList.add('disabled');
@@ -53,17 +60,24 @@ function selectOrder(product_name, picture_name) {
     .catch(error => console.error('Error:', error));
 }
 
-function getTime() {
-    fetch('/get_time')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('datetime').innerText = data.datetime_value;
-        })
-        .catch(error => console.error('Error:', error));
+// Функция для обновления отображения времени
+function updateTimeDisplay() {
+    const datetimeElement = document.getElementById('datetime');
+    if (datetimeElement && serverTime) {
+        datetimeElement.innerText = serverTime.toLocaleString(); // Отображаем время в локальном формате
+    }
 }
 
 window.onload = function() {
+    if (currentWorkplaceID) {
+    document.getElementById('current_workplace_id').innerText = currentWorkplaceID;
+    } else {
+        console.log('Куки ID рабочего места не найдено')
+    }
+
+    getTime();
     selectProductInfo();  // Вызываем функцию при загрузке страницы
-    setInterval(getTime, 1000);  // Обновляем данные каждую секунду
     getProducts();  // Загружаем продукты при загрузке страницы
+    setInterval(getTime, 3600000);  // Запрашиваем время с сервера каждые 60 минут (3600000 миллисекунд)
+    setInterval(incrementLocalTime, 1000);  // Обновляем время локально каждую секунду
 };

@@ -6,6 +6,8 @@
     <title>Таблица производства</title>
     <!-- Подключаем Bootstrap CSS -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <script src="/static/js/global.js"></script>
     <script src="/static/js/productions.js" defer></script>
 </head>
 <body class="bg-light ">
@@ -26,7 +28,7 @@
         </div>
         <div class="row justify-content-center mt-2">
             <div class="col-2">
-                <div class="card-body" style="position: absolute; left: 5px;">
+                <div class="card-body" style="position: absolute; left: -9995px;">
                     <form id="setProductUidForm" autocomplete="off">
                         <input type="text" class="form-control" id="hiddenInput" name="hiddenInput">
                         <button type="submit" class="btn btn-primary btn-block"></button>
@@ -37,48 +39,38 @@
             <div class="col-4 mb-1">
                 <img id="product_img" class="rounded float-start" alt="..." style="max-width: 260px;max-height: 200px">
             </div>
-            <div class="col-md-6">
-                <table class="table table-primary table-bordered border-dark table-sm">
-                    <tbody>
-                        <tr>
-                            <td style="background-color: lightgray">Дата/время:</td>
-                            <td colspan="3" style="color:blue; text-align: center" id="datetime"></td>
-                        </tr>
-                        <tr>
-                            <td style="background-color: lightgray">Имя:</td>
-                            <td style="color:blue" id="username"></td>
-                            <td style="background-color: lightgray">Изделие:</td>
-                            <td style="color:blue" id="product_name"></td>
-                        </tr>
-                        <tr>
-                            <td style="background-color: lightgray">Роль:</td>
-                            <td style="color:blue" id="role"></td>
-                            <td style="background-color: lightgray">ШПЗ:</td>
-                            <td style="color:blue" id="order_num"></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="col-lg-6">
+                <div class="grid_info-container mb-2">
+                    <div class="grid_info-header">Дата:</div>
+                    <div class="grid_info-cell" style="color:blue" id="datetime"></div>
+                    <div class="grid_info-header">ИРМ:</div>
+                    <div class="grid_info-cell" style="color:blue" id="current_workplace_id"></div>
+                    <div class="grid_info-header">Имя:</div>
+                    <div class="grid_info-cell" style="color:blue" id="username"></div>
+                    <div class="grid_info-header">Роль:</div>
+                    <div class="grid_info-cell" style="color:blue" id="role"></div>
+                    <div class="grid_info-header">Изделие:</div>
+                    <div class="grid_info-cell" style="color:blue" id="product_name">Изделие</div>
+                    <div class="grid_info-header">ШПЗ:</div>
+                    <div class="grid_info-cell" style="color:blue" id="order_num">Номер ШПЗ</div>
+                </div>
                 <h4 style="color: forestgreen">Для добавления изделия сканируй Datamatrix!</h4>
             </div>
         </div>
-        <div class="table-responsive justify-content-center mt-3" style="min-height: 247px; max-height: 575px">
-            <table class="table table-bordered table-primary border-dark">
-                <thead class="table-secondary border-dark">
-                    <tr>
-                        <th>№</th>
-                        <th>Дата/время</th>
-                        <th>Изделие</th>
-                        <th>Номер ШПЗ</th>
-                        <th>UID изделия</th>
-                        <th>S/N изделия</th>
-                        <th>Пользователь</th>
-                        <th>Статус</th>
-                    </tr>
-                </thead>
-                <tbody id="productionsTableBody">
-                    <!-- Данные будут загружены с помощью JavaScript -->
-                </tbody>
-            </table>
+        <div class="grid_production-container justify-content-center mt-1" style="max-height: 617px; overflow-y: auto;">
+            <div class="grid_production-header">
+                <div>№</div>
+                <div>Дата/время</div>
+                <div>Изделие</div>
+                <div>Номер ШПЗ</div>
+                <div>UID изделия</div>
+                <div>S/N изделия</div>
+                <div>Пользователь</div>
+                <div>Статус</div>
+            </div>
+            <div class="grid_production-body" id="productionsTableBody">
+                <!-- Данные будут загружены с помощью JavaScript -->
+            </div>
         </div>
         <div class="row justify-content-center mt-4">
             <div class="col-3">
@@ -111,10 +103,6 @@
                         </div>
                     </form>
                 </div>
-<!--                <div class="modal-footer">-->
-<!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
-<!--                    <button type="submit" class="btn btn-primary" id="saveSerialNumButton">Сохранить</button>-->
-<!--                </div>-->
             </div>
         </div>
     </div>
