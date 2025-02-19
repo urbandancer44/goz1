@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Таблица производства</title>
+    <title>Контроль качества</title>
     <!-- Подключаем Bootstrap CSS -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/styles.css" rel="stylesheet">
     <script src="/static/js/global.js" defer></script>
-    <script src="/static/js/productions.js" defer></script>
+    <script src="/static/js/quality_control.js" defer></script>
 </head>
 <body class="bg-light ">
-    <div class="container-fluid" id="containerProductions">
+    <div class="container-fluid">
         <!--<div class="row justify-content-center mt-2">
             <div class="col-2">
-                <a href="/select_order" class="btn btn-secondary w-100 btn-lg">Назад</a>
+                <button class="btn btn-secondary w-100 btn-lg" id="prev_button">Назад</button>
             </div>
             <div class="col-8">
-                <h2 class="text-center"><u>Таблица производства</u></h2>
+                <h2 class="text-center"><u>История производства</u></h2>
             </div>
             <div class="col-2">
                 <form action="/logout" method="post">
@@ -28,7 +28,7 @@
         <div class="row justify-content-between align-items-center bg-light p-1 shadow-lg">
             <!-- Кнопка "Назад" -->
             <div class="col-2">
-                <a href="/select_order" class="btn btn-secondary w-100 btn-lg">Назад</a>
+                <!--<button class="btn btn-secondary w-100 btn-lg" id="prev_button">Назад</button>-->
             </div>
             <!-- Отображение текущего ИРМ -->
             <div class="col-auto">
@@ -54,21 +54,26 @@
         <!-- Заголовок страницы -->
         <div class="row justify-content-center mt-2">
             <div class="col-12 text-center">
-                <h2><u>Таблица производства</u></h2>
+                <h2><u>Контроль качества</u></h2>
             </div>
         </div>
 
-        <div class="row justify-content-center mt-2">
-            <div class="col-2">
-                <div class="card-body" style="position: absolute; left: -9995px;">
-                    <form id="setProductUidForm" autocomplete="off">
-                        <input type="text" class="form-control" id="hiddenInput" name="hiddenInput">
-                        <button type="submit" class="btn btn-success btn-block"></button>
-                    </form>
+        <div class="row justify-content-between mt-2">
+            <div class="col-lg-3">
+                <div class="card bg-light mb-2">
+                    <div class="card-body">
+                        <form id="filterUidForm" autocomplete="off">
+                            <div class="mb-2">
+                                <label for="filterUid" class="form-label">Для выбора изделия введи или сканируй Datamatrix</label>
+                                <input type="text" class="form-control" id="filterUid" required>
+                            </div>
+                            <button type="submit" class="btn btn-success" id="applyUidFilterButton">Выбрать</button>
+                            <button type="button" class="btn btn-primary" id="clearFilterButton">Сбросить</button>
+                        </form>
+                    </div>
                 </div>
-                <!--<input type="text" id="hiddenInputScan" style="position: absolute; left: 10px;" autofocus>-->
             </div>
-            <div class="col-4 mb-1">
+            <div class="col-3 mb-1">
                 <img id="product_img" class="rounded float-start" alt="..." style="max-width: 300px;max-height: 225px">
             </div>
             <div class="col-lg-6">
@@ -81,15 +86,11 @@
                     <div class="grid_info-cell" style="color:blue" id="username"></div>
                     <div class="grid_info-header">Роль:</div>
                     <div class="grid_info-cell" style="color:blue" id="role"></div>
-                    <div class="grid_info-header">Изделие:</div>
-                    <div class="grid_info-cell" style="color:blue" id="product_name">Изделие</div>
-                    <div class="grid_info-header">ШПЗ:</div>
-                    <div class="grid_info-cell" style="color:blue" id="order_num">Номер ШПЗ</div>
                 </div>
-                <h4 style="color: forestgreen">Для добавления изделия сканируй Datamatrix!</h4>
+                <h4 style="color: forestgreen">Для выбора изделия сканируй Datamatrix!</h4>
             </div>
         </div>
-        <div class="grid_production-container justify-content-center mt-1" style="max-height: 617px; overflow-y: auto;">
+        <div class="grid_production-container justify-content-center mt-2" style="max-height: 617px; overflow-y: auto;">
             <div class="grid_production-header">
                 <div>№</div>
                 <div>Дата/время</div>
@@ -106,37 +107,36 @@
                 <!-- Данные будут загружены с помощью JavaScript -->
             </div>
         </div>
-        <div class="row justify-content-between mt-4">
-            <div class="col-3">
-                <a href="/productions_history" class="btn btn-primary w-100 btn-lg">История</a>
-            </div>
-            <div class="col-auto">
-            </div>
-            <div class="col-3">
-                <a href="/edit_productions" id="editProductionsButton" class="btn btn-primary w-100 btn-lg" tabindex="-1" aria-disabled="true">Коррекция данных</a>
-                    <!--<a class="btn btn-primary btn-lg" href="/static/login.html" role="button">Выход</a>-->
+        <div class="row justify-content-center mt-4">
+            <div class="d-grid gap-2 d-md-block mb-2">
+                <button style="min-width: 120px" type="button" id="qcOkButton" class="btn btn-success btn-lg mb-2">Качество OK</button>
+                <button style="min-width: 120px" type="button" id="qcNgButton" class="btn btn-danger btn-lg mb-2">Качество NG</button>
             </div>
         </div>
     </div>
-            <!-- Модальное окно для ввода S/N -->
-    <div class="modal fade" id="setSerialNumModal" tabindex="-1" aria-labelledby="setSerialNumModalLabel" aria-hidden="true">
+    <!-- Модальное окно для фильтра по UID -->
+    <div class="modal fade" id="uidFilterModal" tabindex="-1" aria-labelledby="uidFilterModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="setSerialNumModalLabel">Ввод серийного номера изделия</h5>
+                    <h5 class="modal-title" id="uidFilterModalLabel">Фильтр по UID</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="setSerialNumForm" autocomplete="off">
+                    <form id="filterUidForm" autocomplete="off">
                         <div class="mb-3">
-                            <label for="serialNum" class="form-label">Серийный номер</label>
-                            <input type="text" class="form-control" id="serialNum" required>
+                            <label for="filterUid" class="form-label">Введите или сканируйте UID изделия:</label>
+                            <input type="text" class="form-control" id="filterUid" required>
                         </div>
-                        <div class="d-flex mt-2 justify-content-end">
-                            <button type="submit" class="btn btn-success" id="saveSerialNumButton">Подтвердить</button>
-                        </div>
+                    <div class="d-flex mt-2 justify-content-end">
+                        <button type="submit" class="btn btn-primary" id="applyUidFilterButton">Подтвердить</button>
+                    </div>
                     </form>
                 </div>
+<!--                <div class="modal-footer">-->
+<!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
+<!--                    <button type="button" class="btn btn-primary" id="applyUidFilterButton">Применить</button>-->
+<!--                </div>-->
             </div>
         </div>
     </div>

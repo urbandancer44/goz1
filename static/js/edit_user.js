@@ -1,36 +1,41 @@
-let username = null;
-let editPasswordModal = null;
-let editRoleModal = null;
-let deleteUserModal = null;
-
 function getUsers() {
     fetch('/get_users')
         .then(response => response.json())
         .then(data => {
             const gridBody = document.getElementById('usersTableBody');
-            gridBody.innerHTML = '';  // Очищаем grid
+            gridBody.innerHTML = '';  // Очищаем таблицу
 
-            data.sort((a, b) => a[1].localeCompare(b[1]));
+            // Сортируем данные по имени пользователя (username) в алфавитном порядке
+            data.sort((a, b) => a.username.localeCompare(b.username));
 
+            // Проходим по каждому элементу данных
             data.forEach((user, index) => {
-                if (user[3] !== 'admin') {
+                if (user.role !== 'admin') {  // Исключаем пользователей с ролью 'admin'
                     const row = document.createElement('div');
                     row.classList.add('grid-row');
 
+                    // Создаем ячейки для каждой колонки
                     const numberCell = document.createElement('div');
                     const usernameCell = document.createElement('div');
                     const roleCell = document.createElement('div');
 
+                    // Заполняем ячейки данными из словаря
                     numberCell.innerText = index + 1;
-                    usernameCell.innerText = user[1];
-                    roleCell.innerText = user[3];
+                    usernameCell.innerText = user.username;  // Доступ через ключ словаря
+                    roleCell.innerText = user.role;          // Доступ через ключ словаря
 
+                    // Добавляем ячейки в строку
                     row.appendChild(numberCell);
                     row.appendChild(usernameCell);
                     row.appendChild(roleCell);
+
+                    // Добавляем строку в таблицу
                     gridBody.appendChild(row);
 
-                    row.dataset.user = user[1];
+                    // Добавляем атрибут dataset для хранения имени пользователя
+                    row.dataset.user = user.username;
+
+                    // Добавляем обработчик события клика
                     row.addEventListener("click", (event) => {
                         activateRow(event.currentTarget);
                     });
@@ -66,13 +71,6 @@ document.getElementById('addUserForm').addEventListener('submit', function(event
     event.preventDefault();
     addUser();
 });
-
-// function activateRow(row) {
-//     document.querySelectorAll('#usersTableBody tr').forEach(r => r.classList.remove('table-active'));
-//     row.classList.add('table-active')
-//     username = row.dataset.user;
-//     //alert(product_name);
-// }
 
 function activateRow(row) {
     document.querySelectorAll('#usersTableBody .grid-row').forEach(r => r.classList.remove('active-row'));
@@ -208,6 +206,12 @@ document.getElementById('applyDeleteUserButton').addEventListener('click', funct
 });
 
 window.onload = function() {
+
+    getTime();
+    getWorkplaceName();
+    setInterval(getTime, 3600000);  // Запрашиваем время с сервера каждые 60 минут (3600000 миллисекунд)
+    setInterval(incrementLocalTime, 1000);  // Обновляем время локально каждую секунду
+
     getUsers();  // Загружаем пользователей при загрузке страницы
 };
 

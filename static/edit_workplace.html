@@ -11,24 +11,42 @@
 </head>
 <body class="bg-light">
     <div class="container-fluid">
-        <div class="row justify-content-center mt-2">
+        <!-- Навигационная панель -->
+        <div class="row justify-content-between align-items-center bg-light p-1 shadow-lg">
+            <!-- Кнопка "Назад" -->
             <div class="col-2">
-                <a href="/admin_panel" class="btn btn-secondary w-100 btn-lg">Назад</a>
+                <a href="/admin_panel" class="btn btn-secondary btn-lg w-100">Назад</a>
             </div>
-            <div class="col-7">
-                <h2 class="text-center"><u>Редактор рабочих мест</u></h2>
+            <!-- Отображение текущего ИРМ -->
+            <div class="col-auto">
+                <div style="display: grid; grid-template-columns: auto auto; align-items: center;">
+                    <div class="grid_info-header">Рабочее место:</div>
+                    <div class="grid_info-cell" style="color:blue" id="current_workplace_name"></div>
+                </div>
             </div>
-            <div class="col-md-1" style="display: grid; grid-template-columns: auto auto; align-items: center;">
-                <div class="grid_info-header">ИРМ:</div>
-                <div class="grid_info-cell" style="color:blue" id="current_workplace_id"></div>
+            <div class="col-auto">
+                <div style="display: grid; grid-template-columns: auto auto; align-items: center;">
+                    <div class="grid_info-header">Дата:</div>
+                    <div class="grid_info-cell" style="color:blue" id="datetime"></div>
+                </div>
             </div>
+            <!-- Кнопка "Выход" -->
             <div class="col-2">
                 <form action="/logout" method="post">
-                    <button type="submit" class="btn btn-danger w-100 btn-lg">Выход</button>
+                    <button type="submit" class="btn btn-danger btn-lg w-100">Выход</button>
                 </form>
             </div>
         </div>
-        <div class="row justify-content-center mt-5">
+
+        <!-- Заголовок страницы -->
+        <div class="row justify-content-center mt-2">
+            <div class="col-12 text-center">
+                <h2><u>Редактор рабочих мест</u></h2>
+            </div>
+        </div>
+
+        <!-- Основное содержимое страницы -->
+        <div class="row justify-content-center mt-4">
             <div class="col-md-4">
                 <h3 class="text-center"><u>Добавить рабочее место</u></h3>
                 <div class="card bg-light mb-4">
@@ -42,7 +60,7 @@
                                 <label for="workplace_name" class="form-label">Имя рабочего места:</label>
                                 <input type="text" class="form-control" id="workplace_name" name="workplace_name" required>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-block">Добавить</button>
+                            <button type="submit" class="btn btn-success btn-block">Добавить</button>
                         </form>
                     </div>
                 </div>
@@ -53,11 +71,8 @@
                             <div class="mb-2">
                                 <label class="form-label" for="workplaceSet">ID рабочего места:</label>
                                 <input type="number" class="form-control" id="workplaceSet" name="workplaceSet" required>
-                                <!--<select class="form-select" id="workplaceSelect" name="workplaceSelect" required>-->
-                                    <!-- Опции будут загружаться динамически через JavaScript -->
-                                <!--</select>-->
                             </div>
-                                <button type="submit" class="btn btn-primary btn-block">Установить</button>
+                            <button type="submit" class="btn btn-success btn-block">Установить</button>
                         </form>
                     </div>
                 </div>
@@ -81,7 +96,8 @@
             </div>
         </div>
     </div>
-    <!-- Модальное окно для редактирования имени рабочего места -->
+
+    <!-- Модальные окна -->
     <div class="modal fade" id="editWorkplaceNameModal" tabindex="-1" aria-labelledby="editWorkplaceNameModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -96,14 +112,14 @@
                             <input type="text" class="form-control" id="newWorkplaceName" name="newWorkplaceName" required>
                         </div>
                         <div class="d-flex mt-2 justify-content-end">
-                            <button type="submit" class="btn btn-primary" id="saveWorkplaceNameButton">Подтвердить</button>
+                            <button type="submit" class="btn btn-success" id="saveWorkplaceNameButton">Подтвердить</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-        <!-- Модальное окно для удаления рабочего места -->
+
     <div class="modal fade" id="deleteWorkplaceModal" tabindex="-1" aria-labelledby="deleteWorkplaceModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -117,13 +133,14 @@
                             <h6>Вы уверены, что хотите удалить рабочее место?</h6>
                         </div>
                         <div class="d-flex mt-2 justify-content-end">
-                            <button type="button" class="btn btn-primary" id="applyDeleteWorkplaceButton">Подтвердить</button>
+                            <button type="button" class="btn btn-success" id="applyDeleteWorkplaceButton">Подтвердить</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Подключаем локальный Bootstrap JS и Popper.js -->
     <script src="/static/js/bootstrap.min.js"></script>
 </body>

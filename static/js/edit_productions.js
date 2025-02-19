@@ -1,5 +1,4 @@
 function editProductionsInfo() {
-    // fetch('/get_edit_productions_info')
     fetch('/get_info')
         .then(response => response.json())
         .then(data => {
@@ -7,6 +6,7 @@ function editProductionsInfo() {
             document.getElementById('username').innerText = sessionUsername;
             sessionRole = data.role;
             document.getElementById('role').innerText = sessionRole;
+
             if ((data.product_name) != null) {
                 sessionProductName = data.product_name;
             }
@@ -25,7 +25,7 @@ function getProductions() {
             const gridBody = document.getElementById('productionsTableBody');
             gridBody.innerHTML = '';  // Очищаем таблицу
 
-            data.sort((a,b) => new Date(b[1]) - new Date(a[1]));
+            data.sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
 
             data.forEach((production, index) => {
                 const row = document.createElement('div');
@@ -39,15 +39,19 @@ function getProductions() {
                 const serial_numCell = document.createElement('div');
                 const usernameCell = document.createElement('div');
                 const production_statusCell = document.createElement('div');
+                const qc_statusCell = document.createElement('div');
+                const qc_return_quantityCell = document.createElement('div');
 
                 numberCell.innerText = index + 1;
-                datetimeCell.innerText = new Date(production[1]).toLocaleString(); // Преобразование времени
-                product_nameCell.innerText = production[2];
-                order_numCell.innerText = production[3];
-                product_uidCell.innerText = production[4];
-                serial_numCell.innerText = production[7];
-                usernameCell.innerText = production[5];
-                production_statusCell.innerText = production[6]
+                datetimeCell.innerText = new Date(production.datetime).toLocaleString(); // Преобразование времени
+                product_nameCell.innerText = production.product_name;
+                order_numCell.innerText = production.order_num;
+                product_uidCell.innerText = production.product_uid;
+                serial_numCell.innerText = production.serial_num;
+                usernameCell.innerText = production.username;
+                production_statusCell.innerText = production.production_status;
+                qc_statusCell.innerText = production.qc_status;
+                qc_return_quantityCell.innerText = production.qc_return_quantity;
                 row.appendChild(numberCell);
                 row.appendChild(datetimeCell);
                 row.appendChild(product_nameCell);
@@ -56,11 +60,13 @@ function getProductions() {
                 row.appendChild(serial_numCell);
                 row.appendChild(usernameCell);
                 row.appendChild(production_statusCell);
+                row.appendChild(qc_statusCell);
+                row.appendChild(qc_return_quantityCell);
                 gridBody.appendChild(row);
 
-                row.dataset.uid = production[4];
+                row.dataset.uid = production.product_uid;
                 row.addEventListener("click", (event) => {
-                    //alert(production[4]);
+                    //alert(production.product_uid);
                     activateRow(event.currentTarget);
                 });
             });
@@ -171,10 +177,10 @@ function getUsers() {
             newUser.innerHTML = '';  // Очищаем список
 
             data.forEach(user => {
-                if (user[3] !== 'admin') {
+                if (user.role !== 'admin') {
                     const option = document.createElement('option');
-                    option.value = user[1]; // Предполагаем, что user[1] содержит имя пользователя
-                    option.innerText = user[1];
+                    option.value = user.username; // Предполагаем, что user[1] содержит имя пользователя
+                    option.innerText = user.username;
                     newUser.appendChild(option);
                 }
             });
@@ -295,7 +301,7 @@ function filterByTime(startDatetime, endDatetime) {
     const endDate = new Date(endDatetime);
     // console.log('Start Date:', startDate, 'End Date:', endDate); // Логирование дат
     filterProductions((production) => {
-        const productionDate = new Date(production[1]);
+        const productionDate = new Date(production.datetime);
         // console.log('Production Date:', productionDate); // Логирование даты производства
         return productionDate >= startDate && productionDate <= endDate;
     });
@@ -313,7 +319,7 @@ function getProductionsProducts() {
             const uniqueProducts = new Set();
 
             data.forEach(production => {
-                const productName = production[2];  // Предполагаем, что production[2] содержит наименование изделия
+                const productName = production.product_name;  // Предполагаем, что production[2] содержит наименование изделия
                 if (!uniqueProducts.has(productName)) {
                     uniqueProducts.add(productName);
                     const option = document.createElement('option');
@@ -344,7 +350,7 @@ document.getElementById('applyProductFilterButton').addEventListener('click', fu
 });
 // Фильтр
 function filterByProduct(productName) {
-    filterProductions((production) => production[2].includes(productName));
+    filterProductions((production) => production.product_name.includes(productName));
 }
 
 // --- Фильтрация по номеру ШПЗ ---
@@ -359,7 +365,7 @@ function getProductionsOrders() {
             const uniqueOrders = new Set();
 
             data.forEach(production => {
-                const orderNum = production[3];  // Предполагаем, что production[3] содержит номер ШПЗ
+                const orderNum = production.order_num;  // Предполагаем, что production[3] содержит номер ШПЗ
                 if (!uniqueOrders.has(orderNum)) {
                     uniqueOrders.add(orderNum);
                     const option = document.createElement('option');
@@ -390,7 +396,7 @@ document.getElementById('applyOrderFilterButton').addEventListener('click', func
 });
 // Фильтр
 function filterByOrder(orderNum) {
-    filterProductions((production) => production[3].includes(orderNum));
+    filterProductions((production) => production.order_num.includes(orderNum));
 }
 
 // --- Фильтрация по UID ---
@@ -419,7 +425,7 @@ document.getElementById('filterUidForm').addEventListener('submit', function (ev
 // Фильтр
 function filterByUid(productUid) {
     const transliterateUid = transliterate(productUid)
-    filterProductions((production) => production[4].includes(transliterateUid));
+    filterProductions((production) => production.product_uid.includes(transliterateUid));
 }
 
 // ---Фильтрация по S/N---
@@ -447,7 +453,7 @@ document.getElementById('filterSerialNumForm').addEventListener('submit', functi
 });
 // Фильтр
 function filterBySerialNum(serialNum) {
-    filterProductions((production) => production[7].includes(serialNum));
+    filterProductions((production) => production.serial_num.includes(serialNum));
 }
 
 // ---Фильтрация по пользователю---
@@ -462,7 +468,7 @@ function getProductionsUsers() {
             const uniqueUsers = new Set();
 
             data.forEach(production => {
-                const username = production[5];  // Предполагаем, что production[5] содержит имя пользователя
+                const username = production.username;  // Предполагаем, что production[5] содержит имя пользователя
                 if (!uniqueUsers.has(username)) {
                     uniqueUsers.add(username);
                     const option = document.createElement('option');
@@ -494,7 +500,7 @@ document.getElementById('applyUserFilterButton').addEventListener('click', funct
 });
 // Фильтр
 function filterByUser(username) {
-    filterProductions((production) => production[5].includes(username));
+    filterProductions((production) => production.username.includes(username));
 }
 
 // ---Общая функция для фильтрации---
@@ -505,7 +511,7 @@ function filterProductions(filterFunction) {
             const gridBody = document.getElementById('productionsTableBody');
             gridBody.innerHTML = '';  // Очищаем таблицу
 
-            data.sort((a, b) => new Date(b[1]) - new Date(a[1]));
+            data.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
 
             data.forEach((production, index) => {
                 if (filterFunction(production)) {
@@ -521,15 +527,19 @@ function filterProductions(filterFunction) {
                     const serial_numCell = document.createElement('div');
                     const usernameCell = document.createElement('div');
                     const production_statusCell = document.createElement('div');
+                    const qc_statusCell = document.createElement('div');
+                    const qc_return_quantityCell = document.createElement('div');
 
                     numberCell.innerText = index + 1;
-                    datetimeCell.innerText = new Date(production[1]).toLocaleString(); // Преобразование времени
-                    product_nameCell.innerText = production[2];
-                    order_numCell.innerText = production[3];
-                    product_uidCell.innerText = production[4];
-                    serial_numCell.innerText = production[7];
-                    usernameCell.innerText = production[5];
-                    production_statusCell.innerText = production[6];
+                    datetimeCell.innerText = new Date(production.datetime).toLocaleString(); // Преобразование времени
+                    product_nameCell.innerText = production.product_name;
+                    order_numCell.innerText = production.order_num;
+                    product_uidCell.innerText = production.product_uid;
+                    serial_numCell.innerText = production.serial_num;
+                    usernameCell.innerText = production.username;
+                    production_statusCell.innerText = production.production_status;
+                    qc_statusCell.innerText = production.qc_status;
+                    qc_return_quantityCell.innerText = production.qc_return_quantity;
                     row.appendChild(numberCell);
                     row.appendChild(datetimeCell);
                     row.appendChild(product_nameCell);
@@ -538,11 +548,13 @@ function filterProductions(filterFunction) {
                     row.appendChild(serial_numCell);
                     row.appendChild(usernameCell);
                     row.appendChild(production_statusCell);
+                    row.appendChild(qc_statusCell);
+                    row.appendChild(qc_return_quantityCell);
                     gridBody.appendChild(row);
 
-                    row.dataset.uid = production[4];
+                    row.dataset.uid = production.product_uid;
                     row.addEventListener("click", (event) => {
-                        //alert(production[4]);
+                        //alert(production.product_uid);
                         activateRow(event.currentTarget);
                     });
                 }
@@ -554,31 +566,18 @@ function filterProductions(filterFunction) {
 // Функция для кнопки "НАЗАД"
 document.getElementById('prev_button').addEventListener('click', function () {
     if (sessionProductName !== null) {
-         window.location.href = '/static/productions.html';
+         window.location.href = '/productions';
     } else {
-        window.location.href = '/static/select_product.html';
+        window.location.href = '/select_product';
     }
 });
 
-// Функция для отображения времени
-function updateTimeDisplay() {
-    const datetimeElement = document.getElementById('datetime');
-    if (datetimeElement && serverTime) {
-        datetimeElement.innerText = serverTime.toLocaleString(); // Отображаем время в локальном формате
-    }
-}
-
 window.onload = function() {
-    if (currentWorkplaceID) {
-    document.getElementById('current_workplace_id').innerText = currentWorkplaceID;
-    } else {
-        console.log('Куки ID рабочего места не найдено')
-    }
 
-    getTime()
+    getTime();
+    getWorkplaceName();
     editProductionsInfo();  // Вызываем функцию при загрузке страницы
     getProductions();  // Загружаем продукты при загрузке страницы
     setInterval(getTime, 3600000);  // Запрашиваем время с сервера каждые 60 минут (3600000 миллисекунд)
     setInterval(incrementLocalTime, 1000);  // Обновляем время локально каждую секунду
-
 };

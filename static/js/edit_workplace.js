@@ -5,10 +5,9 @@ function getWorkplaces() {
             const gridBody = document.getElementById('workplacesTableBody');
             gridBody.innerHTML = '';  // Очищаем grid
 
-            // data.sort((a, b) => a[1].localeCompare(b[1]));
             data.sort((a, b) => {
-                const idA = parseInt(a[2], 10); // Преобразуем значение второго столбца в число
-                const idB = parseInt(b[2], 10); // Преобразуем значение второго столбца в число
+                const idA = parseInt(a.workplace_id, 10); // Преобразуем значение второго столбца в число
+                const idB = parseInt(b.workplace_id, 10); // Преобразуем значение второго столбца в число
                 return idA - idB; // Сортировка по возрастанию
             });
 
@@ -21,15 +20,15 @@ function getWorkplaces() {
                 const workplaceIDCell = document.createElement('div');
 
                 numberCell.innerText = index + 1;
-                workplaceNameCell.innerText = workplace[1];
-                workplaceIDCell.innerText = workplace[2];
+                workplaceNameCell.innerText = workplace.workplace_name;
+                workplaceIDCell.innerText = workplace.workplace_id;
 
                 row.appendChild(numberCell);
                 row.appendChild(workplaceNameCell);
                 row.appendChild(workplaceIDCell);
                 gridBody.appendChild(row);
 
-                row.dataset.workplace = workplace[2];
+                row.dataset.workplace = workplace.workplace_id;
                 row.addEventListener("click", (event) => {
                     activateRow(event.currentTarget);
                 });
@@ -47,7 +46,7 @@ function addWorkplace() {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: `workplace_name=${encodeURIComponent(workplaceName)}&workplace_id=${encodeURIComponent(workplaceID)}`
+        body: `workplaceName=${encodeURIComponent(workplaceName)}&workplaceID=${encodeURIComponent(workplaceID)}`
     })
     .then(response => response.text())
     .then(data => {
@@ -169,13 +168,12 @@ document.getElementById('applyDeleteWorkplaceButton').addEventListener('click', 
 });
 
 window.onload = function() {
-    if (currentWorkplaceID) {
-    document.getElementById('current_workplace_id').innerText = currentWorkplaceID;
-    } else {
-        console.log('Куки ID рабочего места не найдено')
-    }
 
+    getTime();
+    getWorkplaceName();
     getWorkplaces();  // Загружаем список рабочих мест при загрузке страницы
+    setInterval(getTime, 3600000);  // Запрашиваем время с сервера каждые 60 минут (3600000 миллисекунд)
+    setInterval(incrementLocalTime, 1000);  // Обновляем время локально каждую секунду
 };
 
 

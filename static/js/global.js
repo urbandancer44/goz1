@@ -1,3 +1,16 @@
+// --- edit_user.js ---
+let username = null;
+let editPasswordModal = null;
+let editRoleModal = null;
+let deleteUserModal = null;
+// ---
+
+// --- edit_product.js ---
+let product_name = null;
+let editPictureModal = null;
+let deleteProductModal = null;
+// ---
+
 // --- productions.js ---
 let serverTime = null; // Глобальная переменная для хранения времени с сервера
 let transliteratedUid = null;
@@ -30,8 +43,9 @@ let deleteWorkplaceModal = null;
 let sessionUsername = null;
 let sessionRole = null;
 let sessionProductName = null;
+let sessionProductUID = null;
 let sessionOrderNum = null;
-;
+
 // Функция для получения значения куки по имени
 let currentWorkplaceID = getCookie('workplace_id');
 function getCookie(name) {
@@ -57,6 +71,40 @@ function incrementLocalTime() {
     if (serverTime) {
         serverTime.setSeconds(serverTime.getSeconds() + 1); // Увеличиваем время на 1 секунду
         updateTimeDisplay(); // Обновляем отображение времени
+    }
+}
+
+// Функция для отображения времени
+function updateTimeDisplay() {
+    const datetimeElement = document.getElementById('datetime');
+    if (datetimeElement && serverTime) {
+        datetimeElement.innerText = serverTime.toLocaleString(); // Отображаем время в локальном формате
+    }
+}
+
+// Функция для запроса и отображения имени рабочего места
+function getWorkplaceName() {
+    if (currentWorkplaceID) {
+        // Получаем название рабочего места по его ID
+        fetch('/get_workplace_name', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ workplaceID: currentWorkplaceID })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.workplaceName) {
+                document.getElementById('current_workplace_name').innerText = data.workplaceName;
+            } else {
+                console.log('Название рабочего места не найдено');
+                document.getElementById('current_workplace_name').innerText = currentWorkplaceID; // Отображаем ID, если название не найдено
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    } else {
+        console.log('Куки ID рабочего места не найдено');
     }
 }
 

@@ -7,12 +7,12 @@
     <!-- Подключаем Bootstrap CSS -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/styles.css" rel="stylesheet">
-    <script src="/static/js/global.js"></script>
+    <script src="/static/js/global.js" defer></script>
     <script src="/static/js/select_product.js" ></script>
 </head>
 <body class="bg-light ">
     <div class="container-fluid">
-        <div class="row justify-content-center mt-2">
+        <!--<div class="row justify-content-center mt-2">
             <div class="col-2">
             </div>
             <div class="col-8">
@@ -21,8 +21,39 @@
             <div class="col-2">
                 <form action="/logout" method="post">
                     <button type="submit" class="btn btn-danger w-100 btn-lg">Выход</button>
-                    <!--<a class="btn btn-primary btn-lg" href="/static/login.html" role="button">Выход</a>-->
                 </form>
+            </div>
+        </div>-->
+        <!-- Навигационная панель -->
+        <div class="row justify-content-between align-items-center bg-light p-1 shadow-lg">
+            <!-- Кнопка "Назад" -->
+            <div class="col-2">
+            </div>
+            <!-- Отображение текущего ИРМ -->
+            <div class="col-auto">
+                <div style="display: grid; grid-template-columns: auto auto; align-items: center;">
+                    <div class="grid_info-header">Рабочее место:</div>
+                    <div class="grid_info-cell" style="color:blue" id="current_workplace_name"></div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div style="display: grid; grid-template-columns: auto auto; align-items: center;">
+                    <div class="grid_info-header">Дата:</div>
+                    <div class="grid_info-cell" style="color:blue" id="datetime"></div>
+                </div>
+            </div>
+            <!-- Кнопка "Выход" -->
+            <div class="col-2">
+                <form action="/logout" method="post">
+                    <button type="submit" class="btn btn-danger btn-lg w-100">Выход</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Заголовок страницы -->
+        <div class="row justify-content-center mt-2">
+            <div class="col-12 text-center">
+                <h2><u>Выбор изделия</u></h2>
             </div>
         </div>
         <div class="row justify-content-center mt-2">
@@ -30,10 +61,10 @@
             </div>
             <div class="col-lg-6">
                 <div class="grid_info-container">
-                    <div class="grid_info-header">Дата:</div>
+                    <!--<div class="grid_info-header">Дата:</div>
                     <div class="grid_info-cell" style="color:blue" id="datetime"></div>
                     <div class="grid_info-header">ИРМ:</div>
-                    <div class="grid_info-cell" style="color:blue" id="current_workplace_id"></div>
+                    <div class="grid_info-cell" style="color:blue" id="current_workplace_id"></div>-->
                     <div class="grid_info-header">Имя:</div>
                     <div class="grid_info-cell" style="color:blue" id="username"></div>
                     <div class="grid_info-header">Роль:</div>
@@ -48,11 +79,11 @@
         <div id="buttons-container" class="d-flex flex-wrap justify-content-center mt-4">
             <!-- Здесь будут динамически добавляться кнопки -->
         </div>
-        <div class="row justify-content-center mt-4">
+        <div class="row justify-content-between mt-4">
             <div class="col-3">
                 <a href="/productions_history" class="btn btn-primary w-100 btn-lg">История</a>
             </div>
-            <div class="col-6">
+            <div class="col-auto">
             </div>
             <div class="col-3">
                 <a href="/edit_productions" id="editProductionsButton" class="btn btn-primary w-100 btn-lg" tabindex="-1" aria-disabled="true">Коррекция данных</a>

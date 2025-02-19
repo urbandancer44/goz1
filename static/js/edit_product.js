@@ -1,7 +1,3 @@
-let product_name = null;
-let editPictureModal = null;
-let deleteProductModal = null;
-
 function getProducts() {
     fetch('/get_products')
         .then(response => response.json())
@@ -9,7 +5,7 @@ function getProducts() {
             const gridBody = document.getElementById('productsTableBody');
             gridBody.innerHTML = '';  // Очищаем таблицу
 
-            data.sort((a, b) => a[1].localeCompare(b[1]));
+            data.sort((a, b) => a.product_name.localeCompare(b.product_name));
 
             data.forEach((product, index) => {
                 const row = document.createElement('div');
@@ -20,16 +16,16 @@ function getProducts() {
                 const pictureCell = document.createElement('div');
 
                 numberCell.innerText = index + 1;
-                product_nameCell.innerText = product[1];
-                pictureCell.innerText = product[2];
+                product_nameCell.innerText = product.product_name;
+                pictureCell.innerText = product.picture_path;
                 row.appendChild(numberCell);
                 row.appendChild(product_nameCell);
                 row.appendChild(pictureCell);
                 gridBody.appendChild(row);
 
-                row.dataset.name = product[1];
+                row.dataset.name = product.product_name;
                 row.addEventListener("click", (event) => {
-                    //alert(product[1]);
+                    //alert(product.product_name);
                     activateRow(event.currentTarget);
                 });
             });
@@ -79,6 +75,7 @@ document.getElementById('editProductPictureButton').addEventListener('click', fu
         alert('Выберите строку для редактирования!');
     }
 });
+
 document.getElementById('savePictureButton').addEventListener('click', function () {
     const newPicture = document.getElementById('newPicture').value;
     const updateFormData = new FormData(document.getElementById('editPictureForm'));
@@ -122,7 +119,7 @@ document.getElementById('applyDeleteProductButton').addEventListener('click', fu
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            product_name: product_name,
+            productName: product_name,
         })
     })
     .then(response => response.json())
@@ -137,7 +134,13 @@ document.getElementById('applyDeleteProductButton').addEventListener('click', fu
 });
 
 window.onload = function() {
-    getProducts();  // Загружаем изделия при загрузке страницы
+
+    getTime();
+    getWorkplaceName();
+    setInterval(getTime, 3600000);  // Запрашиваем время с сервера каждые 60 минут (3600000 миллисекунд)
+    setInterval(incrementLocalTime, 1000);  // Обновляем время локально каждую секунду
+
+    getProducts();  // Загружаем пользователей при загрузке страницы
 };
 
 

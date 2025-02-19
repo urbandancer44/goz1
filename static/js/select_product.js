@@ -1,5 +1,4 @@
 function selectProductInfo() {
-    // fetch('/get_select_product_info')
     fetch('/get_info')
         .then(response => response.json())
         .then(data => {
@@ -29,15 +28,15 @@ function getProducts() {
             const container = document.getElementById('buttons-container');
             container.innerHTML = ''; // Очищаем контейнер перед добавлением новых кнопок
 
-            data.sort((a, b) => a[1].localeCompare(b[1]));
+            data.sort((a, b) => a.product_name.localeCompare(b.product_name));
 
             data.forEach(product => {
                 const product_button = document.createElement('button');
-                product_button.textContent = product[1];
-                product_button.dataset.id = product[1]; // Добавляем идентификатор к кнопке
+                product_button.textContent = product.product_name;
+                product_button.dataset.id = product.product_name; // Добавляем идентификатор к кнопке
                 product_button.classList.add('btn', 'btn-success', 'btn-lg', 'btn-block', 'm-4'); // Добавляем классы Bootstrap
                 product_button.onclick = function () {
-                    selectOrder(product[1], product[2]);
+                    selectOrder(product.product_name, product.picture_path);
                 }
                 container.appendChild(product_button);
             });
@@ -60,22 +59,10 @@ function selectOrder(product_name, picture_name) {
     .catch(error => console.error('Error:', error));
 }
 
-// Функция для обновления отображения времени
-function updateTimeDisplay() {
-    const datetimeElement = document.getElementById('datetime');
-    if (datetimeElement && serverTime) {
-        datetimeElement.innerText = serverTime.toLocaleString(); // Отображаем время в локальном формате
-    }
-}
-
 window.onload = function() {
-    if (currentWorkplaceID) {
-    document.getElementById('current_workplace_id').innerText = currentWorkplaceID;
-    } else {
-        console.log('Куки ID рабочего места не найдено')
-    }
 
     getTime();
+    getWorkplaceName();
     selectProductInfo();  // Вызываем функцию при загрузке страницы
     getProducts();  // Загружаем продукты при загрузке страницы
     setInterval(getTime, 3600000);  // Запрашиваем время с сервера каждые 60 минут (3600000 миллисекунд)

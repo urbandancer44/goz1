@@ -2,7 +2,6 @@ from flask import request, redirect, send_from_directory, session, jsonify
 from datetime import datetime
 import pytz
 from db import DatabaseManager
-#from werkzeug.utils import secure_filename
 import os
 import uuid
 import hashlib
@@ -11,11 +10,6 @@ class Handlers:
     def __init__(self, app):
         self.app = app
         self.db_manager = DatabaseManager(app)
-
-        # Добавляем маршрут для всех статических файлов
-        # @app.route('/static/<path:filename>')
-        # def serve_static(filename):
-        #     return send_from_directory(self.app.static_folder, filename)
 
     @staticmethod
     def check_non_session_value(keys):
@@ -29,28 +23,27 @@ class Handlers:
 
     def login(self):
         password = str(request.form.get('password'))
-        # Хэшируем пароль
         hashed_password = hashlib.md5(password.encode()).hexdigest()
-        # Проверяем наличие куки workplace_id
         current_workplace_id = request.cookies.get('workplace_id')
 
         query = "SELECT * FROM users WHERE password = %s"
-        user = self.db_manager.execute_query(query, (hashed_password,))
-
-        if user:
-            session['username'] = user[0][1]
-            session['role'] = user[0][3]
-            if session['role'] == 'admin':
-                return jsonify({'message': 'Успешная авторизация!', 'redirect': '/admin_panel'})
-
-            else:
-                # Если куки currentWorkplaceID равно 5, перенаправляем на select_product
-                if current_workplace_id == '5':
+        try:
+            user = self.db_manager.execute_query(query, (hashed_password,))
+            if user:
+                session['username'] = user[0]['username']
+                session['role'] = user[0]['role']
+                if session['role'] == 'admin':
+                    return jsonify({'message': 'Успешная авторизация!', 'redirect': '/admin_panel'})
+                elif session['role'] == 'otk':
+                    return jsonify({'message': 'Успешная авторизация!', 'redirect': '/quality_control'})
+                elif current_workplace_id == '5':
                     return jsonify({'message': 'Успешная авторизация!', 'redirect': '/select_product'})
                 else:
                     return jsonify({'message': 'Рабочее место не задано, обратитесь к администратору!'})
-        else:
-            return jsonify({'message': 'Отказ доступа!'}), 401
+            else:
+                return jsonify({'message': 'Отказ доступа!'}), 401
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
     def admin_panel(self):
         if 'username' in session:
@@ -69,33 +62,37 @@ class Handlers:
             username = str(request.form.get('username'))
             password = str(request.form.get('password'))
             role = str(request.form.get('role'))
-            # Хешируем пароль перед сохранением
             hashed_password = hashlib.md5(password.encode('utf-8')).hexdigest()
 
             query = "INSERT INTO users (username, password, role) VALUES (%s, %s, %s)"
-            self.db_manager.execute_insert(query, (username, hashed_password, role))
-
-            return "Пользователь успешно добавлен!"
+            try:
+                self.db_manager.execute_insert(query, (username, hashed_password, role))
+                return "Пользователь успешно добавлен!"
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 
     def get_users(self):
         query = "SELECT * FROM users"
-        users = self.db_manager.execute_query(query)
-
-        return jsonify(users)
+        try:
+            users = self.db_manager.execute_query(query)
+            return jsonify(users)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
     def update_user_password(self):
         if 'username' in session:
             username = request.json['username']
             new_password = request.json['newPassword']
-            # Хешируем пароль перед сохранением
             new_hashed_password = hashlib.md5(new_password.encode('utf-8')).hexdigest()
 
             query = "UPDATE users SET password = %s WHERE username = %s"
-            self.db_manager.execute_insert(query, (new_hashed_password, username))
-
-            return jsonify({'message': 'Пароль успешно изменён!'})
+            try:
+                self.db_manager.execute_update(query, (new_hashed_password, username))
+                return jsonify({'message': 'Пароль успешно изменён!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 
@@ -105,9 +102,11 @@ class Handlers:
             new_role = request.json['newRole']
 
             query = "UPDATE users SET role = %s WHERE username = %s"
-            self.db_manager.execute_insert(query, (new_role, username))
-
-            return jsonify({'message': 'Роль успешно изменена!'})
+            try:
+                self.db_manager.execute_update(query, (new_role, username))
+                return jsonify({'message': 'Роль успешно изменена!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 
@@ -116,26 +115,32 @@ class Handlers:
             username = request.json['username']
 
             query = "DELETE FROM users WHERE username = %s"
-            self.db_manager.execute_delete(query, (username,))
-
-            return jsonify({'message': 'Пользователь успешно удален!'})
+            try:
+                self.db_manager.execute_delete(query, (username,))
+                return jsonify({'message': 'Пользователь успешно удален!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 
     def get_products(self):
         query = "SELECT * FROM products"
-        products = self.db_manager.execute_query(query)
-
-        return jsonify(products)
+        try:
+            products = self.db_manager.execute_query(query)
+            return jsonify(products)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
     def delete_product(self):
         if 'username' in session:
-            product_name = request.json['product_name']
+            product_name = request.json['productName']
 
             query = "DELETE FROM products WHERE product_name = %s"
-            self.db_manager.execute_delete(query, (product_name,))
-
-            return jsonify({'message': 'Изделие успешно удалено!'})
+            try:
+                self.db_manager.execute_delete(query, (product_name,))
+                return jsonify({'message': 'Изделие успешно удалено!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 
@@ -146,17 +151,13 @@ class Handlers:
             return redirect('/')
 
     def add_product(self):
-        if 'username'in session:
+        if 'username' in session:
             product_name = str(request.form.get('product_name'))
             picture = request.files.get('picture')
 
             if picture:
-                # picture_name = secure_filename(picture.filename)
-
-                # Генерируем уникальный UUID
                 unique_id = uuid.uuid4().hex
-                # Создаем хэш из UUID
-                short_hash = hashlib.sha256(unique_id.encode('utf-8')) .hexdigest()[:6] #Берем первые 6 символов хэша
+                short_hash = hashlib.sha256(unique_id.encode('utf-8')).hexdigest()[:6]
                 picture_name = f"{short_hash}_{picture.filename}"
                 picture_path = os.path.join(self.app.config['UPLOAD_FOLDER'], picture_name)
                 picture.save(picture_path)
@@ -164,22 +165,22 @@ class Handlers:
                 picture_name = None
 
             query = "INSERT INTO products (product_name, picture_path) VALUES (%s, %s)"
-            self.db_manager.execute_insert(query, (product_name, picture_name))
-
-            return "Изделие успешно добавлено!"
+            try:
+                self.db_manager.execute_insert(query, (product_name, picture_name))
+                return "Изделие успешно добавлено!"
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 
     def update_product_picture(self):
-        if 'username'in session:
+        if 'username' in session:
             product_name = str(request.form.get('productName'))
             new_picture = request.files.get('newPicture')
 
             if new_picture:
-                # Генерируем уникальный UUID
                 unique_id = uuid.uuid4().hex
-                # Создаем хэш из UUID
-                short_hash = hashlib.sha256(unique_id.encode('utf-8')) .hexdigest()[:6] #Берем первые 6 символов хэша
+                short_hash = hashlib.sha256(unique_id.encode('utf-8')).hexdigest()[:6]
                 picture_name = f"{short_hash}_{new_picture.filename}"
                 picture_path = os.path.join(self.app.config['UPLOAD_FOLDER'], picture_name)
                 new_picture.save(picture_path)
@@ -187,15 +188,11 @@ class Handlers:
                 picture_name = None
 
             query = "UPDATE products SET picture_path = %s WHERE product_name = %s"
-            self.db_manager.execute_insert(query, (picture_name, product_name))
-
-            return "Изображение изделия успешно изменено!"
-        else:
-            return redirect('/')
-
-    def select_product(self):
-        if 'username' in session:
-            return send_from_directory(self.app.static_folder, 'select_product.html')
+            try:
+                self.db_manager.execute_update(query, (picture_name, product_name))
+                return "Изображение изделия успешно изменено!"
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 
@@ -218,19 +215,38 @@ class Handlers:
 
     def get_workplaces(self):
         query = "SELECT * FROM workplaces"
-        workplaces = self.db_manager.execute_query(query)
+        try:
+            workplaces = self.db_manager.execute_query(query)
+            return jsonify(workplaces)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
-        return jsonify(workplaces)
+    def get_workplace_name(self):
+        if 'username' in session:
+            workplace_id = request.json.get('workplaceID')
+            query = "SELECT workplace_name FROM workplaces WHERE workplace_id = %s"
+            try:
+                result = self.db_manager.execute_query(query, (workplace_id,))
+                if result:
+                    return jsonify({'workplaceName': result[0]['workplace_name']})
+                else:
+                    return jsonify({'workplaceName': None})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        else:
+            return redirect('/')
 
     def add_workplace(self):
         if 'username' in session:
-            workplace_name = str(request.form.get('workplace_name'))
-            workplace_id = str(request.form.get('workplace_id'))
+            workplace_name = str(request.form.get('workplaceName'))
+            workplace_id = str(request.form.get('workplaceID'))
 
             query = "INSERT INTO workplaces (workplace_name, workplace_id) VALUES (%s, %s)"
-            self.db_manager.execute_insert(query, (workplace_name, workplace_id))
-
-            return "Рабочее место успешно добавлено!"
+            try:
+                self.db_manager.execute_insert(query, (workplace_name, workplace_id))
+                return "Рабочее место успешно добавлено!"
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 
@@ -240,9 +256,11 @@ class Handlers:
             new_workplace_name = request.json['newWorkplaceName']
 
             query = "UPDATE workplaces SET workplace_name = %s WHERE workplace_id = %s"
-            self.db_manager.execute_insert(query, (new_workplace_name, workplace_id))
-
-            return jsonify({'message': 'Имя успешно изменено!'})
+            try:
+                self.db_manager.execute_update(query, (new_workplace_name, workplace_id))
+                return jsonify({'message': 'Имя успешно изменено!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 
@@ -251,9 +269,23 @@ class Handlers:
             workplace_id = request.json['workplaceID']
 
             query = "DELETE FROM workplaces WHERE workplace_id = %s"
-            self.db_manager.execute_delete(query, (workplace_id,))
+            try:
+                self.db_manager.execute_delete(query, (workplace_id,))
+                return jsonify({'message': 'Рабочее место успешно удалено!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        else:
+            return redirect('/')
 
-            return jsonify({'message': 'Рабочее место успешно удалено!'})
+    def quality_control(self):
+        if 'username' in session:
+            return send_from_directory(self.app.static_folder, 'quality_control.html')
+        else:
+            return redirect('/')
+
+    def select_product(self):
+        if 'username' in session:
+            return send_from_directory(self.app.static_folder, 'select_product.html')
         else:
             return redirect('/')
 
@@ -286,7 +318,7 @@ class Handlers:
 
     def edit_productions(self):
         if 'username' in session:
-            if session.get('role') == 'manager' or session.get('role') == 'otk' or session.get('role') == 'admin':
+            if session.get('role') in ['manager', 'otk', 'admin']:
                 return send_from_directory(self.app.static_folder, 'edit_productions.html')
             else:
                 return "Недостаточно прав для отображения контента!"
@@ -295,13 +327,14 @@ class Handlers:
 
     def get_productions(self):
         query = "SELECT * FROM productions"
-        productions = self.db_manager.execute_query(query)
-
-        return jsonify(productions)
+        try:
+            productions = self.db_manager.execute_query(query)
+            return jsonify(productions)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
     def add_production(self):
         if 'username' in session:
-            # datetime_value = datetime.now(pytz.timezone('Europe/Moscow')).strftime('%Y-%m-%d %H:%M:%S')
             datetime_value = datetime.now()
             product_name = session.get('product_name')
             order_num = session.get('order_num')
@@ -309,14 +342,16 @@ class Handlers:
             serial_num = request.json['serialNum']
             username = session.get('username')
             production_status = 5
+            qc_status = 'OK'
 
-            query = "INSERT INTO productions (datetime, product_name, order_num, product_uid, serial_num, username, production_status) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-            self.db_manager.execute_insert(query, (datetime_value, product_name, order_num, product_uid, serial_num, username, production_status))
-
-            return jsonify({'message': 'Серийный номер успешно добавлен!'})
+            query = "INSERT INTO productions (datetime, product_name, order_num, product_uid, serial_num, username, production_status, qc_status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            try:
+                self.db_manager.execute_insert(query, (datetime_value, product_name, order_num, product_uid, serial_num, username, production_status, qc_status))
+                return jsonify({'message': 'Изделие успешно добавлено!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
-
 
     def update_production_time(self):
         if 'username' in session:
@@ -324,9 +359,11 @@ class Handlers:
             new_datetime = request.json['newDatetime']
 
             query = "UPDATE productions SET datetime = %s WHERE product_uid = %s"
-            self.db_manager.execute_insert(query, (new_datetime, production_uid))
-
-            return jsonify({'message': 'Время успешно изменено!'})
+            try:
+                self.db_manager.execute_update(query, (new_datetime, production_uid))
+                return jsonify({'message': 'Время успешно изменено!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 
@@ -336,9 +373,11 @@ class Handlers:
             new_order_num = request.json['newOrder']
 
             query = "UPDATE productions SET order_num = %s WHERE product_uid = %s"
-            self.db_manager.execute_insert(query, (new_order_num, production_uid))
-
-            return jsonify({'message': 'Номер ШПЗ успешно изменен!'})
+            try:
+                self.db_manager.execute_update(query, (new_order_num, production_uid))
+                return jsonify({'message': 'Номер ШПЗ успешно изменен!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 
@@ -348,9 +387,11 @@ class Handlers:
             new_username = request.json['newUser']
 
             query = "UPDATE productions SET username = %s WHERE product_uid = %s"
-            self.db_manager.execute_insert(query, (new_username, production_uid))
-
-            return jsonify({'message': 'Пользователь успешно изменен!'})
+            try:
+                self.db_manager.execute_update(query, (new_username, production_uid))
+                return jsonify({'message': 'Пользователь успешно изменен!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 
@@ -359,9 +400,25 @@ class Handlers:
             production_uid = request.json['productionUid']
 
             query = "DELETE FROM productions WHERE product_uid = %s"
-            self.db_manager.execute_delete(query, (production_uid,))
+            try:
+                self.db_manager.execute_delete(query, (production_uid,))
+                return jsonify({'message': 'Запись успешно удалена!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        else:
+            return redirect('/')
 
-            return jsonify({'message': 'Запись успешно удалена!'})
+    def update_qc_status(self):
+        if 'username' in session:
+            production_uid = request.json['productionUid']
+            new_qc_status = request.json['newQualityStatus']
+
+            query = "UPDATE productions SET qc_status = %s WHERE product_uid = %s"
+            try:
+                self.db_manager.execute_update(query, (new_qc_status, production_uid))
+                return jsonify({'message': 'Запись занесена в базу данных!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 
@@ -378,76 +435,10 @@ class Handlers:
         else:
             return jsonify({'error': 'Not logged in'}), 401
 
-    # @staticmethod
-    # def get_select_product_info():
-    #     if 'username' in session:
-    #         return jsonify({
-    #             'username': session.get('username'),
-    #             'role': session.get('role'),
-    #             'product_name': session.get('product_name'),
-    #             'order_num': session.get('order_num'),
-    #             'picture_name': session.get('picture_name')
-    #         })
-    #     else:
-    #         return jsonify({'error': 'Not logged in'}), 401
-    #
-    # @staticmethod
-    # def get_select_order_info():
-    #     if 'username' in session:
-    #         return jsonify({
-    #             'username': session.get('username'),
-    #             'role': session.get('role'),
-    #             'product_name': session.get('product_name'),
-    #             'order_num': session.get('order_num'),
-    #             'picture_name': session.get('picture_name')
-    #         })
-    #     else:
-    #         return jsonify({'error': 'Not logged in'}), 401
-    #
-    # @staticmethod
-    # def get_productions_info():
-    #     if 'username' in session:
-    #         return jsonify({
-    #             'username': session.get('username'),
-    #             'role': session.get('role'),
-    #             'product_name': session.get('product_name'),
-    #             'order_num': session.get('order_num'),
-    #             'picture_name': session.get('picture_name')
-    #         })
-    #     else:
-    #         return jsonify({'error': 'Not logged in'}), 401
-    #
-    # @staticmethod
-    # def get_productions_history_info():
-    #     if 'username' in session:
-    #         return jsonify({
-    #             'username': session.get('username'),
-    #             'role': session.get('role'),
-    #             'product_name': session.get('product_name'),
-    #             'order_num': session.get('order_num'),
-    #             'picture_name': session.get('picture_name')
-    #         })
-    #     else:
-    #         return jsonify({'error': 'Not logged in'}), 401
-    #
-    # @staticmethod
-    # def get_edit_productions_info():
-    #     if 'username' in session:
-    #         return jsonify({
-    #             'username': session.get('username'),
-    #             'role': session.get('role'),
-    #             'product_name': session.get('product_name'),
-    #             'order_num': session.get('order_num'),
-    #             'picture_name': session.get('picture_name')
-    #         })
-    #     else:
-    #         return jsonify({'error': 'Not logged in'}), 401
-
     @staticmethod
     def get_time():
         if 'username' in session:
             return jsonify({
-                # 'datetime_value': datetime.now(pytz.timezone('Europe/Moscow')).strftime('%d.%m.%Y, %H:%M:%S'),
                 'datetime_value': datetime.now()
             })
         else:

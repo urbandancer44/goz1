@@ -12,9 +12,8 @@
 </head>
 <body class="bg-light ">
     <div class="container-fluid">
-        <div class="row justify-content-center mt-2">
+        <!--<div class="row justify-content-center mt-2">
             <div class="col-2">
-                <!--<a href="/productions" class="btn btn-secondary w-100 btn-lg" id="prev_button">Назад</a>-->
                 <button class="btn btn-secondary w-100 btn-lg" id="prev_button">Назад</button>
             </div>
             <div class="col-8">
@@ -23,19 +22,51 @@
             <div class="col-2">
                 <form action="/logout" method="post">
                     <button type="submit" class="btn btn-danger w-100 btn-lg">Выход</button>
-                    <!--<a class="btn btn-primary btn-lg" href="/static/login.html" role="button">Выход</a>-->
+                </form>
+            </div>
+        </div>-->
+        <div class="row justify-content-between align-items-center bg-light p-1 shadow-lg">
+            <!-- Кнопка "Назад" -->
+            <div class="col-2">
+                <button class="btn btn-secondary w-100 btn-lg" id="prev_button">Назад</button>
+            </div>
+            <!-- Отображение текущего ИРМ -->
+            <div class="col-auto">
+                <div style="display: grid; grid-template-columns: auto auto; align-items: center;">
+                    <div class="grid_info-header">Рабочее место:</div>
+                    <div class="grid_info-cell" style="color:blue" id="current_workplace_name"></div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div style="display: grid; grid-template-columns: auto auto; align-items: center;">
+                    <div class="grid_info-header">Дата:</div>
+                    <div class="grid_info-cell" style="color:blue" id="datetime"></div>
+                </div>
+            </div>
+            <!-- Кнопка "Выход" -->
+            <div class="col-2">
+                <form action="/logout" method="post">
+                    <button type="submit" class="btn btn-danger btn-lg w-100">Выход</button>
                 </form>
             </div>
         </div>
+
+        <!-- Заголовок страницы -->
+        <div class="row justify-content-center mt-2">
+            <div class="col-12 text-center">
+                <h2><u>История производства</u></h2>
+            </div>
+        </div>
+
         <div class="row justify-content-center mt-2">
             <div class="col-6">
             </div>
             <div class="col-lg-6">
                 <div class="grid_info-container mb-5">
-                    <div class="grid_info-header">Дата:</div>
+                    <!--<div class="grid_info-header">Дата:</div>
                     <div class="grid_info-cell" style="color:blue" id="datetime"></div>
                     <div class="grid_info-header">ИРМ:</div>
-                    <div class="grid_info-cell" style="color:blue" id="current_workplace_id"></div>
+                    <div class="grid_info-cell" style="color:blue" id="current_workplace_id"></div>-->
                     <div class="grid_info-header">Имя:</div>
                     <div class="grid_info-cell" style="color:blue" id="username"></div>
                     <div class="grid_info-header">Роль:</div>
@@ -43,21 +74,21 @@
                 </div>
             </div>
         </div>
-        <div class="row justify-content-center mt-3">
-            <div class="grid_production-container justify-content-center mt-2" style="max-height: 617px; overflow-y: auto;">
-                <div class="grid_production-header">
-                    <div>№</div>
-                    <div>Дата/время</div>
-                    <div>Изделие</div>
-                    <div>Номер ШПЗ</div>
-                    <div>UID изделия</div>
-                    <div>S/N изделия</div>
-                    <div>Пользователь</div>
-                    <div>Статус</div>
-                </div>
-                <div class="grid_production-body" id="productionsTableBody">
-                    <!-- Данные будут загружены с помощью JavaScript -->
-                </div>
+        <div class="grid_production-container justify-content-center mt-2" style="max-height: 617px; overflow-y: auto;">
+            <div class="grid_production-header">
+                <div>№</div>
+                <div>Дата/время</div>
+                <div>Изделие</div>
+                <div>Номер ШПЗ</div>
+                <div>UID изделия</div>
+                <div>S/N изделия</div>
+                <div>Пользователь</div>
+                <div>Статус</div>
+                <div>Проверка</div>
+                <div>Возвраты</div>
+            </div>
+            <div class="grid_production-body" id="productionsTableBody">
+                <!-- Данные будут загружены с помощью JavaScript -->
             </div>
         </div>
         <div class="row justify-content-center mt-4">
@@ -89,13 +120,13 @@
                             <input type="datetime-local" class="form-control" id="endDatetime" required>
                         </div>
                         <div class="d-flex mt-2 justify-content-end">
-                            <button type="button" class="btn btn-primary" id="applyTimeFilterButton">Подтвердить</button>
+                            <button type="button" class="btn btn-success" id="applyTimeFilterButton">Подтвердить</button>
                         </div>
                     </form>
                 </div>
 <!--                <div class="modal-footer">-->
 <!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
-<!--                    <button type="button" class="btn btn-primary" id="applyTimeFilterButton">Применить</button>-->
+<!--                    <button type="button" class="btn btn-success" id="applyTimeFilterButton">Применить</button>-->
 <!--                </div>-->
             </div>
         </div>
@@ -114,12 +145,12 @@
                     <!-- Список будет загружен с помощью JavaScript -->
                     </select>
                     <div class="d-flex mt-2 justify-content-end">
-                        <button type="button" class="btn btn-primary" id="applyProductFilterButton">Подтвердить</button>
+                        <button type="button" class="btn btn-success" id="applyProductFilterButton">Подтвердить</button>
                     </div>
                 </div>
 <!--                <div class="modal-footer">-->
 <!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
-<!--                    <button type="button" class="btn btn-primary" id="applyProductFilterButton">Применить</button>-->
+<!--                    <button type="button" class="btn btn-success" id="applyProductFilterButton">Применить</button>-->
 <!--                </div>-->
             </div>
         </div>
@@ -138,12 +169,12 @@
                     <!-- Список будет загружен с помощью JavaScript -->
                     </select>
                     <div class="d-flex mt-2 justify-content-end">
-                        <button type="button" class="btn btn-primary" id="applyOrderFilterButton">Подтвердить</button>
+                        <button type="button" class="btn btn-success" id="applyOrderFilterButton">Подтвердить</button>
                     </div>
                 </div>
 <!--                <div class="modal-footer">-->
 <!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
-<!--                    <button type="button" class="btn btn-primary" id="applyOrderFilterButton">Применить</button>-->
+<!--                    <button type="button" class="btn btn-success" id="applyOrderFilterButton">Применить</button>-->
 <!--                </div>-->
             </div>
         </div>
@@ -163,13 +194,13 @@
                             <input type="text" class="form-control" id="filterUid" required>
                         </div>
                     <div class="d-flex mt-2 justify-content-end">
-                        <button type="submit" class="btn btn-primary" id="applyUidFilterButton">Подтвердить</button>
+                        <button type="submit" class="btn btn-success" id="applyUidFilterButton">Подтвердить</button>
                     </div>
                     </form>
                 </div>
 <!--                <div class="modal-footer">-->
 <!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
-<!--                    <button type="button" class="btn btn-primary" id="applyUidFilterButton">Применить</button>-->
+<!--                    <button type="button" class="btn btn-success" id="applyUidFilterButton">Применить</button>-->
 <!--                </div>-->
             </div>
         </div>
@@ -189,13 +220,13 @@
                             <input type="text" class="form-control" id="filterSerialNum" required>
                         </div>
                     <div class="d-flex mt-2 justify-content-end">
-                        <button type="submit" class="btn btn-primary" id="applySerialNumFilterButton">Подтвердить</button>
+                        <button type="submit" class="btn btn-success" id="applySerialNumFilterButton">Подтвердить</button>
                     </div>
                     </form>
                 </div>
 <!--                <div class="modal-footer">-->
 <!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
-<!--                    <button type="button" class="btn btn-primary" id="applySerialNumFilterButton">Применить</button>-->
+<!--                    <button type="button" class="btn btn-success" id="applySerialNumFilterButton">Применить</button>-->
 <!--                </div>-->
             </div>
         </div>
@@ -214,12 +245,12 @@
                     <!-- Список будет загружен с помощью JavaScript -->
                     </select>
                     <div class="d-flex mt-2 justify-content-end">
-                        <button type="button" class="btn btn-primary" id="applyUserFilterButton">Подтвердить</button>
+                        <button type="button" class="btn btn-success" id="applyUserFilterButton">Подтвердить</button>
                     </div>
                 </div>
 <!--                <div class="modal-footer">-->
 <!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
-<!--                    <button type="button" class="btn btn-primary" id="applyUserFilterButton">Применить</button>-->
+<!--                    <button type="button" class="btn btn-success" id="applyUserFilterButton">Применить</button>-->
 <!--                </div>-->
             </div>
         </div>
