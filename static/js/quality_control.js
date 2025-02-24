@@ -24,12 +24,12 @@ function getQualityProductions() {
             const gridBody = document.getElementById('productionsTableBody');
             gridBody.innerHTML = '';  // Очищаем таблицу
 
-            data.sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
+            data.sort((a,b) => new Date(a.datetime) - new Date(b.datetime));
 
-            // Фильтруем данные: оставляем только записи с двухзначным статусом
+            // Фильтруем данные: оставляем только записи с пустым статусом и NG
             const filteredData = data.filter(production => {
                 const qc_status = production.qc_status;
-                return qc_status !== 'OK'; // Оставляем только статусы NG
+                return qc_status !== 'OK';
             });
 
             // Отображаем отфильтрованные данные
@@ -71,6 +71,8 @@ function getQualityProductions() {
                 gridBody.appendChild(row);
 
                 row.dataset.uid = production.product_uid;
+                row.dataset.product_name = production.product_name;
+                row.dataset.qc_return_quantity = production.qc_return_quantity;
                 row.addEventListener("click", (event) => {
                     //alert(production.product_name);
                     activateRow(event.currentTarget);
@@ -78,13 +80,38 @@ function getQualityProductions() {
             });
         })
         .catch(error => console.error('Error:', error));
+    document.getElementById('product_img').src = "";
 }
 
 function activateRow(row) {
     document.querySelectorAll('#productionsTableBody .grid_production-row').forEach(r => r.classList.remove('active-row'));
     row.classList.add('active-row')
     sessionProductUID = row.dataset.uid;
+    sessionProductName = row.dataset.product_name;
+    sessionQcReturnQuantity = Number(row.dataset.qc_return_quantity);
+    getPictureName(sessionProductName);
     //alert(sessionProductName);
+}
+
+function getPictureName(product_name) {
+    // Получаем название изображения из имени продукта
+    fetch('/get_picture_name', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ product_name: product_name })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.picture_name) {
+            const picture_name = data.picture_name;
+            document.getElementById('product_img').src = "/static/img/products/" + picture_name;
+        } else {
+            console.log('Имя изображения не найдено');
+        }
+    })
+    .catch(error => console.error('Error:', error));
 }
 
 // ---Сброс фильтра---
@@ -95,15 +122,22 @@ function clearFilter() {
 }
 
 // Функция изменения статуса качества
-function updateQcStatus(new_qc_status) {
-    fetch('/update_qc_status', {
+function updateQuality(new_qc_status) {
+    let new_qc_return_quantity;
+    if (new_qc_status === 'OK') {
+        new_qc_return_quantity = sessionQcReturnQuantity;
+    } else {
+        new_qc_return_quantity = sessionQcReturnQuantity+1;
+    }
+    fetch('/update_quality', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             productionUid: sessionProductUID,
-            newQualityStatus: new_qc_status
+            newQualityStatus: new_qc_status,
+            newQcReturnQuantity: new_qc_return_quantity
         })
     })
     .then(response => response.json())
@@ -119,7 +153,7 @@ function updateQcStatus(new_qc_status) {
 document.getElementById('qcOkButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#productionsTableBody .grid_production-row.active-row');
     if (activeRow) {
-        updateQcStatus('OK')
+        updateQuality('OK');
     } else {
         sessionProductUID = null;
         alert('Выберите строку с изделием!');
@@ -130,154 +164,37 @@ document.getElementById('qcOkButton').addEventListener('click', function() {
 document.getElementById('qcNgButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#productionsTableBody .grid_production-row.active-row');
     if (activeRow) {
-        updateQcStatus('NG')
+        updateQuality('NG');
+        // addQcReturn();
     } else {
         sessionProductUID = null;
         alert('Выберите строку с изделием!');
     }
 });
 
-
-// // --- Фильтрация по времени ---
-// document.getElementById('timeFilterButton').addEventListener('click', function() {
-//     // document.getElementById('startDatetime').value = '';
-//     // document.getElementById('endDatetime').value = '';
-//     timeFilterModal = new bootstrap.Modal(document.getElementById('timeFilterModal'));
-//     timeFilterModal.show();
-// });
-// // При нажатии кнопки модального окна
-// document.getElementById('applyTimeFilterButton').addEventListener('click', function () {
-//     const startDatetime = document.getElementById('startDatetime').value;
-//     const endDatetime = document.getElementById('endDatetime').value;
-//     if (startDatetime && endDatetime) {
-//         const startDate = new Date(startDatetime);
-//         const endDate = new Date(endDatetime);
-//
-//         if (endDate >= startDate) {
-//             filterByTime(startDatetime, endDatetime);
-//             timeFilterModal.hide();
-//             timeFilterModal = null;
-//         } else {
-//             alert('Конечная дата должна быть больше или равна начальной дате!');
-//         }
-//     } else {
-//         alert('Установите временной интервал!');
-//     }
-// });// Фильтр
-// function filterByTime(startDatetime, endDatetime) {
-//     const startDate = new Date(startDatetime);
-//     const endDate = new Date(endDatetime);
-//     // console.log('Start Date:', startDate, 'End Date:', endDate); // Логирование дат
-//     filterProductions((production) => {
-//         const productionDate = new Date(production[1]);
-//         // console.log('Production Date:', productionDate); // Логирование даты производства
-//         return productionDate >= startDate && productionDate <= endDate;
-//     });
-// }
-//
-// // --- Фильтрация по изделию ---
-// function getProductionsProducts() {
-//     fetch('/get_productions')
-//         .then(response => response.json())
-//         .then(data => {
-//             const productSelect = document.getElementById('productSelect');
-//             productSelect.innerHTML = '';  // Очищаем список
-//
-//             // Создаем Set для хранения уникальных номеров ШПЗ
-//             const uniqueProducts = new Set();
-//
-//             data.forEach(production => {
-//                 const productName = production[2];  // Предполагаем, что production[2] содержит наименование изделия
-//                 if (!uniqueProducts.has(productName)) {
-//                     uniqueProducts.add(productName);
-//                     const option = document.createElement('option');
-//                     option.value = productName;
-//                     option.innerText = productName;
-//                     productSelect.appendChild(option);
-//                 }
-//             });
+// Функция добавления возврата после проверки качества
+// function addQcReturn() {
+//     fetch('/add_quality_return', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//             productionUid: sessionProductUID,
+//             newQcReturnQuantity: sessionQcReturnQuantity+1
 //         })
-//         .catch(error => console.error('Error:', error));
-// }
-// // Открытие модального окна
-// document.getElementById('productFilterButton').addEventListener('click', function() {
-//     productFilterModal = new bootstrap.Modal(document.getElementById('productFilterModal'));
-//     productFilterModal.show();
-//     getProductionsProducts();  // Загружаем список изделий
-// });
-// // При нажатии кнопки модального окна
-// document.getElementById('applyProductFilterButton').addEventListener('click', function() {
-//     const selectedProduct = document.getElementById('productSelect').value;
-//     if (selectedProduct) {
-//         filterByProduct(selectedProduct);
-//         productFilterModal.hide();
-//         productFilterModal = null;
-//     } else {
-//         alert('Выберите изделие из списка!');
-//     }
-// });
-// // Фильтр
-// function filterByProduct(productName) {
-//     filterProductions((production) => production[2].includes(productName));
-// }
-//
-// // --- Фильтрация по номеру ШПЗ ---
-// function getProductionsOrders() {
-//     fetch('/get_productions')
-//         .then(response => response.json())
-//         .then(data => {
-//             const orderSelect = document.getElementById('orderSelect');
-//             orderSelect.innerHTML = '';  // Очищаем список
-//
-//             // Создаем Set для хранения уникальных номеров ШПЗ
-//             const uniqueOrders = new Set();
-//
-//             data.forEach(production => {
-//                 const orderNum = production[3];  // Предполагаем, что production[3] содержит номер ШПЗ
-//                 if (!uniqueOrders.has(orderNum)) {
-//                     uniqueOrders.add(orderNum);
-//                     const option = document.createElement('option');
-//                     option.value = orderNum;
-//                     option.innerText = orderNum;
-//                     orderSelect.appendChild(option);
-//                 }
-//             });
-//         })
-//         .catch(error => console.error('Error:', error));
-// }
-// // Открытие модального кона
-// document.getElementById('orderFilterButton').addEventListener('click', function() {
-//     orderFilterModal = new bootstrap.Modal(document.getElementById('orderFilterModal'));
-//     orderFilterModal.show();
-//     getProductionsOrders();  // Загружаем список ШПЗ
-// });
-// // При нажатии кнопки модального окна
-// document.getElementById('applyOrderFilterButton').addEventListener('click', function() {
-//     const selectedOrder = document.getElementById('orderSelect').value;
-//     if (selectedOrder) {
-//         filterByOrder(selectedOrder);
-//         orderFilterModal.hide();
-//         orderFilterModal = null;
-//     } else {
-//         alert('Выберите номер ШПЗ из списка!');
-//     }
-// });
-// // Фильтр
-// function filterByOrder(orderNum) {
-//     filterProductions((production) => production[3].includes(orderNum));
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         // alert(data.message);
+//         sessionProductUID = null;
+//         sessionQcReturnQuantity = 0;
+//         getQualityProductions();  // Перезагружаем таблицу после изменения
+//     })
+//     .catch(error => console.error('Error:', error));
 // }
 
-// --- Фильтрация по UID ---
-// // Открытие модального окна
-// document.getElementById('uidFilterButton').addEventListener('click', function() {
-//     document.getElementById('filterUid').value = '';
-//     uidFilterModal = new bootstrap.Modal(document.getElementById('uidFilterModal'));
-//     uidFilterModal.show();
-// });
-// // При открытии модального окна
-// document.getElementById('uidFilterModal').addEventListener('shown.bs.modal', function () {
-//     document.getElementById('filterUid').focus();
-// })
+
 // При нажатии кнопки модального окна
 document.getElementById('filterUidForm').addEventListener('submit', function (event) {
     event.preventDefault();
@@ -294,86 +211,12 @@ document.getElementById('filterUidForm').addEventListener('submit', function (ev
 // Фильтр
 function filterByUid(productUid) {
     const transliterateUid = transliterate(productUid)
-    filterProductions((production) => production.product_uid.includes(transliterateUid));
+    filterQualityProductions((production) => production.product_uid.includes(transliterateUid));
 }
 
-// // ---Фильтрация по S/N---
-// // Открытие модального окна
-// document.getElementById('serialNumFilterButton').addEventListener('click', function() {
-//     document.getElementById('filterSerialNum').value = '';
-//     serialNumFilterModal = new bootstrap.Modal(document.getElementById('serialNumFilterModal'));
-//     serialNumFilterModal.show();
-// });
-// // При открытии модального окна
-// document.getElementById('serialNumFilterModal').addEventListener('shown.bs.modal', function () {
-//     document.getElementById('filterSerialNum').focus();
-// })
-// // При нажатии кнопки модального окна
-// document.getElementById('filterSerialNumForm').addEventListener('submit', function (event) {
-//     event.preventDefault();
-//     const filterSerialNum = document.getElementById('filterSerialNum').value;
-//     if (filterSerialNum) {
-//         filterBySerialNum(filterSerialNum);
-//         serialNumFilterModal.hide();
-//         serialNumFilterModal = null;
-//     } else {
-//         alert('Введите серийный номер изделия!');
-//     }
-// });
-// // Фильтр
-// function filterBySerialNum(serialNum) {
-//     filterProductions((production) => production[7].includes(serialNum));
-// }
-//
-// // ---Фильтрация по пользователю---
-// function getProductionsUsers() {
-//     fetch('/get_productions')
-//         .then(response => response.json())
-//         .then(data => {
-//             const userSelect = document.getElementById('userSelect');
-//             userSelect.innerHTML = '';  // Очищаем список
-//
-//             // Создаем Set для хранения уникальных имён
-//             const uniqueUsers = new Set();
-//
-//             data.forEach(production => {
-//                 const username = production[5];  // Предполагаем, что production[5] содержит имя пользователя
-//                 if (!uniqueUsers.has(username)) {
-//                     uniqueUsers.add(username);
-//                     const option = document.createElement('option');
-//                     option.value = username;
-//                     option.innerText = username;
-//                     userSelect.appendChild(option);
-//                 }
-//             });
-//         })
-//         .catch(error => console.error('Error:', error));
-// }
-// // Открытие модального окна
-// document.getElementById('userFilterButton').addEventListener('click', function() {
-//     userFilterModal = new bootstrap.Modal(document.getElementById('userFilterModal'));
-//     userFilterModal.show();
-//     getProductionsUsers();  // Загружаем список ШПЗ
-// });
-// // При нажатии кнопки модального окна
-// document.getElementById('applyUserFilterButton').addEventListener('click', function() {
-//     const selectedUser = document.getElementById('userSelect').value;
-//     if (selectedUser) {
-//         filterByUser(selectedUser);
-//         userFilterModal.hide();
-//         document.getElementById('userSelect').value = '';
-//         userFilterModal = null;
-//     } else {
-//         alert('Выберите пользователя из списка!');
-//     }
-// });
-// // Фильтр
-// function filterByUser(username) {
-//     filterProductions((production) => production[5].includes(username));
-// }
 
 // ---Общая функция для фильтрации---
-function filterProductions(filterFunction) {
+function filterQualityProductions(filterFunction) {
     fetch('/get_productions')
         .then(response => response.json())
         .then(data => {
@@ -420,6 +263,14 @@ function filterProductions(filterFunction) {
                     row.appendChild(qc_statusCell);
                     row.appendChild(qc_return_quantityCell);
                     gridBody.appendChild(row);
+
+                    row.dataset.uid = production.product_uid;
+                    row.dataset.product_name = production.product_name;
+                    row.dataset.qc_return_quantity = production.qc_return_quantity;
+                    row.addEventListener("click", (event) => {
+                        //alert(production.product_name);
+                        activateRow(event.currentTarget);
+                    });
                 }
             });
         })

@@ -173,6 +173,21 @@ class Handlers:
         else:
             return redirect('/')
 
+    def get_picture_name(self):
+        if 'username' in session:
+            product_name = request.json.get('product_name')
+            query = "SELECT picture_path FROM products WHERE product_name = %s"
+            try:
+                result = self.db_manager.execute_query(query, (product_name,))
+                if result:
+                    return jsonify({'picture_name': result[0]['picture_path']})
+                else:
+                    return jsonify({'picture_name': None})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        else:
+            return redirect('/')
+
     def update_product_picture(self):
         if 'username' in session:
             product_name = str(request.form.get('productName'))
@@ -408,14 +423,29 @@ class Handlers:
         else:
             return redirect('/')
 
-    def update_qc_status(self):
+    def update_quality(self):
         if 'username' in session:
             production_uid = request.json['productionUid']
             new_qc_status = request.json['newQualityStatus']
+            new_qc_return_quantity = request.json['newQcReturnQuantity']
 
-            query = "UPDATE productions SET qc_status = %s WHERE product_uid = %s"
+            query = "UPDATE productions SET qc_status = %s, qc_return_quantity = %s WHERE product_uid = %s"
             try:
-                self.db_manager.execute_update(query, (new_qc_status, production_uid))
+                self.db_manager.execute_update(query, (new_qc_status, new_qc_return_quantity, production_uid))
+                return jsonify({'message': 'Запись занесена в базу данных!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        else:
+            return redirect('/')
+
+    def add_quality_return(self):
+        if 'username' in session:
+            production_uid = request.json['productionUid']
+            new_qc_return_quantity = request.json['newQcReturnQuantity']
+
+            query = "UPDATE productions SET qc_return_quantity = %s WHERE product_uid = %s"
+            try:
+                self.db_manager.execute_update(query, (new_qc_return_quantity, production_uid))
                 return jsonify({'message': 'Запись занесена в базу данных!'})
             except Exception as e:
                 return jsonify({'error': str(e)}), 500

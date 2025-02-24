@@ -57,7 +57,9 @@ app.add_url_rule('/update_production_time', 'update_production_time', handlers.u
 app.add_url_rule('/update_production_order', 'update_production_order', handlers.update_production_order, methods=['POST'])
 app.add_url_rule('/update_production_user', 'update_production_user', handlers.update_production_user, methods=['POST'])
 app.add_url_rule('/delete_production', 'delete_production', handlers.delete_production, methods=['POST'])
-app.add_url_rule('/update_qc_status', 'update_qc_status', handlers.update_qc_status, methods=['POST'])
+app.add_url_rule('/update_quality', 'update_quality', handlers.update_quality, methods=['POST'])
+app.add_url_rule('/add_quality_return', 'add_quality_return', handlers.add_quality_return, methods=['POST'])
+app.add_url_rule('/get_picture_name', 'get_picture_name', handlers.get_picture_name, methods=['POST'])
 app.add_url_rule('/get_time', 'get_time', handlers.get_time)
 app.add_url_rule('/logout', 'logout', handlers.logout, methods=['POST'])
 

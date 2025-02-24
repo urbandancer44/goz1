@@ -45,6 +45,7 @@ let sessionRole = null;
 let sessionProductName = null;
 let sessionProductUID = null;
 let sessionOrderNum = null;
+let sessionQcReturnQuantity = 0;
 
 // Функция для получения значения куки по имени
 let currentWorkplaceID = getCookie('workplace_id');
