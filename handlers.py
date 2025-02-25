@@ -438,15 +438,28 @@ class Handlers:
         else:
             return redirect('/')
 
-    def add_quality_return(self):
-        if 'username' in session:
-            production_uid = request.json['productionUid']
-            new_qc_return_quantity = request.json['newQcReturnQuantity']
+    def get_quality_control(self):
+        query = "SELECT * FROM quality_control"
+        try:
+            quality_control = self.db_manager.execute_query(query)
+            return jsonify(quality_control)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
-            query = "UPDATE productions SET qc_return_quantity = %s WHERE product_uid = %s"
+    def add_quality_control(self):
+        if 'username' in session:
+            datetime_value = datetime.now()
+            product_name = request.json['product_name']
+            product_uid = request.json['productionUid']
+            username = request.json['username']
+            production_status = request.json['productionStatus']
+            qc_username = session.get('username')
+            qc_status = request.json['newQualityStatus']
+
+            query = "INSERT INTO quality_control (datetime, product_name, product_uid, username, production_status, qc_username, qc_status) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             try:
-                self.db_manager.execute_update(query, (new_qc_return_quantity, production_uid))
-                return jsonify({'message': 'Запись занесена в базу данных!'})
+                self.db_manager.execute_insert(query, (datetime_value, product_name, product_uid, username, production_status, qc_username, qc_status))
+                return jsonify({'message': 'Запись успешно добавлена!'})
             except Exception as e:
                 return jsonify({'error': str(e)}), 500
         else:

@@ -73,6 +73,8 @@ function getQualityProductions() {
                 row.dataset.uid = production.product_uid;
                 row.dataset.product_name = production.product_name;
                 row.dataset.qc_return_quantity = production.qc_return_quantity;
+                row.dataset.username = production.username;
+                row.dataset.production_status = production.production_status;
                 row.addEventListener("click", (event) => {
                     //alert(production.product_name);
                     activateRow(event.currentTarget);
@@ -89,8 +91,69 @@ function activateRow(row) {
     sessionProductUID = row.dataset.uid;
     sessionProductName = row.dataset.product_name;
     sessionQcReturnQuantity = Number(row.dataset.qc_return_quantity);
+    sessionUsername = row.dataset.username;
+    sessionProductionStatus = Number(row.dataset.production_status);
     getPictureName(sessionProductName);
     //alert(sessionProductName);
+}
+
+function getQualityControl() {
+    fetch('/get_quality_control')
+        .then(response => response.json())
+        .then(data => {
+            const gridBody = document.getElementById('quality_controlTableBody');
+            gridBody.innerHTML = '';  // Очищаем таблицу
+
+            data.sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
+
+            // // Фильтруем данные: оставляем только записи с пустым статусом и NG
+            // const filteredData = data.filter(production => {
+            //     const qc_status = production.qc_status;
+            //     return qc_status !== 'OK';
+            // });
+            // Отображаем отфильтрованные данные
+            data.forEach((quality_control, index) => {
+                const row = document.createElement('div');
+                row.classList.add('grid_quality-row');
+
+                const numberCell = document.createElement('div');
+                const datetimeCell = document.createElement('div');
+                const product_nameCell = document.createElement('div');
+                const product_uidCell = document.createElement('div');
+                const usernameCell = document.createElement('div');
+                const production_statusCell = document.createElement('div');
+                const qc_usernameCell = document.createElement('div');
+                const qc_statusCell = document.createElement('div');
+
+                numberCell.innerText = index + 1;
+                datetimeCell.innerText = new Date(quality_control.datetime).toLocaleString(); // Преобразование времени
+                product_nameCell.innerText = quality_control.product_name;
+                product_uidCell.innerText = quality_control.product_uid;
+                usernameCell.innerText = quality_control.username;
+                production_statusCell.innerText = quality_control.production_status;
+                qc_usernameCell.innerText = quality_control.qc_username;
+                qc_statusCell.innerText = quality_control.qc_status;
+                row.appendChild(numberCell);
+                row.appendChild(datetimeCell);
+                row.appendChild(product_nameCell);
+                row.appendChild(product_uidCell);
+                row.appendChild(usernameCell);
+                row.appendChild(production_statusCell);
+                row.appendChild(qc_usernameCell);
+                row.appendChild(qc_statusCell);
+                gridBody.appendChild(row);
+
+                // row.dataset.uid = production.product_uid;
+                // row.dataset.product_name = production.product_name;
+                // row.dataset.qc_return_quantity = production.qc_return_quantity;
+                // row.dataset.username = production.username;
+                // row.addEventListener("click", (event) => {
+                //     //alert(production.product_name);
+                //     activateRow(event.currentTarget);
+                // });
+            });
+        })
+        .catch(error => console.error('Error:', error));
 }
 
 function getPictureName(product_name) {
@@ -145,6 +208,7 @@ function updateQuality(new_qc_status) {
         alert(data.message);
         sessionProductUID = null;
         getQualityProductions();  // Перезагружаем таблицу после изменения
+        getQualityControl();
     })
     .catch(error => console.error('Error:', error));
 }
@@ -165,35 +229,39 @@ document.getElementById('qcNgButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#productionsTableBody .grid_production-row.active-row');
     if (activeRow) {
         updateQuality('NG');
-        // addQcReturn();
+        addQualityControl('NG');
     } else {
         sessionProductUID = null;
         alert('Выберите строку с изделием!');
     }
 });
 
-// Функция добавления возврата после проверки качества
-// function addQcReturn() {
-//     fetch('/add_quality_return', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify({
-//             productionUid: sessionProductUID,
-//             newQcReturnQuantity: sessionQcReturnQuantity+1
-//         })
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         // alert(data.message);
-//         sessionProductUID = null;
-//         sessionQcReturnQuantity = 0;
-//         getQualityProductions();  // Перезагружаем таблицу после изменения
-//     })
-//     .catch(error => console.error('Error:', error));
-// }
-
+//Функция добавления записи проверки качества
+function addQualityControl(new_qc_status) {
+    fetch('/add_quality_control', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            product_name: sessionProductName,
+            productionUid: sessionProductUID,
+            username: sessionUsername,
+            productionStatus: sessionProductionStatus,
+            newQualityStatus: new_qc_status
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // alert(data.message);
+        sessionProductName = null;
+        sessionProductUID = null;
+        sessionUsername = null;
+        sessionProductionStatus = 0;
+        getQualityControl();  // Перезагружаем таблицу после изменения
+    })
+    .catch(error => console.error('Error:', error));
+}
 
 // При нажатии кнопки модального окна
 document.getElementById('filterUidForm').addEventListener('submit', function (event) {
@@ -267,6 +335,8 @@ function filterQualityProductions(filterFunction) {
                     row.dataset.uid = production.product_uid;
                     row.dataset.product_name = production.product_name;
                     row.dataset.qc_return_quantity = production.qc_return_quantity;
+                    row.dataset.username = production.username;
+                    row.dataset.production_status = production.production_status;
                     row.addEventListener("click", (event) => {
                         //alert(production.product_name);
                         activateRow(event.currentTarget);
@@ -295,6 +365,7 @@ window.onload = function() {
     focusHiddenInput();
     productionsHistoryInfo();  // Вызываем функцию при загрузке страницы
     getQualityProductions();  // Загружаем продукты при загрузке страницы
+    getQualityControl();
     setInterval(getTime, 3600000);  // Запрашиваем время с сервера каждые 60 минут (3600000 миллисекунд)
     setInterval(incrementLocalTime, 1000);  // Обновляем время локально каждую секунду
 };
