@@ -340,13 +340,25 @@ class Handlers:
         else:
             return redirect('/')
 
-    def get_productions(self):
-        query = "SELECT * FROM productions"
+    def get_productions_common(self, status = None):
+        if status:
+            query = "SELECT * FROM productions WHERE production_status = %s"
+        else:
+            query = "SELECT * FROM productions"
+
         try:
-            productions = self.db_manager.execute_query(query)
+            productions = self.db_manager.execute_query(query, (status,))
+            # print(productions)
             return jsonify(productions)
         except Exception as e:
+            print(e)
             return jsonify({'error': str(e)}), 500
+
+    def get_productions(self):
+        return self.get_productions_common()
+
+    def get_productions_status5(self):
+        return self.get_productions_common(status = 5)
 
     def add_production(self):
         if 'username' in session:

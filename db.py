@@ -24,6 +24,7 @@ class DatabaseManager:
         conn = self.get_db_connection()
         try:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                # print(cur.mogrify(query, params))
                 cur.execute(query, params or ())
                 result = cur.fetchall()
                 return result if result else []

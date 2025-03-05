@@ -90,6 +90,7 @@
                 <!--<h4 style="color: forestgreen">Для выбора изделия сканируй Datamatrix!</h4>-->
             </div>
         </div>
+        <h4>Таблица производства</h4>
         <div class="grid_production-container justify-content-center mt-2" style="max-height: 288px; overflow-y: auto;">
             <div class="grid_production-header">
                 <div>№</div>
@@ -113,6 +114,7 @@
                 <button style="min-width: 120px" type="button" id="qcNgButton" class="btn btn-danger btn-lg mb-2">Качество NG</button>
             </div>
         </div>
+        <h4>Таблица контроля качества</h4>
         <div class="grid_quality-container justify-content-center mt-2" style="max-height: 288px; overflow-y: auto;">
             <div class="grid_quality-header">
                 <div>№</div>
@@ -136,31 +138,31 @@
         </div>
     </div>
     <!-- Модальное окно для фильтра по UID -->
-    <div class="modal fade" id="uidFilterModal" tabindex="-1" aria-labelledby="uidFilterModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="uidFilterModalLabel">Фильтр по UID</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="filterUidForm" autocomplete="off">
-                        <div class="mb-3">
-                            <label for="filterUid" class="form-label">Введите или сканируйте UID изделия:</label>
-                            <input type="text" class="form-control" id="filterUid" required>
-                        </div>
-                    <div class="d-flex mt-2 justify-content-end">
-                        <button type="submit" class="btn btn-primary" id="applyUidFilterButton">Подтвердить</button>
-                    </div>
-                    </form>
-                </div>
-<!--                <div class="modal-footer">-->
-<!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
-<!--                    <button type="button" class="btn btn-primary" id="applyUidFilterButton">Применить</button>-->
+<!--    <div class="modal fade" id="uidFilterModal" tabindex="-1" aria-labelledby="uidFilterModalLabel" aria-hidden="true">-->
+<!--        <div class="modal-dialog">-->
+<!--            <div class="modal-content">-->
+<!--                <div class="modal-header">-->
+<!--                    <h5 class="modal-title" id="uidFilterModalLabel">Фильтр по UID</h5>-->
+<!--                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
 <!--                </div>-->
-            </div>
-        </div>
-    </div>
+<!--                <div class="modal-body">-->
+<!--                    <form id="filterUidForm" autocomplete="off">-->
+<!--                        <div class="mb-3">-->
+<!--                            <label for="filterUid" class="form-label">Введите или сканируйте UID изделия:</label>-->
+<!--                            <input type="text" class="form-control" id="filterUid" required>-->
+<!--                        </div>-->
+<!--                    <div class="d-flex mt-2 justify-content-end">-->
+<!--                        <button type="submit" class="btn btn-primary" id="applyUidFilterButton">Подтвердить</button>-->
+<!--                    </div>-->
+<!--                    </form>-->
+<!--                </div>-->
+<!--&lt;!&ndash;                <div class="modal-footer">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <button type="button" class="btn btn-primary" id="applyUidFilterButton">Применить</button>&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
     <!-- Подключаем Bootstrap JS и Popper.js -->
      <script src="/static/js/bootstrap.min.js"></script>
 </body>

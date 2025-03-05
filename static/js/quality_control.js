@@ -33,7 +33,7 @@ function getQualityProductions() {
             });
 
             // Отображаем отфильтрованные данные
-            filteredData.forEach((production, index) => {
+            data.forEach((production, index) => {
                 const row = document.createElement('div');
                 row.classList.add('grid_production-row');
 
@@ -94,10 +94,16 @@ function activateRow(row) {
     sessionUsername = row.dataset.username;
     sessionProductionStatus = Number(row.dataset.production_status);
     getPictureName(sessionProductName);
+    if (sessionQcReturnQuantity > 0) {
+        getQualityControl(sessionProductUID);
+    } else {
+        const gridBody = document.getElementById('quality_controlTableBody');
+            gridBody.innerHTML = '';  // Очищаем таблицу
+    }
     //alert(sessionProductName);
 }
 
-function getQualityControl() {
+function getQualityControl(productUID) {
     fetch('/get_quality_control')
         .then(response => response.json())
         .then(data => {
@@ -107,12 +113,12 @@ function getQualityControl() {
             data.sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
 
             // // Фильтруем данные: оставляем только записи с пустым статусом и NG
-            // const filteredData = data.filter(production => {
-            //     const qc_status = production.qc_status;
-            //     return qc_status !== 'OK';
-            // });
+            const filteredData = data.filter(quality_control => {
+                const product_uid = quality_control.product_uid;
+                return product_uid === productUID;
+            });
             // Отображаем отфильтрованные данные
-            data.forEach((quality_control, index) => {
+            filteredData.forEach((quality_control, index) => {
                 const row = document.createElement('div');
                 row.classList.add('grid_quality-row');
 
@@ -365,7 +371,7 @@ window.onload = function() {
     focusHiddenInput();
     productionsHistoryInfo();  // Вызываем функцию при загрузке страницы
     getQualityProductions();  // Загружаем продукты при загрузке страницы
-    getQualityControl();
+    // getQualityControl();
     setInterval(getTime, 3600000);  // Запрашиваем время с сервера каждые 60 минут (3600000 миллисекунд)
     setInterval(incrementLocalTime, 1000);  // Обновляем время локально каждую секунду
 };

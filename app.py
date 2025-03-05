@@ -1,4 +1,6 @@
 from flask import Flask, session
+from jinja2.ext import debug
+
 from handlers import Handlers
 import os
 
@@ -50,6 +52,7 @@ app.add_url_rule('/set_product_name', 'set_product_name', handlers.set_product_n
 app.add_url_rule('/set_order_num', 'set_order_num', handlers.set_order_num, methods=['POST'])
 app.add_url_rule('/productions', 'productions', handlers.productions)
 app.add_url_rule('/get_productions', 'get_productions', handlers.get_productions)
+app.add_url_rule('/get_productions_status5', 'get_productions_status5', handlers.get_productions_status5)
 app.add_url_rule('/add_production', 'add_production', handlers.add_production, methods=['POST'])
 app.add_url_rule('/productions_history', 'productions_history', handlers.productions_history)
 app.add_url_rule('/edit_productions', 'edit_productions', handlers.edit_productions)
@@ -65,4 +68,4 @@ app.add_url_rule('/get_time', 'get_time', handlers.get_time)
 app.add_url_rule('/logout', 'logout', handlers.logout, methods=['POST'])
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)

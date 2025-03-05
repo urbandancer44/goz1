@@ -31,13 +31,14 @@ function productionsInfo() {
 }
 
 function getProductions() {
-    fetch('/get_productions')
+    fetch('/get_productions_status5')
         .then(response => response.json())
         .then(data => {
             const gridBody = document.getElementById('productionsTableBody');
             gridBody.innerHTML = '';  // Очищаем таблицу
 
             data.sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
+            // console.log(data);
 
             data.forEach((production, index) => {
                 const row = document.createElement('div');
