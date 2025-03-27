@@ -38,6 +38,10 @@ class Handlers:
                     return jsonify({'message': 'Успешная авторизация!', 'redirect': '/quality_control'})
                 elif current_workplace_id == '5':
                     return jsonify({'message': 'Успешная авторизация!', 'redirect': '/select_product'})
+                elif current_workplace_id == '6':
+                    return jsonify({'message': 'Успешная авторизация!', 'redirect': '/flying_test'})
+                elif current_workplace_id == '7':
+                    return jsonify({'message': 'Успешная авторизация!', 'redirect': '/package_control'})
                 else:
                     return jsonify({'message': 'Рабочее место не задано, обратитесь к администратору!'})
             else:
@@ -342,7 +346,7 @@ class Handlers:
 
     def get_productions_common(self, status = None):
         if status:
-            query = "SELECT * FROM productions WHERE production_status = %s"
+            query = "SELECT * FROM productions WHERE production_status = %s AND qc_status = 'OK'"
         else:
             query = "SELECT * FROM productions"
 
@@ -360,9 +364,12 @@ class Handlers:
     def get_productions_status5(self):
         return self.get_productions_common(status = 5)
 
+    def get_productions_status6(self):
+        return self.get_productions_common(status = 6)
+
     def add_production(self):
         if 'username' in session:
-            datetime_value = datetime.now()
+            datetime_value = datetime.now(tz=pytz.timezone('Europe/Moscow'))
             product_name = session.get('product_name')
             order_num = session.get('order_num')
             product_uid = request.json['productUid']
@@ -450,6 +457,38 @@ class Handlers:
         else:
             return redirect('/')
 
+    def sub_quality(self):
+        if 'username' in session:
+            production_uid = request.json['productionUid']
+            new_qc_return_quantity = request.json['newQcReturnQuantity']
+            if new_qc_return_quantity == 0:
+                new_qc_status = 'OK'
+            else:
+                new_qc_status = 'NG'
+
+            query = "UPDATE productions SET qc_status = %s, qc_return_quantity = %s WHERE product_uid = %s"
+            try:
+                self.db_manager.execute_update(query, (new_qc_status, new_qc_return_quantity, production_uid))
+                return jsonify({'message': 'Запись занесена в базу данных!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        else:
+            return redirect('/')
+
+    def delete_quality(self):
+        if 'username' in session:
+            production_uid = request.json['productionUid']
+            new_qc_status = request.json['newQualityStatus']
+            new_qc_return_quantity = request.json['newQcReturnQuantity']
+
+            query = "UPDATE productions SET qc_status = %s, qc_return_quantity = %s WHERE product_uid = %s"
+            try:
+                self.db_manager.execute_update(query, (new_qc_status, new_qc_return_quantity, production_uid))
+                return jsonify({'message': 'Запись занесена в базу данных!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        else:
+            return redirect('/')
     def get_quality_control(self):
         query = "SELECT * FROM quality_control"
         try:
@@ -460,7 +499,7 @@ class Handlers:
 
     def add_quality_control(self):
         if 'username' in session:
-            datetime_value = datetime.now()
+            datetime_value = datetime.now(tz=pytz.timezone('Europe/Moscow'))
             product_name = request.json['product_name']
             product_uid = request.json['productionUid']
             username = request.json['username']
@@ -474,6 +513,48 @@ class Handlers:
                 return jsonify({'message': 'Запись успешно добавлена!'})
             except Exception as e:
                 return jsonify({'error': str(e)}), 500
+        else:
+            return redirect('/')
+
+    def delete_quality_control(self):
+        if 'username' in session:
+            quality_control_id = request.json['quality_controlID']
+
+            query = "DELETE FROM quality_control WHERE id = %s"
+            try:
+                self.db_manager.execute_delete(query, (quality_control_id,))
+                return jsonify({'message': 'Запись успешно удалена!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        else:
+            return redirect('/')
+
+    def flying_test(self):
+        if 'username' in session:
+            return send_from_directory(self.app.static_folder, 'flying_test.html')
+        else:
+            return redirect('/')
+
+    def update_production_status(self):
+        if 'username' in session:
+            datetime_value = datetime.now(tz=pytz.timezone('Europe/Moscow'))
+            production_uid = request.json['productionUid']
+            new_production_status = request.json['newProductionStatus']
+            new_qc_status = request.json['newQualityStatus']
+            username = session.get('username')
+
+            query = "UPDATE productions SET datetime = %s, qc_status = %s, production_status = %s, username = %s WHERE product_uid = %s"
+            try:
+                self.db_manager.execute_update(query, (datetime_value, new_qc_status, new_production_status, username, production_uid))
+                return jsonify({'message': 'Запись занесена в базу данных!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        else:
+            return redirect('/')
+
+    def package_control(self):
+        if 'username' in session:
+            return send_from_directory(self.app.static_folder, 'package_control.html')
         else:
             return redirect('/')
 
@@ -494,7 +575,7 @@ class Handlers:
     def get_time():
         if 'username' in session:
             return jsonify({
-                'datetime_value': datetime.now()
+                'datetime_value': datetime.now(tz=pytz.timezone('Europe/Moscow'))
             })
         else:
             return jsonify({'error': 'Not logged in'}), 401

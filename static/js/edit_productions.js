@@ -65,8 +65,12 @@ function getProductions() {
                 gridBody.appendChild(row);
 
                 row.dataset.uid = production.product_uid;
+                row.dataset.product_name = production.product_name;
+                row.dataset.qc_return_quantity = production.qc_return_quantity;
+                row.dataset.username = production.username;
+                row.dataset.production_status = production.production_status;
                 row.addEventListener("click", (event) => {
-                    //alert(production.product_uid);
+                    //alert(production.product_name);
                     activateRow(event.currentTarget);
                 });
             });
@@ -77,18 +81,100 @@ function getProductions() {
 function activateRow(row) {
     document.querySelectorAll('#productionsTableBody .grid_production-row').forEach(r => r.classList.remove('active-row'));
     row.classList.add('active-row')
-    productionUid = row.dataset.uid;
-    //alert(productionUid);
+    sessionProductUID = row.dataset.uid;
+    sessionProductName = row.dataset.product_name;
+    sessionQcReturnQuantity = Number(row.dataset.qc_return_quantity);
+    sessionUsername = row.dataset.username;
+    sessionProductionStatus = Number(row.dataset.production_status);
+    // getPictureName(sessionProductName);
+
+    if (sessionQcReturnQuantity > 0) {
+        getQualityControl(sessionProductUID);
+    } else {
+        const gridBody = document.getElementById('quality_controlTableBody');
+            gridBody.innerHTML = '';  // Очищаем таблицу
+    }
+    //alert(sessionProductName);
 }
+
+function getQualityControl(productUID) {
+    let filteredData = null;
+    fetch('/get_quality_control')
+        .then(response => response.json())
+        .then(data => {
+            const gridBody = document.getElementById('quality_controlTableBody');
+            gridBody.innerHTML = '';  // Очищаем таблицу
+
+            data.sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
+
+            if (productUID != null) {
+                filteredData = data.filter(quality_control => { // Фильтруем данные: оставляем только записи с выделенным UID
+                    const product_uid = quality_control.product_uid;
+                    return product_uid === productUID;
+                });
+            } else {
+                filteredData = data;    // Оставляем начальные данные
+            }
+
+            // Отображаем отфильтрованные данные
+            filteredData.forEach((quality_control, index) => {
+                const row = document.createElement('div');
+                row.classList.add('grid_quality_control-row');
+
+                const numberCell = document.createElement('div');
+                const datetimeCell = document.createElement('div');
+                // const product_nameCell = document.createElement('div');
+                // const product_uidCell = document.createElement('div');
+                const usernameCell = document.createElement('div');
+                const production_statusCell = document.createElement('div');
+                const qc_usernameCell = document.createElement('div');
+                const qc_statusCell = document.createElement('div');
+
+                numberCell.innerText = index + 1;
+                datetimeCell.innerText = new Date(quality_control.datetime).toLocaleString(); // Преобразование времени
+                // product_nameCell.innerText = quality_control.product_name;
+                // product_uidCell.innerText = quality_control.product_uid;
+                usernameCell.innerText = quality_control.username;
+                production_statusCell.innerText = quality_control.production_status;
+                qc_usernameCell.innerText = quality_control.qc_username;
+                qc_statusCell.innerText = quality_control.qc_status;
+                row.appendChild(numberCell);
+                row.appendChild(datetimeCell);
+                // row.appendChild(product_nameCell);
+                // row.appendChild(product_uidCell);
+                row.appendChild(usernameCell);
+                row.appendChild(production_statusCell);
+                row.appendChild(qc_usernameCell);
+                row.appendChild(qc_statusCell);
+                gridBody.appendChild(row);
+
+                row.dataset.id = quality_control.id;
+                row.dataset.qc_uid = quality_control.product_uid;
+                row.addEventListener("click", (event) => {
+                    //alert(production.product_name);
+                    activateQualityRow(event.currentTarget);
+                });
+            });
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function activateQualityRow(row) {
+    document.querySelectorAll('#quality_controlTableBody .grid_quality_control-row').forEach(r => r.classList.remove('active-row'));
+    row.classList.add('active-row')
+    sessionQualityID = Number(row.dataset.id);
+    sessionQualityUID = row.dataset.qc_uid;
+}
+
 // ---Изменение времени в таблице---
 // Открытие модального окна
 document.getElementById('editProductionTimeButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#productionsTableBody .grid_production-row.active-row');
     if (activeRow) {
-        editTimeModal = new bootstrap. Modal(document.getElementById('editTimeModal'));
+        editTimeModal = new bootstrap.Modal(document.getElementById('editTimeModal'));
         editTimeModal.show();
     } else {
-        productionUid = null;
+        sessionProductUID = null;
         editTimeModal = null;
         alert('Выберите строку для редактирования!');
     }
@@ -103,7 +189,7 @@ document.getElementById('saveTimeButton').addEventListener('click', function () 
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                productionUid: productionUid,
+                productionUid: sessionProductUID,
                 newDatetime: newDatetime
             })
         })
@@ -112,7 +198,7 @@ document.getElementById('saveTimeButton').addEventListener('click', function () 
             alert(data.message);
             editTimeModal.hide();
             editTimeModal = null;
-            productionUid = null;
+            sessionProductUID = null;
             getProductions();  // Перезагружаем таблицу после изменения
         })
         .catch(error => console.error('Error:', error));
@@ -127,10 +213,10 @@ document.getElementById('editProductionOrderButton').addEventListener('click', f
     const activeRow = document.querySelector('#productionsTableBody .grid_production-row.active-row');
     if (activeRow) {
         document.getElementById('newOrder').value = '';
-        editOrderModal = new bootstrap. Modal(document.getElementById('editOrderModal'));
+        editOrderModal = new bootstrap.Modal(document.getElementById('editOrderModal'));
         editOrderModal.show();
     } else {
-        productionUid = null;
+        sessionProductUID = null;
         editOrderModal = null;
         alert('Выберите строку для редактирования!');
     }
@@ -150,7 +236,7 @@ document.getElementById('editOrderForm').addEventListener('submit', function (ev
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                productionUid: productionUid,
+                productionUid: sessionProductUID,
                 newOrder: newOrder
             })
         })
@@ -159,7 +245,7 @@ document.getElementById('editOrderForm').addEventListener('submit', function (ev
             alert(data.message);
             editOrderModal.hide();
             editOrderModal = null;
-            productionUid = null;
+            sessionProductUID = null;
             getProductions();  // Перезагружаем таблицу после изменения
         })
         .catch(error => console.error('Error:', error));
@@ -195,7 +281,7 @@ document.getElementById('editProductionUserButton').addEventListener('click', fu
         editUserModal.show();
         getUsers();  // Загружаем список пользователей
     } else {
-        productionUid = null;
+        sessionProductUID = null;
         editUserModal = null;
         alert('Выберите строку для редактирования!');
     }
@@ -210,7 +296,7 @@ document.getElementById('saveUserButton').addEventListener('click', function() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                productionUid: productionUid,
+                productionUid: sessionProductUID,
                 newUser: selectedUser
             })
         })
@@ -219,7 +305,7 @@ document.getElementById('saveUserButton').addEventListener('click', function() {
             alert(data.message);
             editUserModal.hide();
             editUserModal = null;
-            productionUid = null;
+            sessionProductUID = null;
             getProductions();  // Перезагружаем таблицу после изменения
         })
         .catch(error => console.error('Error:', error));
@@ -228,17 +314,17 @@ document.getElementById('saveUserButton').addEventListener('click', function() {
     }
 });
 
-// ---Удаление записи в таблице---
+// ---Удаление записи в таблице производства---
 // Открытие модального окна
 document.getElementById('deleteProductionButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#productionsTableBody .grid_production-row.active-row');
     if (activeRow) {
-        deleteProductionModal = new bootstrap. Modal(document.getElementById('deleteProductionModal'));
+        deleteProductionModal = new bootstrap.Modal(document.getElementById('deleteProductionModal'));
         deleteProductionModal.show();
     } else {
-        productionUid = null;
+        sessionProductUID = null;
         deleteProductionModal = null;
-        alert('Выберите строку для редактирования!');
+        alert('Выберите строку для удаления!');
     }
 });
 // При нажатии кнопки модального окна
@@ -249,7 +335,7 @@ document.getElementById('applyDeleteProductionButton').addEventListener('click',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            productionUid: productionUid,
+            productionUid: sessionProductUID,
         })
     })
     .then(response => response.json())
@@ -257,8 +343,60 @@ document.getElementById('applyDeleteProductionButton').addEventListener('click',
         alert(data.message);
         deleteProductionModal.hide();
         deleteProductionModal = null;
-        productionUid = null;
+        sessionProductUID = null;
         getProductions();  // Перезагружаем таблицу после изменения
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+// ---Удаление записи в таблице качества---
+// Открытие модального окна
+document.getElementById('deleteQualityButton').addEventListener('click', function() {
+    const activeRow = document.querySelector('#quality_controlTableBody .grid_quality_control-row.active-row');
+    if (activeRow) {
+        deleteQualityModal = new bootstrap.Modal(document.getElementById('deleteQualityModal'));
+        deleteQualityModal.show();
+    } else {
+        sessionQualityID = null;
+        deleteQualityModal = null;
+        alert('Выберите строку для удаления!');
+    }
+});
+// При нажатии кнопки модального окна
+document.getElementById('applyDeleteQualityButton').addEventListener('click', function () {
+    fetch('/delete_quality_control', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            quality_controlID: sessionQualityID,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        deleteQualityModal.hide();
+        deleteQualityModal = null;
+        sessionQualityID = null;
+        getQualityControl(sessionProductUID);   // Перезагружаем таблицу после изменения
+    })
+    .catch(error => console.error('Error:', error));
+
+    fetch('/sub_quality', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            productionUid: sessionProductUID,
+            newQcReturnQuantity: sessionQcReturnQuantity - 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        getProductions();    // Перезагружаем таблицу после изменения
     })
     .catch(error => console.error('Error:', error));
 });
@@ -268,6 +406,8 @@ document.getElementById('clearFilterButton').addEventListener('click', clearFilt
 // Фильтр
 function clearFilter() {
     getProductions();  // Сбрасываем фильтр, загружая все данные
+    const gridBody = document.getElementById('quality_controlTableBody');
+            gridBody.innerHTML = '';  // Очищаем таблицу
 }
 
 // --- Фильтрация по времени ---
@@ -553,8 +693,12 @@ function filterProductions(filterFunction) {
                     gridBody.appendChild(row);
 
                     row.dataset.uid = production.product_uid;
+                    row.dataset.product_name = production.product_name;
+                    row.dataset.qc_return_quantity = production.qc_return_quantity;
+                    row.dataset.username = production.username;
+                    row.dataset.production_status = production.production_status;
                     row.addEventListener("click", (event) => {
-                        //alert(production.product_uid);
+                        //alert(production.product_name);
                         activateRow(event.currentTarget);
                     });
                 }
@@ -565,10 +709,16 @@ function filterProductions(filterFunction) {
 
 // Функция для кнопки "НАЗАД"
 document.getElementById('prev_button').addEventListener('click', function () {
-    if (sessionProductName !== null) {
-         window.location.href = '/productions';
+    if (sessionOrderNum !== null) {
+        window.location.href = '/productions';
     } else {
         window.location.href = '/select_product';
+    }
+    if (currentWorkplaceID === '6') {
+        window.location.href = '/flying_test';
+    }
+    if (currentWorkplaceID === '7') {
+        window.location.href = '/package_control';
     }
 });
 

@@ -27,7 +27,6 @@ let serialNumFilterModal = null;
 // ---
 
 // --- edit_productions.js ---
-let productionUid = null;
 let editTimeModal = null;
 let editOrderModal = null;
 let editUserModal = null;
@@ -38,15 +37,31 @@ let deleteProductionModal = null;
 let workplaceID = null;
 let editWorkplaceNameModal = null;
 let deleteWorkplaceModal = null;
+let deleteQualityModal = null;
+// ---
+
+// --- quality_control.js ---
+let qualityOkModal = null;
+let qualityNgModal = null;
+// ---
+
+// --- flying_test.js ---
+let flyingTestOkModal = null;
+// ---
+
+// --- package_control.js ---
+let packageOkModal = null;
 // ---
 
 let sessionUsername = null;
 let sessionRole = null;
 let sessionProductName = null;
-let sessionProductUID = null;
 let sessionOrderNum = null;
+let sessionProductUID = null;
 let sessionProductionStatus = 0;
 let sessionQcReturnQuantity = 0;
+let sessionQualityID = 0;
+let sessionQualityUID = 0;
 
 // Функция для получения значения куки по имени
 let currentWorkplaceID = getCookie('workplace_id');
@@ -63,6 +78,7 @@ function getTime() {
         .then(response => response.json())
         .then(data => {
             serverTime = new Date(data.datetime_value); // Сохраняем время с сервера
+            // console.log(serverTime);
             updateTimeDisplay(); // Обновляем отображение времени
         })
         .catch(error => console.error('Error:', error));

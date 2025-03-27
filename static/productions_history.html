@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>История производства</title>
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
     <!-- Подключаем Bootstrap CSS -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/styles.css" rel="stylesheet">
@@ -74,6 +75,7 @@
                 </div>
             </div>
         </div>
+        <h4>Таблица производства</h4>
         <div class="grid_production-container justify-content-center mt-2" style="max-height: 617px; overflow-y: auto;">
             <div class="grid_production-header">
                 <div>№</div>
@@ -91,7 +93,7 @@
                 <!-- Данные будут загружены с помощью JavaScript -->
             </div>
         </div>
-        <div class="row justify-content-center mt-4">
+        <div class="row justify-content-center mt-3">
             <div class="d-grid gap-2 d-md-block mb-2">
                 <button style="min-width: 120px" type="button" id="clearFilterButton" class="btn btn-primary btn-lg mb-2">Сбросить фильтр</button>
                 <button style="min-width: 120px" type="button" id="timeFilterButton" class="btn btn-secondary btn-lg mb-2">Время</button>
@@ -102,6 +104,45 @@
                 <button style="min-width: 120px" type="button" id="userFilterButton" class="btn btn-secondary btn-lg mb-2">ФИО</button>
             </div>
         </div>
+        <div class="row justify-content-center mt-2">
+            <div class="col-lg-5">
+                <h4>Таблица контроля производства</h4>
+            </div>
+            <div class="col-lg-7">
+                <h4>Таблица контроля качества</h4>
+                <div class="grid_quality_control-container justify-content-center mt-2" style="max-height: 288px; overflow-y: auto;">
+                    <div class="grid_quality_control-header">
+                        <div>№</div>
+                        <div>Дата/время</div>
+        <!--                <div>Изделие</div>-->
+        <!--                <div>UID изделия</div>-->
+                        <div>Пользователь</div>
+                        <div>Статус</div>
+                        <div>Проверил</div>
+                        <div>Проверка</div>
+                    </div>
+                    <div class="grid_quality_control-body" id="quality_controlTableBody">
+                        <!-- Данные будут загружены с помощью JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+<!--        <h4>Таблица контроля качества</h4>-->
+<!--        <div class="grid_quality_control-container justify-content-center mt-2" style="max-height: 288px; overflow-y: auto;">-->
+<!--            <div class="grid_quality_control-header">-->
+<!--                <div>№</div>-->
+<!--                <div>Дата/время</div>-->
+<!--&lt;!&ndash;                <div>Изделие</div>&ndash;&gt;-->
+<!--&lt;!&ndash;                <div>UID изделия</div>&ndash;&gt;-->
+<!--                <div>Пользователь</div>-->
+<!--                <div>Статус</div>-->
+<!--                <div>Проверил</div>-->
+<!--                <div>Проверка</div>-->
+<!--            </div>-->
+<!--            <div class="grid_quality_control-body" id="quality_controlTableBody">-->
+<!--                &lt;!&ndash; Данные будут загружены с помощью JavaScript &ndash;&gt;-->
+<!--            </div>-->
+<!--        </div>-->
     </div>
     <!-- Модальное окно для фильтра времени -->
     <div class="modal fade" id="timeFilterModal" tabindex="-1" aria-labelledby="timeFilterModalLabel" aria-hidden="true">

@@ -62,6 +62,90 @@ function getProductions() {
                 row.appendChild(qc_statusCell);
                 row.appendChild(qc_return_quantityCell);
                 gridBody.appendChild(row);
+
+                row.dataset.uid = production.product_uid;
+                row.dataset.product_name = production.product_name;
+                row.dataset.qc_return_quantity = production.qc_return_quantity;
+                row.dataset.username = production.username;
+                row.dataset.production_status = production.production_status;
+                row.addEventListener("click", (event) => {
+                    //alert(production.product_name);
+                    activateRow(event.currentTarget);
+                });
+            });
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function activateRow(row) {
+    document.querySelectorAll('#productionsTableBody .grid_production-row').forEach(r => r.classList.remove('active-row'));
+    row.classList.add('active-row')
+    sessionProductUID = row.dataset.uid;
+    sessionProductName = row.dataset.product_name;
+    sessionQcReturnQuantity = Number(row.dataset.qc_return_quantity);
+    sessionUsername = row.dataset.username;
+    sessionProductionStatus = Number(row.dataset.production_status);
+    // getPictureName(sessionProductName);
+
+    if (sessionQcReturnQuantity > 0) {
+        getQualityControl(sessionProductUID);
+    } else {
+        const gridBody = document.getElementById('quality_controlTableBody');
+            gridBody.innerHTML = '';  // Очищаем таблицу
+    }
+    //alert(sessionProductName);
+}
+
+function getQualityControl(productUID) {
+    let filteredData = null;
+    fetch('/get_quality_control')
+        .then(response => response.json())
+        .then(data => {
+            const gridBody = document.getElementById('quality_controlTableBody');
+            gridBody.innerHTML = '';  // Очищаем таблицу
+
+            data.sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
+
+            if (productUID != null) {
+                filteredData = data.filter(quality_control => { // Фильтруем данные: оставляем только записи с выделенным UID
+                    const product_uid = quality_control.product_uid;
+                    return product_uid === productUID;
+                });
+            } else {
+                filteredData = data;    // Оставляем начальные данные
+            }
+
+            // Отображаем отфильтрованные данные
+            filteredData.forEach((quality_control, index) => {
+                const row = document.createElement('div');
+                row.classList.add('grid_quality_control-row');
+
+                const numberCell = document.createElement('div');
+                const datetimeCell = document.createElement('div');
+                // const product_nameCell = document.createElement('div');
+                // const product_uidCell = document.createElement('div');
+                const usernameCell = document.createElement('div');
+                const production_statusCell = document.createElement('div');
+                const qc_usernameCell = document.createElement('div');
+                const qc_statusCell = document.createElement('div');
+
+                numberCell.innerText = index + 1;
+                datetimeCell.innerText = new Date(quality_control.datetime).toLocaleString(); // Преобразование времени
+                // product_nameCell.innerText = quality_control.product_name;
+                // product_uidCell.innerText = quality_control.product_uid;
+                usernameCell.innerText = quality_control.username;
+                production_statusCell.innerText = quality_control.production_status;
+                qc_usernameCell.innerText = quality_control.qc_username;
+                qc_statusCell.innerText = quality_control.qc_status;
+                row.appendChild(numberCell);
+                row.appendChild(datetimeCell);
+                // row.appendChild(product_nameCell);
+                // row.appendChild(product_uidCell);
+                row.appendChild(usernameCell);
+                row.appendChild(production_statusCell);
+                row.appendChild(qc_usernameCell);
+                row.appendChild(qc_statusCell);
+                gridBody.appendChild(row);
             });
         })
         .catch(error => console.error('Error:', error));
@@ -72,6 +156,8 @@ document.getElementById('clearFilterButton').addEventListener('click', clearFilt
 // Фильтр
 function clearFilter() {
     getProductions();  // Сбрасываем фильтр, загружая все данные
+    const gridBody = document.getElementById('quality_controlTableBody');
+            gridBody.innerHTML = '';  // Очищаем таблицу
 }
 
 // --- Фильтрация по времени ---
@@ -181,7 +267,7 @@ function getProductionsOrders() {
         })
         .catch(error => console.error('Error:', error));
 }
-// Открытие модального кона
+// Открытие модального окна
 document.getElementById('orderFilterButton').addEventListener('click', function() {
     orderFilterModal = new bootstrap.Modal(document.getElementById('orderFilterModal'));
     orderFilterModal.show();
@@ -230,6 +316,7 @@ document.getElementById('filterUidForm').addEventListener('submit', function (ev
 function filterByUid(productUid) {
     const transliterateUid = transliterate(productUid)
     filterProductions((production) => production.product_uid.includes(transliterateUid));
+    getQualityControl(transliterateUid);
 }
 
 // ---Фильтрация по S/N---
@@ -355,6 +442,16 @@ function filterProductions(filterFunction) {
                     row.appendChild(qc_statusCell);
                     row.appendChild(qc_return_quantityCell);
                     gridBody.appendChild(row);
+
+                    row.dataset.uid = production.product_uid;
+                    row.dataset.product_name = production.product_name;
+                    row.dataset.qc_return_quantity = production.qc_return_quantity;
+                    row.dataset.username = production.username;
+                    row.dataset.production_status = production.production_status;
+                    row.addEventListener("click", (event) => {
+                        //alert(production.product_name);
+                        activateRow(event.currentTarget);
+                    });
                 }
             });
         })
@@ -363,10 +460,20 @@ function filterProductions(filterFunction) {
 
 // Функция для кнопки "НАЗАД"
 document.getElementById('prev_button').addEventListener('click', function () {
-    if (sessionProductName !== null) {
-         window.location.href = '/productions';
+    if (sessionRole === 'admin' || sessionRole === 'otk' ) {
+         window.location.href = '/quality_control';
     } else {
-        window.location.href = '/select_product';
+        if (sessionOrderNum !== null) {
+             window.location.href = '/productions';
+        } else {
+            window.location.href = '/select_product';
+        }
+        if (currentWorkplaceID === '6') {
+            window.location.href = '/flying_test';
+        }
+        if (currentWorkplaceID === '7') {
+            window.location.href = '/package_control';
+        }
     }
 });
 
@@ -376,6 +483,7 @@ window.onload = function() {
     getWorkplaceName();
     productionsHistoryInfo();  // Вызываем функцию при загрузке страницы
     getProductions();  // Загружаем продукты при загрузке страницы
+    // getQualityControl();    // Загружаем таблицу качества при загрузке страницы
     setInterval(getTime, 3600000);  // Запрашиваем время с сервера каждые 60 минут (3600000 миллисекунд)
     setInterval(incrementLocalTime, 1000);  // Обновляем время локально каждую секунду
 };

@@ -1,4 +1,4 @@
-function qualityControlInfo() {
+function packageControlInfo() {
     fetch('/get_info')
         .then(response => response.json())
         .then(data => {
@@ -13,27 +13,29 @@ function qualityControlInfo() {
             if ((data.order_num) != null) {
                 sessionOrderNum = data.order_num;
             }
+
+            const editProductionsButton = document.getElementById('editProductionsButton');
+            if (sessionRole === 'manager') {
+                editProductionsButton.classList.remove('disabled');
+            } else {
+                editProductionsButton.classList.add('disabled');
+            }
         })
         .catch(error => console.error('Error:', error));
 }
 
-function getQualityProductions() {
-    fetch('/get_productions')
+function getPackageProductions() {
+    fetch('/get_productions_status6')
         .then(response => response.json())
         .then(data => {
             const gridBody = document.getElementById('productionsTableBody');
             gridBody.innerHTML = '';  // Очищаем таблицу
 
+            // data.sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
             data.sort((a,b) => new Date(a.datetime) - new Date(b.datetime));
+            // console.log(data);
 
-            // Фильтруем данные: оставляем только записи с пустым статусом и NG
-            const filteredData = data.filter(production => {
-                const qc_status = production.qc_status;
-                return qc_status !== 'OK';
-            });
-
-            // Отображаем отфильтрованные данные
-            filteredData.forEach((production, index) => {
+            data.forEach((production, index) => {
                 const row = document.createElement('div');
                 row.classList.add('grid_production-row');
 
@@ -95,63 +97,13 @@ function activateRow(row) {
     sessionProductionStatus = Number(row.dataset.production_status);
     getPictureName(sessionProductName);
 
-    if (sessionQcReturnQuantity > 0) {
-        getQualityControl(sessionProductUID);
-    } else {
-        const gridBody = document.getElementById('quality_controlTableBody');
-            gridBody.innerHTML = '';  // Очищаем таблицу
-    }
+    // if (sessionQcReturnQuantity > 0) {
+    //     getQualityControl(sessionProductUID);
+    // } else {
+    //     const gridBody = document.getElementById('quality_controlTableBody');
+    //         gridBody.innerHTML = '';  // Очищаем таблицу
+    // }
     //alert(sessionProductName);
-}
-
-function getQualityControl(productUID) {
-    fetch('/get_quality_control')
-        .then(response => response.json())
-        .then(data => {
-            const gridBody = document.getElementById('quality_controlTableBody');
-            gridBody.innerHTML = '';  // Очищаем таблицу
-
-            data.sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
-
-            // // Фильтруем данные: оставляем только записи с выделенным UID
-            const filteredData = data.filter(quality_control => {
-                const product_uid = quality_control.product_uid;
-                return product_uid === productUID;
-            });
-            // Отображаем отфильтрованные данные
-            filteredData.forEach((quality_control, index) => {
-                const row = document.createElement('div');
-                row.classList.add('grid_quality_control-row');
-
-                const numberCell = document.createElement('div');
-                const datetimeCell = document.createElement('div');
-                // const product_nameCell = document.createElement('div');
-                // const product_uidCell = document.createElement('div');
-                const usernameCell = document.createElement('div');
-                const production_statusCell = document.createElement('div');
-                const qc_usernameCell = document.createElement('div');
-                const qc_statusCell = document.createElement('div');
-
-                numberCell.innerText = index + 1;
-                datetimeCell.innerText = new Date(quality_control.datetime).toLocaleString(); // Преобразование времени
-                // product_nameCell.innerText = quality_control.product_name;
-                // product_uidCell.innerText = quality_control.product_uid;
-                usernameCell.innerText = quality_control.username;
-                production_statusCell.innerText = quality_control.production_status;
-                qc_usernameCell.innerText = quality_control.qc_username;
-                qc_statusCell.innerText = quality_control.qc_status;
-                row.appendChild(numberCell);
-                row.appendChild(datetimeCell);
-                // row.appendChild(product_nameCell);
-                // row.appendChild(product_uidCell);
-                row.appendChild(usernameCell);
-                row.appendChild(production_statusCell);
-                row.appendChild(qc_usernameCell);
-                row.appendChild(qc_statusCell);
-                gridBody.appendChild(row);
-            });
-        })
-        .catch(error => console.error('Error:', error));
 }
 
 function getPictureName(product_name) {
@@ -179,20 +131,14 @@ function getPictureName(product_name) {
 document.getElementById('clearFilterButton').addEventListener('click', clearFilter);
 // Фильтр
 function clearFilter() {
-    getQualityProductions();  // Сбрасываем фильтр, загружая все данные
-    const gridBody = document.getElementById('quality_controlTableBody');
-            gridBody.innerHTML = '';  // Очищаем таблицу
+    getPackageProductions();  // Сбрасываем фильтр, загружая все данные
+    // const gridBody = document.getElementById('quality_controlTableBody');
+    //         gridBody.innerHTML = '';  // Очищаем таблицу
 }
 
-// Функция изменения статуса качества
-function updateQuality(new_qc_status) {
-    let new_qc_return_quantity;
-    if (new_qc_status === 'OK') {
-        new_qc_return_quantity = sessionQcReturnQuantity;
-    } else {
-        new_qc_return_quantity = sessionQcReturnQuantity+1;
-    }
-    fetch('/update_quality', {
+// Функция изменения статуса производства
+function updateProductionStatus(new_production_status, new_qc_status) {
+    fetch('/update_production_status', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -200,62 +146,41 @@ function updateQuality(new_qc_status) {
         body: JSON.stringify({
             productionUid: sessionProductUID,
             newQualityStatus: new_qc_status,
-            newQcReturnQuantity: new_qc_return_quantity
+            newProductionStatus: new_production_status
         })
     })
     .then(response => response.json())
     .then(data => {
         alert(data.message);
         sessionProductUID = null;
-        getQualityProductions();  // Перезагружаем таблицу после изменения
-        // getQualityControl();
+        getPackageProductions();  // Перезагружаем таблицу после изменения
     })
     .catch(error => console.error('Error:', error));
 }
 
-// Нажатие кнопки OK. Открытие модального окна
-document.getElementById('qualityOkButton').addEventListener('click', function() {
+// Нажатие кнопки прохождения облёта. Открытие модального окна
+document.getElementById('packageOkButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#productionsTableBody .grid_production-row.active-row');
     if (activeRow) {
-        qualityOkModal = new bootstrap.Modal(document.getElementById('qualityOkModal'));
-        qualityOkModal.show();
+        packageOkModal = new bootstrap.Modal(document.getElementById('packageOkModal'));
+        packageOkModal.show();
     } else {
         sessionProductUID = null;
-        qualityOkModal = null;
+        packageOkModal = null;
         alert('Выберите строку с изделием!');
     }
 });
 // Нажатие кнопки подтверждения
-document.getElementById('applyQualityOkButton').addEventListener('click', function () {
-    updateQuality('OK');
-    addQualityControl('OK');
-    qualityOkModal.hide();
-    qualityOkModal = null;
+document.getElementById('applyPackageOkButton').addEventListener('click', function () {
+    updateProductionStatus(7, 'OK');
+    packageOkModal.hide();
+    packageOkModal = null;
     sessionProductUID = null;
 });
 
-// Нажатие кнопки NG. Открытие модального окна
-document.getElementById('qualityNgButton').addEventListener('click', function() {
-    const activeRow = document.querySelector('#productionsTableBody .grid_production-row.active-row');
-    if (activeRow) {
-        qualityNgModal = new bootstrap.Modal(document.getElementById('qualityNgModal'));
-        qualityNgModal.show();
-    } else {
-        sessionProductUID = null;
-        qualityNgModal = null;
-        alert('Выберите строку с изделием!');
-    }
-});
-// Нажатие кнопки подтверждения
-document.getElementById('applyQualityNgButton').addEventListener('click', function () {
-    updateQuality('NG');
-    addQualityControl('NG');
-    qualityNgModal.hide();
-    qualityNgModal = null;
-    sessionProductUID = null;
-});
 
-//Функция добавления записи проверки качества
+
+//Функция добавления записи в смежную таблицу
 function addQualityControl(new_qc_status) {
     fetch('/add_quality_control', {
         method: 'POST',
@@ -298,19 +223,22 @@ document.getElementById('filterUidForm').addEventListener('submit', function (ev
 // Фильтр
 function filterByUid(productUid) {
     const transliterateUid = transliterate(productUid)
-    filterQualityProductions((production) => production.product_uid.includes(transliterateUid));
-     getQualityControl(transliterateUid);
+    filterPackageProductions((production) => production.product_uid.includes(transliterateUid));
+     // getQualityControl(transliterateUid);
 }
 
+
+
 // ---Общая функция для фильтрации---
-function filterQualityProductions(filterFunction) {
-    fetch('/get_productions')
+function filterPackageProductions(filterFunction) {
+    fetch('/get_productions_status6')
         .then(response => response.json())
         .then(data => {
             const gridBody = document.getElementById('productionsTableBody');
             gridBody.innerHTML = '';  // Очищаем таблицу
 
-            data.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+            // data.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+            data.sort((a,b) => new Date(a.datetime) - new Date(b.datetime));
 
             data.forEach((production, index) => {
                 if (filterFunction(production)) {
@@ -382,8 +310,9 @@ window.onload = function() {
     getTime();
     getWorkplaceName();
     focusHiddenInput();
-    qualityControlInfo();  // Вызываем функцию при загрузке страницы
-    getQualityProductions();  // Загружаем продукты при загрузке страницы
+    packageControlInfo();  // Вызываем функцию при загрузке страницы
+    getPackageProductions();
+    // getQualityProductions();  // Загружаем продукты при загрузке страницы
     setInterval(getTime, 3600000);  // Запрашиваем время с сервера каждые 60 минут (3600000 миллисекунд)
     setInterval(incrementLocalTime, 1000);  // Обновляем время локально каждую секунду
 };

@@ -89,9 +89,9 @@
     text-align: left;
 }
 
-.grid_quality-container {
+.grid_quality_control-container {
     display: grid;
-    grid-template-columns: 1fr 3fr 2fr 4fr 4fr 1fr 4fr 1fr; /* 8 колонок */
+    grid-template-columns: 1fr 3fr 4fr 1fr 4fr 1fr; /* 6 колонок */
     gap: 1px;
     background-color: rgba(0,0,0,.125);
     border: 1px solid rgba(0,0,0,.125);
@@ -99,11 +99,11 @@
     overflow: hidden; /* Чтобы скругление углов работало корректно */
 }
 
-.grid_quality-header {
+.grid_quality_control-header {
     display: contents; /* Заголовки будут частью grid-контейнера */
 }
 
-.grid_quality-header > div {
+.grid_quality_control-header > div {
     background-color: #e9ecef;
     padding: 8px;
     font-weight: bold;
@@ -114,15 +114,15 @@
     z-index: 1; /* Заголовки поверх контента */
 }
 
-.grid_quality-body {
+.grid_quality_control-body {
     display: contents; /* Данные будут частью grid-контейнера */
 }
 
-.grid_quality-row {
+.grid_quality_control-row {
     display: contents; /* Каждая строка будет частью grid-контейнера */
 }
 
-.grid_quality-row > div {
+.grid_quality_control-row > div {
     padding: 8px;
     border: 1px rgba(0,0,0,.125);
     background-color: white;
@@ -158,4 +158,12 @@
     overflow: hidden; /* Чтобы скругление углов работало корректно */
     background-color: white; /* Цвет фона ячеек */
     text-align: left;
+}
+h4 {
+  margin: 0; /* Убираем стандартные отступы */
+}
+
+.small-text {
+  font-size: 14px; /* Меньший размер шрифта */
+  margin-left: 4px; /* Отступ между основным текстом и дополнительным */
 }
