@@ -84,7 +84,7 @@ function getProductions() {
 document.getElementById('setProductUidForm').addEventListener('submit', function(event) {
     event.preventDefault();
     const product_uid = document.getElementById('hiddenInput').value;
-    transliteratedUid = transliterate(product_uid);
+    sessionProductUID = transliterate(product_uid);
     setSerialNumModal = new bootstrap. Modal(document.getElementById('setSerialNumModal'));
     setSerialNumModal.show();
     // addProduction(product_uid);
@@ -110,7 +110,7 @@ document.getElementById('setSerialNumForm').addEventListener('submit', function 
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                productUid: transliteratedUid,
+                productUid: sessionProductUID,
                 serialNum: serialNum
             })
         })
@@ -124,7 +124,7 @@ document.getElementById('setSerialNumForm').addEventListener('submit', function 
             alert(data.message);
             setSerialNumModal.hide();
             setSerialNumModal = null;
-            transliteratedUid = null;
+            // transliteratedUid = null;
             getProductions();  // Перезагружаем таблицу после изменения
         })
         .catch(error => {
@@ -136,7 +136,28 @@ document.getElementById('setSerialNumForm').addEventListener('submit', function 
     } else {
         alert('Пустое поле ввода!')
     }
+    addProductionControl(5);
 });
+
+function addProductionControl(status) {
+    fetch('/add_production_control', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            productionUid: sessionProductUID,
+            username: sessionUsername,
+            productionStatus: status,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // alert(data.message);
+        sessionProductUID = null;
+    })
+    .catch(error => console.error('Error:', error));
+}
 
 document.addEventListener('click', function(event) {
     // Проверяем, что клик был не по модальному окну

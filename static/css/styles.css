@@ -129,6 +129,48 @@
     text-align: left;
 }
 
+
+.grid_production_control-container {
+    display: grid;
+    grid-template-columns: 1fr 3fr 4fr 1fr; /* 4 колонок */
+    gap: 1px;
+    background-color: rgba(0,0,0,.125);
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem; /* Скругление углов */
+    overflow: hidden; /* Чтобы скругление углов работало корректно */
+}
+
+.grid_production_control-header {
+    display: contents; /* Заголовки будут частью grid-контейнера */
+}
+
+.grid_production_control-header > div {
+    background-color: #e9ecef;
+    padding: 8px;
+    font-weight: bold;
+    text-align: left;
+    border: 1px rgba(0,0,0,.125);
+    position: sticky; /* Заголовки будут прилипать при прокрутке */
+    top: 0; /* Прилипание к верхней части контейнера */
+    z-index: 1; /* Заголовки поверх контента */
+}
+
+.grid_production_control-body {
+    display: contents; /* Данные будут частью grid-контейнера */
+}
+
+.grid_production_control-row {
+    display: contents; /* Каждая строка будет частью grid-контейнера */
+}
+
+.grid_production_control-row > div {
+    padding: 8px;
+    border: 1px rgba(0,0,0,.125);
+    background-color: white;
+    text-align: left;
+}
+
+
 .active-row > div {
     background-color: #86b7fe !important;
 }

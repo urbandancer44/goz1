@@ -24,6 +24,7 @@ let orderFilterModal = null;
 let uidFilterModal = null;
 let userFilterModal = null;
 let serialNumFilterModal = null;
+let statusFilterModal = null;
 // ---
 
 // --- edit_productions.js ---
@@ -62,6 +63,8 @@ let sessionProductionStatus = 0;
 let sessionQcReturnQuantity = 0;
 let sessionQualityID = 0;
 let sessionQualityUID = 0;
+
+let isFiltering = false;
 
 // Функция для получения значения куки по имени
 let currentWorkplaceID = getCookie('workplace_id');
@@ -140,5 +143,3 @@ function transliterate(text) {
 
     return text.split('').map(char => translitMap[char] || char).join('');
 }
-
-

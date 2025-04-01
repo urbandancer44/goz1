@@ -500,16 +500,15 @@ class Handlers:
     def add_quality_control(self):
         if 'username' in session:
             datetime_value = datetime.now(tz=pytz.timezone('Europe/Moscow'))
-            product_name = request.json['product_name']
             product_uid = request.json['productionUid']
             username = request.json['username']
             production_status = request.json['productionStatus']
             qc_username = session.get('username')
             qc_status = request.json['newQualityStatus']
 
-            query = "INSERT INTO quality_control (datetime, product_name, product_uid, username, production_status, qc_username, qc_status) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            query = "INSERT INTO quality_control (datetime, product_uid, username, production_status, qc_username, qc_status) VALUES (%s, %s, %s, %s, %s, %s)"
             try:
-                self.db_manager.execute_insert(query, (datetime_value, product_name, product_uid, username, production_status, qc_username, qc_status))
+                self.db_manager.execute_insert(query, (datetime_value, product_uid, username, production_status, qc_username, qc_status))
                 return jsonify({'message': 'Запись успешно добавлена!'})
             except Exception as e:
                 return jsonify({'error': str(e)}), 500
@@ -555,6 +554,30 @@ class Handlers:
     def package_control(self):
         if 'username' in session:
             return send_from_directory(self.app.static_folder, 'package_control.html')
+        else:
+            return redirect('/')
+
+    def get_production_control(self):
+        query = "SELECT * FROM production_control"
+        try:
+            production_control = self.db_manager.execute_query(query)
+            return jsonify(production_control)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+    def add_production_control(self):
+        if 'username' in session:
+            datetime_value = datetime.now(tz=pytz.timezone('Europe/Moscow'))
+            product_uid = request.json['productionUid']
+            username = request.json['username']
+            production_status = request.json['productionStatus']
+
+            query = "INSERT INTO production_control (datetime, product_uid, username, production_status) VALUES (%s, %s, %s, %s)"
+            try:
+                self.db_manager.execute_insert(query, (datetime_value, product_uid, username, production_status))
+                return jsonify({'message': 'Запись успешно добавлена!'})
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
         else:
             return redirect('/')
 

@@ -87,13 +87,15 @@ function activateRow(row) {
     sessionUsername = row.dataset.username;
     sessionProductionStatus = Number(row.dataset.production_status);
     // getPictureName(sessionProductName);
+    getProductionControl(sessionProductUID);
+    getQualityControl(sessionProductUID);
 
-    if (sessionQcReturnQuantity > 0) {
-        getQualityControl(sessionProductUID);
-    } else {
-        const gridBody = document.getElementById('quality_controlTableBody');
-            gridBody.innerHTML = '';  // Очищаем таблицу
-    }
+    // if (sessionQcReturnQuantity > 0) {
+    //     getQualityControl(sessionProductUID);
+    // } else {
+    //     const gridBody = document.getElementById('quality_controlTableBody');
+    //         gridBody.innerHTML = '';  // Очищаем таблицу
+    // }
     //alert(sessionProductName);
 }
 
@@ -105,7 +107,7 @@ function getQualityControl(productUID) {
             const gridBody = document.getElementById('quality_controlTableBody');
             gridBody.innerHTML = '';  // Очищаем таблицу
 
-            data.sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
+            data.sort((a,b) => new Date(a.datetime) - new Date(b.datetime));
 
             if (productUID != null) {
                 filteredData = data.filter(quality_control => { // Фильтруем данные: оставляем только записи с выделенным UID
@@ -123,7 +125,6 @@ function getQualityControl(productUID) {
 
                 const numberCell = document.createElement('div');
                 const datetimeCell = document.createElement('div');
-                // const product_nameCell = document.createElement('div');
                 // const product_uidCell = document.createElement('div');
                 const usernameCell = document.createElement('div');
                 const production_statusCell = document.createElement('div');
@@ -132,7 +133,6 @@ function getQualityControl(productUID) {
 
                 numberCell.innerText = index + 1;
                 datetimeCell.innerText = new Date(quality_control.datetime).toLocaleString(); // Преобразование времени
-                // product_nameCell.innerText = quality_control.product_name;
                 // product_uidCell.innerText = quality_control.product_uid;
                 usernameCell.innerText = quality_control.username;
                 production_statusCell.innerText = quality_control.production_status;
@@ -140,7 +140,6 @@ function getQualityControl(productUID) {
                 qc_statusCell.innerText = quality_control.qc_status;
                 row.appendChild(numberCell);
                 row.appendChild(datetimeCell);
-                // row.appendChild(product_nameCell);
                 // row.appendChild(product_uidCell);
                 row.appendChild(usernameCell);
                 row.appendChild(production_statusCell);
@@ -151,7 +150,6 @@ function getQualityControl(productUID) {
                 row.dataset.id = quality_control.id;
                 row.dataset.qc_uid = quality_control.product_uid;
                 row.addEventListener("click", (event) => {
-                    //alert(production.product_name);
                     activateQualityRow(event.currentTarget);
                 });
             });
@@ -165,6 +163,59 @@ function activateQualityRow(row) {
     sessionQualityID = Number(row.dataset.id);
     sessionQualityUID = row.dataset.qc_uid;
 }
+
+function getProductionControl(productUID) {
+    let filteredData = null;
+    fetch('/get_production_control')
+        .then(response => response.json())
+        .then(data => {
+            const gridBody = document.getElementById('production_controlTableBody');
+            gridBody.innerHTML = '';  // Очищаем таблицу
+
+            data.sort((a,b) => new Date(a.datetime) - new Date(b.datetime));
+
+            if (productUID != null) {
+                filteredData = data.filter(production_control => { // Фильтруем данные: оставляем только записи с выделенным UID
+                    const product_uid = production_control.product_uid;
+                    return product_uid === productUID;
+                });
+            } else {
+                filteredData = data;    // Оставляем начальные данные
+            }
+
+            // Отображаем отфильтрованные данные
+            filteredData.forEach((production_control, index) => {
+                const row = document.createElement('div');
+                row.classList.add('grid_production_control-row');
+
+                const numberCell = document.createElement('div');
+                const datetimeCell = document.createElement('div');
+                // const product_uidCell = document.createElement('div');
+                const usernameCell = document.createElement('div');
+                const production_statusCell = document.createElement('div');
+                // const qc_usernameCell = document.createElement('div');
+                // const qc_statusCell = document.createElement('div');
+
+                numberCell.innerText = index + 1;
+                datetimeCell.innerText = new Date(production_control.datetime).toLocaleString(); // Преобразование времени
+                // product_uidCell.innerText = production_control.product_uid;
+                usernameCell.innerText = production_control.username;
+                production_statusCell.innerText = production_control.production_status;
+                // qc_usernameCell.innerText = production_control.qc_username;
+                // qc_statusCell.innerText = production_control.qc_status;
+                row.appendChild(numberCell);
+                row.appendChild(datetimeCell);
+                // row.appendChild(product_uidCell);
+                row.appendChild(usernameCell);
+                row.appendChild(production_statusCell);
+                // row.appendChild(qc_usernameCell);
+                // row.appendChild(qc_statusCell);
+                gridBody.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+}
+
 
 // ---Изменение времени в таблице---
 // Открытие модального окна
@@ -406,8 +457,10 @@ document.getElementById('clearFilterButton').addEventListener('click', clearFilt
 // Фильтр
 function clearFilter() {
     getProductions();  // Сбрасываем фильтр, загружая все данные
-    const gridBody = document.getElementById('quality_controlTableBody');
-            gridBody.innerHTML = '';  // Очищаем таблицу
+    const gridBodyQuality = document.getElementById('quality_controlTableBody');
+            gridBodyQuality.innerHTML = '';  // Очищаем таблицу
+    const gridBodyProduction = document.getElementById('production_controlTableBody');
+            gridBodyProduction.innerHTML = '';  // Очищаем таблицу
 }
 
 // --- Фильтрация по времени ---
@@ -427,8 +480,11 @@ document.getElementById('applyTimeFilterButton').addEventListener('click', funct
 
         if (endDate >= startDate) {
             filterByTime(startDatetime, endDatetime);
+
             timeFilterModal.hide();
             timeFilterModal = null;
+            getQualityControl();
+
         } else {
             alert('Конечная дата должна быть больше или равна начальной дате!');
         }
@@ -641,6 +697,54 @@ document.getElementById('applyUserFilterButton').addEventListener('click', funct
 // Фильтр
 function filterByUser(username) {
     filterProductions((production) => production.username.includes(username));
+}
+
+// ---Фильтрация по статусу--
+// Открытие модального окна
+document.getElementById('statusFilterButton').addEventListener('click', function() {
+    // document.getElementById('filterStatus').value = null;
+    statusFilterModal = new bootstrap.Modal(document.getElementById('statusFilterModal'));
+    statusFilterModal.show();
+});
+// При открытии модального окна
+// document.getElementById('statusFilterModal').addEventListener('shown.bs.modal', function () {
+//     document.getElementById('filterStatus').focus();
+// })
+// При нажатии кнопки модального окна
+// document.getElementById('filterStatusForm').addEventListener('submit', function (event) {
+//     event.preventDefault();
+//     const filterStatus = Number(document.getElementById('filterStatus').value);
+//     if (filterStatus) {
+//         filterByStatus(filterStatus);
+//         statusFilterModal.hide();
+//         statusFilterModal = null;
+//     } else {
+//         alert('Введите статус производства изделия!');
+//     }
+// });
+
+// При нажатии кнопки модального окна
+document.getElementById('filterStatusForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const selectedStatus = Number(document.getElementById('statusSelect').value);
+    if (selectedStatus) {
+        filterByStatus(selectedStatus);
+        statusFilterModal.hide();
+        statusFilterModal = null;
+        sessionProductUID = null;
+    } else {
+        alert('Выберите статус производства из списка!');
+    }
+});
+
+// Фильтр
+function filterByStatus(status) {
+    // Фильтруем записи, где production_status строго равен введённому статусу
+    filterProductions((production) => {
+        // Преобразуем статус из данных в число (на случай, если он приходит как строка)
+        const productionStatus = Number(production.production_status);
+        return productionStatus === status;
+    });
 }
 
 // ---Общая функция для фильтрации---

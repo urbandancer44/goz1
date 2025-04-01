@@ -158,7 +158,29 @@ function updateProductionStatus(new_production_status, new_qc_status) {
     .catch(error => console.error('Error:', error));
 }
 
-// Нажатие кнопки прохождения облёта. Открытие модального окна
+//Функция добавления записи в таблицу контроля производства
+function addProductionControl(status) {
+    fetch('/add_production_control', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            productionUid: sessionProductUID,
+            username: sessionUsername,
+            productionStatus: status,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // alert(data.message);
+        sessionProductUID = null;
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+
+// Нажатие кнопки упаковки. Открытие модального окна
 document.getElementById('packageOkButton').addEventListener('click', function() {
     const activeRow = document.querySelector('#productionsTableBody .grid_production-row.active-row');
     if (activeRow) {
@@ -173,39 +195,11 @@ document.getElementById('packageOkButton').addEventListener('click', function() 
 // Нажатие кнопки подтверждения
 document.getElementById('applyPackageOkButton').addEventListener('click', function () {
     updateProductionStatus(7, 'OK');
+    addProductionControl(7);
     packageOkModal.hide();
     packageOkModal = null;
     sessionProductUID = null;
 });
-
-
-
-//Функция добавления записи в смежную таблицу
-function addQualityControl(new_qc_status) {
-    fetch('/add_quality_control', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            product_name: sessionProductName,
-            productionUid: sessionProductUID,
-            username: sessionUsername,
-            productionStatus: sessionProductionStatus,
-            newQualityStatus: new_qc_status
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        // alert(data.message);
-        sessionProductName = null;
-        sessionProductUID = null;
-        sessionUsername = null;
-        sessionProductionStatus = 0;
-        getQualityControl();  // Перезагружаем таблицу после изменения
-    })
-    .catch(error => console.error('Error:', error));
-}
 
 // При нажатии кнопки выбора изделия
 document.getElementById('filterUidForm').addEventListener('submit', function (event) {

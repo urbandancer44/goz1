@@ -173,36 +173,29 @@ document.getElementById('flyingTestOkButton').addEventListener('click', function
 // Нажатие кнопки подтверждения
 document.getElementById('applyFlyingTestOkButton').addEventListener('click', function () {
     updateProductionStatus(6, '');
+    addProductionControl(6);
     flyingTestOkModal.hide();
     flyingTestOkModal = null;
     sessionProductUID = null;
 });
 
-
-
-//Функция добавления записи в смежную таблицу
-function addQualityControl(new_qc_status) {
-    fetch('/add_quality_control', {
+//Функция добавления записи в таблицу контроля производства
+function addProductionControl(status) {
+    fetch('/add_production_control', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            product_name: sessionProductName,
             productionUid: sessionProductUID,
             username: sessionUsername,
-            productionStatus: sessionProductionStatus,
-            newQualityStatus: new_qc_status
+            productionStatus: status,
         })
     })
     .then(response => response.json())
     .then(data => {
         // alert(data.message);
-        sessionProductName = null;
         sessionProductUID = null;
-        sessionUsername = null;
-        sessionProductionStatus = 0;
-        getQualityControl();  // Перезагружаем таблицу после изменения
     })
     .catch(error => console.error('Error:', error));
 }

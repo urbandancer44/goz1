@@ -94,13 +94,14 @@ function activateRow(row) {
     sessionUsername = row.dataset.username;
     sessionProductionStatus = Number(row.dataset.production_status);
     getPictureName(sessionProductName);
+    getQualityControl(sessionProductUID);
 
-    if (sessionQcReturnQuantity > 0) {
-        getQualityControl(sessionProductUID);
-    } else {
-        const gridBody = document.getElementById('quality_controlTableBody');
-            gridBody.innerHTML = '';  // Очищаем таблицу
-    }
+    // if (sessionQcReturnQuantity > 0) {
+    //     getQualityControl(sessionProductUID);
+    // } else {
+    //     const gridBody = document.getElementById('quality_controlTableBody');
+    //         gridBody.innerHTML = '';  // Очищаем таблицу
+    // }
     //alert(sessionProductName);
 }
 
@@ -111,7 +112,7 @@ function getQualityControl(productUID) {
             const gridBody = document.getElementById('quality_controlTableBody');
             gridBody.innerHTML = '';  // Очищаем таблицу
 
-            data.sort((a,b) => new Date(b.datetime) - new Date(a.datetime));
+            data.sort((a,b) => new Date(a.datetime) - new Date(b.datetime));
 
             // // Фильтруем данные: оставляем только записи с выделенным UID
             const filteredData = data.filter(quality_control => {
@@ -125,7 +126,6 @@ function getQualityControl(productUID) {
 
                 const numberCell = document.createElement('div');
                 const datetimeCell = document.createElement('div');
-                // const product_nameCell = document.createElement('div');
                 // const product_uidCell = document.createElement('div');
                 const usernameCell = document.createElement('div');
                 const production_statusCell = document.createElement('div');
@@ -134,7 +134,6 @@ function getQualityControl(productUID) {
 
                 numberCell.innerText = index + 1;
                 datetimeCell.innerText = new Date(quality_control.datetime).toLocaleString(); // Преобразование времени
-                // product_nameCell.innerText = quality_control.product_name;
                 // product_uidCell.innerText = quality_control.product_uid;
                 usernameCell.innerText = quality_control.username;
                 production_statusCell.innerText = quality_control.production_status;
@@ -142,7 +141,6 @@ function getQualityControl(productUID) {
                 qc_statusCell.innerText = quality_control.qc_status;
                 row.appendChild(numberCell);
                 row.appendChild(datetimeCell);
-                // row.appendChild(product_nameCell);
                 // row.appendChild(product_uidCell);
                 row.appendChild(usernameCell);
                 row.appendChild(production_statusCell);
@@ -255,7 +253,6 @@ document.getElementById('applyQualityNgButton').addEventListener('click', functi
     sessionProductUID = null;
 });
 
-//Функция добавления записи проверки качества
 function addQualityControl(new_qc_status) {
     fetch('/add_quality_control', {
         method: 'POST',
@@ -263,7 +260,6 @@ function addQualityControl(new_qc_status) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            product_name: sessionProductName,
             productionUid: sessionProductUID,
             username: sessionUsername,
             productionStatus: sessionProductionStatus,
@@ -273,7 +269,6 @@ function addQualityControl(new_qc_status) {
     .then(response => response.json())
     .then(data => {
         // alert(data.message);
-        sessionProductName = null;
         sessionProductUID = null;
         sessionUsername = null;
         sessionProductionStatus = 0;
@@ -281,6 +276,8 @@ function addQualityControl(new_qc_status) {
     })
     .catch(error => console.error('Error:', error));
 }
+
+//Функция добавления записи проверки качества
 
 // При нажатии кнопки выбора изделия
 document.getElementById('filterUidForm').addEventListener('submit', function (event) {

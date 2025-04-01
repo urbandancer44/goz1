@@ -69,6 +69,8 @@ app.add_url_rule('/sub_quality', 'sub_quality', handlers.sub_quality, methods=['
 app.add_url_rule('/get_quality_control', 'get_quality_control', handlers.get_quality_control)
 app.add_url_rule('/add_quality_control', 'add_quality_control', handlers.add_quality_control, methods=['POST'])
 app.add_url_rule('/delete_quality_control', 'delete_quality_control', handlers.delete_quality_control, methods=['POST'])
+app.add_url_rule('/get_production_control', 'get_production_control', handlers.get_production_control)
+app.add_url_rule('/add_production_control', 'add_production_control', handlers.add_production_control, methods=['POST'])
 app.add_url_rule('/get_picture_name', 'get_picture_name', handlers.get_picture_name, methods=['POST'])
 app.add_url_rule('/get_time', 'get_time', handlers.get_time)
 app.add_url_rule('/logout', 'logout', handlers.logout, methods=['POST'])

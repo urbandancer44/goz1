@@ -102,11 +102,23 @@
                 <button style="min-width: 120px" type="button" id="uidFilterButton" class="btn btn-secondary btn-lg mb-2">UID</button>
                 <button style="min-width: 120px" type="button" id="serialNumFilterButton" class="btn btn-secondary btn-lg mb-2">S/N</button>
                 <button style="min-width: 120px" type="button" id="userFilterButton" class="btn btn-secondary btn-lg mb-2">ФИО</button>
+                <button style="min-width: 120px" type="button" id="statusFilterButton" class="btn btn-secondary btn-lg mb-2">Статус</button>
             </div>
         </div>
         <div class="row justify-content-center mt-2">
             <div class="col-lg-5">
                 <h4>Таблица контроля производства</h4>
+                <div class="grid_production_control-container justify-content-center mt-2" style="max-height: 288px; overflow-y: auto;">
+                    <div class="grid_production_control-header">
+                        <div>№</div>
+                        <div>Дата/время</div>
+                        <div>Пользователь</div>
+                        <div>Статус</div>
+                    </div>
+                    <div class="grid_production_control-body" id="production_controlTableBody">
+                        <!-- Данные будут загружены с помощью JavaScript -->
+                    </div>
+                </div>
             </div>
             <div class="col-lg-7">
                 <h4>Таблица контроля качества</h4>
@@ -114,8 +126,6 @@
                     <div class="grid_quality_control-header">
                         <div>№</div>
                         <div>Дата/время</div>
-        <!--                <div>Изделие</div>-->
-        <!--                <div>UID изделия</div>-->
                         <div>Пользователь</div>
                         <div>Статус</div>
                         <div>Проверил</div>
@@ -127,22 +137,6 @@
                 </div>
             </div>
         </div>
-<!--        <h4>Таблица контроля качества</h4>-->
-<!--        <div class="grid_quality_control-container justify-content-center mt-2" style="max-height: 288px; overflow-y: auto;">-->
-<!--            <div class="grid_quality_control-header">-->
-<!--                <div>№</div>-->
-<!--                <div>Дата/время</div>-->
-<!--&lt;!&ndash;                <div>Изделие</div>&ndash;&gt;-->
-<!--&lt;!&ndash;                <div>UID изделия</div>&ndash;&gt;-->
-<!--                <div>Пользователь</div>-->
-<!--                <div>Статус</div>-->
-<!--                <div>Проверил</div>-->
-<!--                <div>Проверка</div>-->
-<!--            </div>-->
-<!--            <div class="grid_quality_control-body" id="quality_controlTableBody">-->
-<!--                &lt;!&ndash; Данные будут загружены с помощью JavaScript &ndash;&gt;-->
-<!--            </div>-->
-<!--        </div>-->
     </div>
     <!-- Модальное окно для фильтра времени -->
     <div class="modal fade" id="timeFilterModal" tabindex="-1" aria-labelledby="timeFilterModalLabel" aria-hidden="true">
@@ -154,12 +148,10 @@
                 </div>
                 <div class="modal-body">
                     <form id="filterTimeForm" autocomplete="off">
-                        <div class="mb-3">
-                            <label for="startDatetime" class="form-label">Время начала интервала:</label>
-                            <input type="datetime-local" class="form-control" id="startDatetime" required>
-                            <label for="endDatetime" class="form-label">Время окончания интервала:</label>
-                            <input type="datetime-local" class="form-control" id="endDatetime" required>
-                        </div>
+                        <label for="startDatetime" class="form-label">Время начала интервала:</label>
+                        <input type="datetime-local" class="form-control" id="startDatetime" required>
+                        <label for="endDatetime" class="form-label">Время окончания интервала:</label>
+                        <input type="datetime-local" class="form-control" id="endDatetime" required>
                         <div class="d-flex mt-2 justify-content-end">
                             <button type="button" class="btn btn-success" id="applyTimeFilterButton">Подтвердить</button>
                         </div>
@@ -189,10 +181,6 @@
                         <button type="button" class="btn btn-success" id="applyProductFilterButton">Подтвердить</button>
                     </div>
                 </div>
-<!--                <div class="modal-footer">-->
-<!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
-<!--                    <button type="button" class="btn btn-success" id="applyProductFilterButton">Применить</button>-->
-<!--                </div>-->
             </div>
         </div>
     </div>
@@ -213,10 +201,6 @@
                         <button type="button" class="btn btn-success" id="applyOrderFilterButton">Подтвердить</button>
                     </div>
                 </div>
-<!--                <div class="modal-footer">-->
-<!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
-<!--                    <button type="button" class="btn btn-success" id="applyOrderFilterButton">Применить</button>-->
-<!--                </div>-->
             </div>
         </div>
     </div>
@@ -230,19 +214,13 @@
                 </div>
                 <div class="modal-body">
                     <form id="filterUidForm" autocomplete="off">
-                        <div class="mb-3">
-                            <label for="filterUid" class="form-label">Введите или сканируйте UID изделия:</label>
-                            <input type="text" class="form-control" id="filterUid" required>
+                        <label for="filterUid" class="form-label">Введите или сканируйте UID изделия:</label>
+                        <input type="text" class="form-control" id="filterUid" required>
+                        <div class="d-flex mt-2 justify-content-end">
+                            <button type="submit" class="btn btn-success" id="applyUidFilterButton">Подтвердить</button>
                         </div>
-                    <div class="d-flex mt-2 justify-content-end">
-                        <button type="submit" class="btn btn-success" id="applyUidFilterButton">Подтвердить</button>
-                    </div>
                     </form>
                 </div>
-<!--                <div class="modal-footer">-->
-<!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
-<!--                    <button type="button" class="btn btn-success" id="applyUidFilterButton">Применить</button>-->
-<!--                </div>-->
             </div>
         </div>
     </div>
@@ -256,19 +234,13 @@
                 </div>
                 <div class="modal-body">
                     <form id="filterSerialNumForm" autocomplete="off">
-                        <div class="mb-3">
-                            <label for="filterSerialNum" class="form-label">Введите S/N изделия:</label>
-                            <input type="text" class="form-control" id="filterSerialNum" required>
+                        <label for="filterSerialNum" class="form-label">Введите S/N изделия:</label>
+                        <input type="text" class="form-control" id="filterSerialNum" required>
+                        <div class="d-flex mt-2 justify-content-end">
+                            <button type="submit" class="btn btn-success" id="applySerialNumFilterButton">Подтвердить</button>
                         </div>
-                    <div class="d-flex mt-2 justify-content-end">
-                        <button type="submit" class="btn btn-success" id="applySerialNumFilterButton">Подтвердить</button>
-                    </div>
                     </form>
                 </div>
-<!--                <div class="modal-footer">-->
-<!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
-<!--                    <button type="button" class="btn btn-success" id="applySerialNumFilterButton">Применить</button>-->
-<!--                </div>-->
             </div>
         </div>
     </div>
@@ -289,14 +261,46 @@
                         <button type="button" class="btn btn-success" id="applyUserFilterButton">Подтвердить</button>
                     </div>
                 </div>
-<!--                <div class="modal-footer">-->
-<!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>-->
-<!--                    <button type="button" class="btn btn-success" id="applyUserFilterButton">Применить</button>-->
-<!--                </div>-->
             </div>
         </div>
     </div>
-
+        <!-- Модальное окно для фильтра по статусу -->
+    <div class="modal fade" id="statusFilterModal" tabindex="-1" aria-labelledby="statusFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="statusFilterModalLabel">Фильтр по статусу производства изделия</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+<!--                    <form id="filterStatusForm" autocomplete="off">-->
+<!--                        <div class="mb-3">-->
+<!--                            <label for="filterStatus" class="form-label">Введите статус производства изделия:</label>-->
+<!--                            <input type="number" class="form-control" id="filterStatus" required>-->
+<!--                        </div>-->
+<!--                    <div class="d-flex mt-2 justify-content-end">-->
+<!--                        <button type="submit" class="btn btn-success" id="applyStatusFilterButton">Подтвердить</button>-->
+<!--                    </div>-->
+<!--                    </form>-->
+                    <form id="filterStatusForm" autocomplete="off">
+                        <label for="statusSelect" class="form-label">Выберите статус из списка:</label>
+                        <select class="form-select" id="statusSelect">
+<!--                            <option value = 1>1 - сборка плат</option>-->
+<!--                            <option value = 2>2 - регулировка</option>-->
+<!--                            <option value = 3>3 - лак</option>-->
+<!--                            <option value = 4>4 - сборка рамы</option>-->
+                            <option value = 5>5 - сборка дрона</option>
+                            <option value = 6>6 - облёт</option>
+                            <option value = 7>7 - упаковка</option>
+                        </select>
+                        <div class="d-flex mt-2 justify-content-end">
+                            <button type="submit" class="btn btn-success" id="applyStatusFilterButton">Подтвердить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Подключаем Bootstrap JS и Popper.js -->
      <script src="/static/js/bootstrap.min.js"></script>
 </body>
