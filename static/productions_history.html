@@ -55,7 +55,7 @@
         <!-- Заголовок страницы -->
         <div class="row justify-content-center mt-2">
             <div class="col-12 text-center">
-                <h2><u>История производства</u></h2>
+                <h3><u>История производства</u></h3>
             </div>
         </div>
 
@@ -63,7 +63,7 @@
             <div class="col-6">
             </div>
             <div class="col-lg-6">
-                <div class="grid_info-container mb-5">
+                <div class="grid_info-container mb-2">
                     <!--<div class="grid_info-header">Дата:</div>
                     <div class="grid_info-cell" style="color:blue" id="datetime"></div>
                     <div class="grid_info-header">ИРМ:</div>
@@ -76,7 +76,7 @@
             </div>
         </div>
         <h4>Таблица производства</h4>
-        <div class="grid_production-container justify-content-center mt-2" style="max-height: 617px; overflow-y: auto;">
+        <div class="grid_production-container justify-content-center mt-2" style="max-height: 456px; overflow-y: auto;">
             <div class="grid_production-header">
                 <div>№</div>
                 <div>Дата/время</div>
@@ -103,12 +103,13 @@
                 <button style="min-width: 120px" type="button" id="serialNumFilterButton" class="btn btn-secondary btn-lg mb-2">S/N</button>
                 <button style="min-width: 120px" type="button" id="userFilterButton" class="btn btn-secondary btn-lg mb-2">ФИО</button>
                 <button style="min-width: 120px" type="button" id="statusFilterButton" class="btn btn-secondary btn-lg mb-2">Статус</button>
+                <button style="min-width: 120px" type="button" id="qcStatusFilterButton" class="btn btn-secondary btn-lg mb-2">Проверка</button>
             </div>
         </div>
         <div class="row justify-content-center mt-2">
             <div class="col-lg-5">
                 <h4>Таблица контроля производства</h4>
-                <div class="grid_production_control-container justify-content-center mt-2" style="max-height: 288px; overflow-y: auto;">
+                <div class="grid_production_control-container justify-content-center mt-2" style="max-height: 183px; overflow-y: auto;">
                     <div class="grid_production_control-header">
                         <div>№</div>
                         <div>Дата/время</div>
@@ -122,7 +123,7 @@
             </div>
             <div class="col-lg-7">
                 <h4>Таблица контроля качества</h4>
-                <div class="grid_quality_control-container justify-content-center mt-2" style="max-height: 288px; overflow-y: auto;">
+                <div class="grid_quality_control-container justify-content-center mt-2" style="max-height: 183px; overflow-y: auto;">
                     <div class="grid_quality_control-header">
                         <div>№</div>
                         <div>Дата/время</div>
@@ -130,6 +131,7 @@
                         <div>Статус</div>
                         <div>Проверил</div>
                         <div>Проверка</div>
+                        <div>Комментарий</div>
                     </div>
                     <div class="grid_quality_control-body" id="quality_controlTableBody">
                         <!-- Данные будут загружены с помощью JavaScript -->
@@ -295,6 +297,30 @@
                         </select>
                         <div class="d-flex mt-2 justify-content-end">
                             <button type="submit" class="btn btn-success" id="applyStatusFilterButton">Подтвердить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- Модальное окно для фильтра по статусу проверки -->
+    <div class="modal fade" id="qcStatusFilterModal" tabindex="-1" aria-labelledby="qcStatusFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="qcStatusFilterModalLabel">Фильтр по статусу проверки изделия</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="filterQcStatusForm" autocomplete="off">
+                        <label for="qcStatusSelect" class="form-label">Выберите статус проверки из списка:</label>
+                        <select class="form-select" id="qcStatusSelect">
+                            <option value = 'OK'>OK</option>
+                            <option value = 'NG'>NG</option>
+                            <option value = ''>Ожидает проверки</option>
+                        </select>
+                        <div class="d-flex mt-2 justify-content-end">
+                            <button type="submit" class="btn btn-success" id="applyQcStatusFilterButton">Подтвердить</button>
                         </div>
                     </form>
                 </div>

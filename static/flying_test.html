@@ -42,7 +42,7 @@
         <!-- Заголовок страницы -->
         <div class="row justify-content-center mt-2">
             <div class="col-12 text-center">
-                <h2><u>Контроль облёта</u></h2>
+                <h3><u>Контроль облёта</u></h3>
             </div>
         </div>
 
@@ -61,7 +61,7 @@
                 </div>
             </div>
             <div class="col-3 mb-1">
-                <img id="product_img" class="rounded float-start" alt="..." style="max-width: 300px;max-height: 225px">
+                <img id="product_img" class="rounded float-start" alt="..." style="max-height: 162px">
             </div>
             <div class="col-lg-6">
                 <div class="grid_info-container mb-2">
@@ -80,7 +80,7 @@
         <h4>Таблица производства
             <span class="small-text">(изделия, прошедшие сборку)</span>
         </h4>
-        <div class="grid_production-container justify-content-center mt-2" style="max-height: 450px; overflow-y: auto;">
+        <div class="grid_production-container justify-content-center mt-2" style="max-height: 456px; overflow-y: auto;">
             <div class="grid_production-header">
                 <div>№</div>
                 <div>Дата/время</div>
@@ -101,6 +101,7 @@
             <div class="d-grid gap-2 d-md-block">
                 <button style="min-width: 120px" type="button" id="clearFilterButton" class="btn btn-primary btn-lg mb-2">Сбросить фильтр</button>
                 <button style="min-width: 120px" type="button" id="flyingTestOkButton" class="btn btn-success btn-lg mb-2">Облёт пройден</button>
+                <button style="min-width: 120px" type="button" id="flyingTestNgButton" class="btn btn-danger btn-lg mb-2">Облёт не пройден</button>
             </div>
         </div>
 <!--        <h4>Таблица контроля качества</h4>-->
@@ -149,6 +150,27 @@
                         </div>
                         <div class="d-flex mt-2 justify-content-end">
                             <button type="button" class="btn btn-success" id="applyFlyingTestOkButton">Подтвердить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- Модальное окно NG облёта -->
+    <div class="modal fade" id="flyingTestNgModal" tabindex="-1" aria-labelledby="flyingTestNgModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="flyingTestNgModalLabel">Прохождение облёта</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="flyingTestNgForm">
+                        <div class="mb-3">
+                            <h6>Вы уверены, что облёт не пройден?</h6>
+                        </div>
+                        <div class="d-flex mt-2 justify-content-end">
+                            <button type="button" class="btn btn-success" id="applyFlyingTestNgButton">Подтвердить</button>
                         </div>
                     </form>
                 </div>

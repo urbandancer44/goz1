@@ -9,6 +9,7 @@ let deleteUserModal = null;
 let product_name = null;
 let editPictureModal = null;
 let deleteProductModal = null;
+let deletePictureName = null;
 // ---
 
 // --- productions.js ---
@@ -25,6 +26,7 @@ let uidFilterModal = null;
 let userFilterModal = null;
 let serialNumFilterModal = null;
 let statusFilterModal = null;
+let qcStatusFilterModal = null;
 // ---
 
 // --- edit_productions.js ---
@@ -44,10 +46,12 @@ let deleteQualityModal = null;
 // --- quality_control.js ---
 let qualityOkModal = null;
 let qualityNgModal = null;
+let qualityComment = null;
 // ---
 
 // --- flying_test.js ---
 let flyingTestOkModal = null;
+let flyingTestNgModal = null;
 // ---
 
 // --- package_control.js ---
@@ -64,7 +68,6 @@ let sessionQcReturnQuantity = 0;
 let sessionQualityID = 0;
 let sessionQualityUID = 0;
 
-let isFiltering = false;
 
 // Функция для получения значения куки по имени
 let currentWorkplaceID = getCookie('workplace_id');

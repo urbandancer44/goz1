@@ -135,24 +135,57 @@ class Handlers:
         except Exception as e:
             return jsonify({'error': str(e)}), 500
 
-    def delete_product(self):
-        if 'username' in session:
-            product_name = request.json['productName']
-
-            query = "DELETE FROM products WHERE product_name = %s"
-            try:
-                self.db_manager.execute_delete(query, (product_name,))
-                return jsonify({'message': 'Изделие успешно удалено!'})
-            except Exception as e:
-                return jsonify({'error': str(e)}), 500
-        else:
-            return redirect('/')
-
     def edit_product(self):
         if 'username' in session:
             return send_from_directory(self.app.static_folder, 'edit_product.html')
         else:
             return redirect('/')
+
+    def delete_product(self):
+        if 'username' not in session:
+            return redirect('/')
+
+        product_name = request.json['productName']
+        delete_picture_name = request.json['deletePictureName']
+
+        # Удаление из базы данных
+        query = "DELETE FROM products WHERE product_name = %s"
+        try:
+            self.db_manager.execute_delete(query, (product_name,))
+
+            # Удаление файла изображения, если указано имя файла
+            if delete_picture_name and delete_picture_name != 'None':
+                try:
+                    # Используем путь из конфига приложения
+                    img_path = os.path.join(self.app.config['UPLOAD_FOLDER'], delete_picture_name)
+
+                    if os.path.exists(img_path):
+                        os.remove(img_path)
+                        return jsonify({
+                            'message': 'Изделие и изображение успешно удалены!',
+                            'deleted_file': True,
+                            'file_path': img_path  # Для отладки
+                        })
+                    return jsonify({
+                        'message': 'Изделие удалено, но файл изображения не найден',
+                        'deleted_file': False,
+                        'file_path': img_path  # Для отладки
+                    })
+                except Exception as e:
+                    return jsonify({
+                        'message': f'Изделие удалено, но ошибка при удалении файла: {str(e)}',
+                        'deleted_file': False,
+                        'error': str(e),
+                        'file_path': img_path  # Для отладки
+                    }), 500
+
+            return jsonify({
+                'message': 'Изделие успешно удалено!',
+                'deleted_file': False
+            })
+
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
     def add_product(self):
         if 'username' in session:
@@ -444,13 +477,14 @@ class Handlers:
 
     def update_quality(self):
         if 'username' in session:
+            datetime_value = datetime.now(tz=pytz.timezone('Europe/Moscow'))
             production_uid = request.json['productionUid']
             new_qc_status = request.json['newQualityStatus']
             new_qc_return_quantity = request.json['newQcReturnQuantity']
 
-            query = "UPDATE productions SET qc_status = %s, qc_return_quantity = %s WHERE product_uid = %s"
+            query = "UPDATE productions SET datetime = %s, qc_status = %s, qc_return_quantity = %s WHERE product_uid = %s"
             try:
-                self.db_manager.execute_update(query, (new_qc_status, new_qc_return_quantity, production_uid))
+                self.db_manager.execute_update(query, (datetime_value, new_qc_status, new_qc_return_quantity, production_uid))
                 return jsonify({'message': 'Запись занесена в базу данных!'})
             except Exception as e:
                 return jsonify({'error': str(e)}), 500
@@ -505,10 +539,11 @@ class Handlers:
             production_status = request.json['productionStatus']
             qc_username = session.get('username')
             qc_status = request.json['newQualityStatus']
+            qc_comment = request.json['qualityComment']
 
-            query = "INSERT INTO quality_control (datetime, product_uid, username, production_status, qc_username, qc_status) VALUES (%s, %s, %s, %s, %s, %s)"
+            query = "INSERT INTO quality_control (datetime, product_uid, username, production_status, qc_username, qc_status, qc_comment) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             try:
-                self.db_manager.execute_insert(query, (datetime_value, product_uid, username, production_status, qc_username, qc_status))
+                self.db_manager.execute_insert(query, (datetime_value, product_uid, username, production_status, qc_username, qc_status, qc_comment))
                 return jsonify({'message': 'Запись успешно добавлена!'})
             except Exception as e:
                 return jsonify({'error': str(e)}), 500
@@ -541,10 +576,11 @@ class Handlers:
             new_production_status = request.json['newProductionStatus']
             new_qc_status = request.json['newQualityStatus']
             username = session.get('username')
+            new_qc_return_quantity = request.json['newQcReturnQuantity']
 
-            query = "UPDATE productions SET datetime = %s, qc_status = %s, production_status = %s, username = %s WHERE product_uid = %s"
+            query = "UPDATE productions SET datetime = %s, qc_status = %s, production_status = %s, username = %s, qc_return_quantity = %s WHERE product_uid = %s"
             try:
-                self.db_manager.execute_update(query, (datetime_value, new_qc_status, new_production_status, username, production_uid))
+                self.db_manager.execute_update(query, (datetime_value, new_qc_status, new_production_status, username, new_qc_return_quantity, production_uid))
                 return jsonify({'message': 'Запись занесена в базу данных!'})
             except Exception as e:
                 return jsonify({'error': str(e)}), 500

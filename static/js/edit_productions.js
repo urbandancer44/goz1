@@ -130,6 +130,7 @@ function getQualityControl(productUID) {
                 const production_statusCell = document.createElement('div');
                 const qc_usernameCell = document.createElement('div');
                 const qc_statusCell = document.createElement('div');
+                const qc_commentCell = document.createElement('div');
 
                 numberCell.innerText = index + 1;
                 datetimeCell.innerText = new Date(quality_control.datetime).toLocaleString(); // Преобразование времени
@@ -138,6 +139,7 @@ function getQualityControl(productUID) {
                 production_statusCell.innerText = quality_control.production_status;
                 qc_usernameCell.innerText = quality_control.qc_username;
                 qc_statusCell.innerText = quality_control.qc_status;
+                qc_commentCell.innerText = quality_control.qc_comment;
                 row.appendChild(numberCell);
                 row.appendChild(datetimeCell);
                 // row.appendChild(product_uidCell);
@@ -145,10 +147,12 @@ function getQualityControl(productUID) {
                 row.appendChild(production_statusCell);
                 row.appendChild(qc_usernameCell);
                 row.appendChild(qc_statusCell);
+                row.appendChild(qc_commentCell);
                 gridBody.appendChild(row);
 
                 row.dataset.id = quality_control.id;
                 row.dataset.qc_uid = quality_control.product_uid;
+                row.dataset.qc_comment = quality_control.qc_comment;
                 row.addEventListener("click", (event) => {
                     activateQualityRow(event.currentTarget);
                 });
@@ -215,7 +219,6 @@ function getProductionControl(productUID) {
         })
         .catch(error => console.error('Error:', error));
 }
-
 
 // ---Изменение времени в таблице---
 // Открытие модального окна
@@ -706,22 +709,6 @@ document.getElementById('statusFilterButton').addEventListener('click', function
     statusFilterModal = new bootstrap.Modal(document.getElementById('statusFilterModal'));
     statusFilterModal.show();
 });
-// При открытии модального окна
-// document.getElementById('statusFilterModal').addEventListener('shown.bs.modal', function () {
-//     document.getElementById('filterStatus').focus();
-// })
-// При нажатии кнопки модального окна
-// document.getElementById('filterStatusForm').addEventListener('submit', function (event) {
-//     event.preventDefault();
-//     const filterStatus = Number(document.getElementById('filterStatus').value);
-//     if (filterStatus) {
-//         filterByStatus(filterStatus);
-//         statusFilterModal.hide();
-//         statusFilterModal = null;
-//     } else {
-//         alert('Введите статус производства изделия!');
-//     }
-// });
 
 // При нажатии кнопки модального окна
 document.getElementById('filterStatusForm').addEventListener('submit', function (event) {
@@ -744,6 +731,35 @@ function filterByStatus(status) {
         // Преобразуем статус из данных в число (на случай, если он приходит как строка)
         const productionStatus = Number(production.production_status);
         return productionStatus === status;
+    });
+}
+
+// ---Фильтрация по статусу проверки--
+// Открытие модального окна
+document.getElementById('qcStatusFilterButton').addEventListener('click', function() {
+    qcStatusFilterModal = new bootstrap.Modal(document.getElementById('qcStatusFilterModal'));
+    qcStatusFilterModal.show();
+});
+
+// При нажатии кнопки модального окна
+document.getElementById('filterQcStatusForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    const selectedQcStatus = document.getElementById('qcStatusSelect').value;
+    if (selectedQcStatus != null) {
+        filterByQcStatus(selectedQcStatus);
+        qcStatusFilterModal.hide();
+        qcStatusFilterModal = null;
+    } else {
+        alert('Выберите статус проверки из списка!');
+    }
+});
+
+// Фильтр
+function filterByQcStatus(qcStatus) {
+    // Фильтруем записи, где qc_status строго равен введённому статусу
+    filterProductions((production) => {
+        const productionStatus = production.qc_status;
+        return productionStatus === qcStatus;
     });
 }
 

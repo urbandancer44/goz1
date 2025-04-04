@@ -13,19 +13,6 @@
 </head>
 <body class="bg-light ">
     <div class="container-fluid">
-        <!--<div class="row justify-content-center mt-2">
-            <div class="col-2">
-                <button class="btn btn-secondary w-100 btn-lg" id="prev_button">Назад</button>
-            </div>
-            <div class="col-8">
-                <h2 class="text-center"><u>История производства</u></h2>
-            </div>
-            <div class="col-2">
-                <form action="/logout" method="post">
-                    <button type="submit" class="btn btn-danger w-100 btn-lg">Выход</button>
-                </form>
-            </div>
-        </div>-->
         <div class="row justify-content-between align-items-center bg-light p-1 shadow-lg">
             <!-- Кнопка "Назад" -->
             <div class="col-2">
@@ -55,7 +42,7 @@
         <!-- Заголовок страницы -->
         <div class="row justify-content-center mt-2">
             <div class="col-12 text-center">
-                <h2><u>Контроль качества</u></h2>
+                <h3><u>Контроль качества</u></h3>
             </div>
         </div>
 
@@ -74,7 +61,7 @@
                 </div>
             </div>
             <div class="col-3 mb-1">
-                <img id="product_img" class="rounded float-start" alt="..." style="max-width: 300px;max-height: 225px">
+                <img id="product_img" class="rounded float-start" alt="..." style="max-height: 162px">
             </div>
             <div class="col-lg-6">
                 <div class="grid_info-container mb-2">
@@ -93,7 +80,7 @@
         <h4>Таблица производства
             <span class="small-text">(проверка качества изделий не проводилась или NG)</span>
         </h4>
-        <div class="grid_production-container justify-content-center mt-2" style="max-height: 450px; overflow-y: auto;">
+        <div class="grid_production-container justify-content-center mt-2" style="max-height: 274px; overflow-y: auto;">
             <div class="grid_production-header">
                 <div>№</div>
                 <div>Дата/время</div>
@@ -120,7 +107,7 @@
         <h4>Таблица контроля качества
             <span class="small-text">(по выбранному изделию)</span>
         </h4>
-        <div class="grid_quality_control-container justify-content-center mt-2" style="max-height: 288px; overflow-y: auto;">
+        <div class="grid_quality_control-container justify-content-center mt-2" style="max-height: 152px; overflow-y: auto;">
             <div class="grid_quality_control-header">
                 <div>№</div>
                 <div>Дата/время</div>
@@ -130,6 +117,7 @@
                 <div>Статус</div>
                 <div>Проверил</div>
                 <div>Проверка</div>
+                <div>Комментарий</div>
             </div>
             <div class="grid_quality_control-body" id="quality_controlTableBody">
                 <!-- Данные будут загружены с помощью JavaScript -->
@@ -145,12 +133,6 @@
 <!--                <a href="/edit_productions" id="editProductionsButton" class="btn btn-primary w-100 btn-lg" tabindex="-1" aria-disabled="true">Редактор данных</a>-->
             </div>
         </div>
-<!--        <div class="row justify-content-center mt-4">-->
-<!--            <div class="d-grid gap-2 d-md-block mb-2">-->
-<!--                <button style="min-width: 120px" type="button" id="button1" class="btn btn-success btn-lg mb-2">Качество OK</button>-->
-<!--                <button style="min-width: 120px" type="button" id="button2" class="btn btn-danger btn-lg mb-2">Качество NG</button>-->
-<!--            </div>-->
-<!--        </div>-->
     </div>
         <!-- Модальное окно качество OK -->
     <div class="modal fade" id="qualityOkModal" tabindex="-1" aria-labelledby="qualityOkModalLabel" aria-hidden="true">
@@ -185,6 +167,11 @@
                     <form id="qualityNgForm">
                         <div class="mb-3">
                             <h6>Вы уверены, что качество NG?</h6>
+                            <label for="qc_comment" class="form-label">Комментарий</label>
+                            <input type="text" class="form-control" id="qc_comment" required maxlength="200">
+                            <div class="text-end text-muted small">
+                                <span id="qcCommentCharCount">0</span>/200 символов
+                            </div>
                         </div>
                         <div class="d-flex mt-2 justify-content-end">
                             <button type="button" class="btn btn-success" id="applyQualityNgButton">Подтвердить</button>

@@ -24,6 +24,7 @@ function getProducts() {
                 gridBody.appendChild(row);
 
                 row.dataset.name = product.product_name;
+                row.dataset.picture_name = product.picture_path;
                 row.addEventListener("click", (event) => {
                     //alert(product.product_name);
                     activateRow(event.currentTarget);
@@ -59,6 +60,7 @@ function activateRow(row) {
     document.querySelectorAll('#productsTableBody .grid-row').forEach(r => r.classList.remove('active-row'));
     row.classList.add('active-row')
     product_name = row.dataset.name;
+    picture_name = row.dataset.picture_name
     //alert(product_name);
 }
 //---изменение фото в таблице---
@@ -120,6 +122,7 @@ document.getElementById('applyDeleteProductButton').addEventListener('click', fu
         },
         body: JSON.stringify({
             productName: product_name,
+            deletePictureName: deletePictureName
         })
     })
     .then(response => response.json())

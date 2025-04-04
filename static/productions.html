@@ -13,19 +13,6 @@
 </head>
 <body class="bg-light ">
     <div class="container-fluid" id="containerProductions">
-        <!--<div class="row justify-content-center mt-2">
-            <div class="col-2">
-                <a href="/select_order" class="btn btn-secondary w-100 btn-lg">Назад</a>
-            </div>
-            <div class="col-8">
-                <h2 class="text-center"><u>Таблица производства</u></h2>
-            </div>
-            <div class="col-2">
-                <form action="/logout" method="post">
-                    <button type="submit" class="btn btn-danger w-100 btn-lg">Выход</button>
-                </form>
-            </div>
-        </div>-->
         <div class="row justify-content-between align-items-center bg-light p-1 shadow-lg">
             <!-- Кнопка "Назад" -->
             <div class="col-2">
@@ -55,7 +42,7 @@
         <!-- Заголовок страницы -->
         <div class="row justify-content-center mt-2">
             <div class="col-12 text-center">
-                <h2><u>Контроль производства</u></h2>
+                <h3><u>Контроль производства</u></h3>
             </div>
         </div>
 
@@ -70,7 +57,7 @@
                 <!--<input type="text" id="hiddenInputScan" style="position: absolute; left: 10px;" autofocus>-->
             </div>
             <div class="col-4 mb-1">
-                <img id="product_img" class="rounded float-start" alt="..." style="max-width: 300px;max-height: 225px">
+                <img id="product_img" class="rounded float-start" alt="..." style="max-height: 162px">
             </div>
             <div class="col-lg-6">
                 <div class="grid_info-container mb-2">
@@ -87,11 +74,12 @@
                     <div class="grid_info-header">ШПЗ:</div>
                     <div class="grid_info-cell" style="color:blue" id="order_num">Номер ШПЗ</div>
                 </div>
-                <h4 style="color: forestgreen">Для добавления изделия сканируй Datamatrix!</h4>
             </div>
         </div>
-        <h4>Таблица производства</h4>
-        <div class="grid_production-container justify-content-center mt-1" style="max-height: 617px; overflow-y: auto;">
+        <h4>Таблица производства
+            <span class="small-text">(Для добавления изделия сканируй Datamatrix)</span>
+        </h4>
+        <div class="grid_production-container justify-content-center mt-1" style="max-height: 577px; overflow-y: auto;">
             <div class="grid_production-header">
                 <div>№</div>
                 <div>Дата/время</div>

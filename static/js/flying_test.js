@@ -138,6 +138,12 @@ function clearFilter() {
 
 // Функция изменения статуса производства
 function updateProductionStatus(new_production_status, new_qc_status) {
+    let new_qc_return_quantity;
+    if (new_qc_status === 'OK') {
+        new_qc_return_quantity = sessionQcReturnQuantity;
+    } else {
+        new_qc_return_quantity = sessionQcReturnQuantity+1;
+    }
     fetch('/update_production_status', {
         method: 'POST',
         headers: {
@@ -146,7 +152,8 @@ function updateProductionStatus(new_production_status, new_qc_status) {
         body: JSON.stringify({
             productionUid: sessionProductUID,
             newQualityStatus: new_qc_status,
-            newProductionStatus: new_production_status
+            newProductionStatus: new_production_status,
+            newQcReturnQuantity: new_qc_return_quantity
         })
     })
     .then(response => response.json())
@@ -178,6 +185,52 @@ document.getElementById('applyFlyingTestOkButton').addEventListener('click', fun
     flyingTestOkModal = null;
     sessionProductUID = null;
 });
+
+// Нажатие кнопки облёт не пройден. Открытие модального окна
+document.getElementById('flyingTestNgButton').addEventListener('click', function() {
+    const activeRow = document.querySelector('#productionsTableBody .grid_production-row.active-row');
+    if (activeRow) {
+        flyingTestNgModal = new bootstrap.Modal(document.getElementById('flyingTestNgModal'));
+        flyingTestNgModal.show();
+    } else {
+        sessionProductUID = null;
+        flyingTestNgModal = null;
+        alert('Выберите строку с изделием!');
+    }
+});
+// Нажатие кнопки подтверждения
+document.getElementById('applyFlyingTestNgButton').addEventListener('click', function () {
+    updateProductionStatus(6, 'NG');
+    addProductionControl(6);
+    addQualityControl(6,'NG');
+    flyingTestNgModal.hide();
+    flyingTestNgModal = null;
+    sessionProductUID = null;
+});
+
+//Функция добавления записи проверки качества
+function addQualityControl(new_production_status, new_qc_status) {
+    fetch('/add_quality_control', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            productionUid: sessionProductUID,
+            username: sessionUsername,
+            productionStatus: new_production_status,
+            newQualityStatus: new_qc_status
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // alert(data.message);
+        sessionProductUID = null;
+        sessionUsername = null;
+        sessionProductionStatus = 0;
+    })
+    .catch(error => console.error('Error:', error));
+}
 
 //Функция добавления записи в таблицу контроля производства
 function addProductionControl(status) {

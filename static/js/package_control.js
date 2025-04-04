@@ -138,6 +138,12 @@ function clearFilter() {
 
 // Функция изменения статуса производства
 function updateProductionStatus(new_production_status, new_qc_status) {
+    let new_qc_return_quantity;
+    if (new_qc_status === 'OK') {
+        new_qc_return_quantity = sessionQcReturnQuantity;
+    } else {
+        new_qc_return_quantity = sessionQcReturnQuantity+1;
+    }
     fetch('/update_production_status', {
         method: 'POST',
         headers: {
@@ -146,7 +152,8 @@ function updateProductionStatus(new_production_status, new_qc_status) {
         body: JSON.stringify({
             productionUid: sessionProductUID,
             newQualityStatus: new_qc_status,
-            newProductionStatus: new_production_status
+            newProductionStatus: new_production_status,
+            newQcReturnQuantity: new_qc_return_quantity
         })
     })
     .then(response => response.json())
