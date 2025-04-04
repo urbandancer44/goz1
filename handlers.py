@@ -141,6 +141,19 @@ class Handlers:
         else:
             return redirect('/')
 
+    # def delete_product(self):
+    #     if 'username' in session:
+    #         product_name = request.json['productName']
+    #
+    #         query = "DELETE FROM products WHERE product_name = %s"
+    #         try:
+    #             self.db_manager.execute_delete(query, (product_name,))
+    #             return jsonify({'message': 'Изделие успешно удалено!'})
+    #         except Exception as e:
+    #             return jsonify({'error': str(e)}), 500
+    #     else:
+    #         return redirect('/')
+
     def delete_product(self):
         if 'username' not in session:
             return redirect('/')
