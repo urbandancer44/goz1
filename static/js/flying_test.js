@@ -198,18 +198,61 @@ document.getElementById('flyingTestNgButton').addEventListener('click', function
         alert('Выберите строку с изделием!');
     }
 });
+
+// Обработчик изменения текста в комментарии
+document.getElementById('qc_comment').addEventListener('input', function() {
+    const comment = this.value;
+    const charCount = comment.length;
+    document.getElementById('qcCommentCharCount').textContent = charCount;
+
+    // Подсветка при приближении к лимиту
+    const counter = document.getElementById('qcCommentCharCount');
+    if (charCount >= 150) {
+        counter.classList.add('text-warning');
+        if (charCount >= 180) {
+            counter.classList.add('text-danger');
+        } else {
+            counter.classList.remove('text-danger');
+        }
+    } else {
+        counter.classList.remove('text-warning', 'text-danger');
+    }
+});
+
+// Сброс счётчика при открытии модального окна
+document.getElementById('flyingTestNgModal').addEventListener('show.bs.modal', function() {
+    document.getElementById('qcCommentCharCount').textContent = '0';
+    document.getElementById('qc_comment').value = '';
+});
+
+// // Нажатие кнопки подтверждения
+// document.getElementById('applyFlyingTestNgButton').addEventListener('click', function () {
+//     updateProductionStatus(6, 'NG');
+//     addProductionControl(6);
+//     addQualityControl(6,'NG');
+//     flyingTestNgModal.hide();
+//     flyingTestNgModal = null;
+//     sessionProductUID = null;
+// });
+
 // Нажатие кнопки подтверждения
-document.getElementById('applyFlyingTestNgButton').addEventListener('click', function () {
-    updateProductionStatus(6, 'NG');
-    addProductionControl(6);
-    addQualityControl(6,'NG');
-    flyingTestNgModal.hide();
-    flyingTestNgModal = null;
-    sessionProductUID = null;
+document.getElementById('applyFlyingTestNgButton').addEventListener('click', function() {
+    qualityComment = document.getElementById('qc_comment').value;
+    if (qualityComment.length > 200) {
+        alert('Комментарий не должен превышать 200 символов!');
+        return false;
+    } else {
+        updateProductionStatus(6, 'NG');
+        addProductionControl(6);
+        addQualityControl('NG');
+        flyingTestNgModal.hide();
+        flyingTestNgModal = null;
+        sessionProductUID = null;
+    }
 });
 
 //Функция добавления записи проверки качества
-function addQualityControl(new_production_status, new_qc_status) {
+function addQualityControl(new_qc_status) {
     fetch('/add_quality_control', {
         method: 'POST',
         headers: {
@@ -218,8 +261,9 @@ function addQualityControl(new_production_status, new_qc_status) {
         body: JSON.stringify({
             productionUid: sessionProductUID,
             username: sessionUsername,
-            productionStatus: new_production_status,
-            newQualityStatus: new_qc_status
+            productionStatus: sessionProductionStatus,
+            newQualityStatus: new_qc_status,
+            qualityComment: qualityComment
         })
     })
     .then(response => response.json())
@@ -228,6 +272,8 @@ function addQualityControl(new_production_status, new_qc_status) {
         sessionProductUID = null;
         sessionUsername = null;
         sessionProductionStatus = 0;
+        qualityComment = null;
+        getQualityControl();  // Перезагружаем таблицу после изменения
     })
     .catch(error => console.error('Error:', error));
 }
@@ -341,8 +387,8 @@ function filterFlyingProductions(filterFunction) {
 }
 
 document.addEventListener('click', function(event) {
-    // Проверяем, что клик был не по таблице
-    if (!event.target.closest('.grid_production-body')) {
+    // Проверяем, что клик был не по таблице и не по модальному окну
+    if (!event.target.closest('.grid_production-body') && !event.target.closest('.modal')) {
         focusHiddenInput();
     }
 });

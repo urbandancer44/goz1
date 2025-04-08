@@ -156,7 +156,28 @@
             </div>
         </div>
     </div>
-        <!-- Модальное окно NG облёта -->
+<!--        &lt;!&ndash; Модальное окно NG облёта &ndash;&gt;-->
+<!--    <div class="modal fade" id="flyingTestNgModal" tabindex="-1" aria-labelledby="flyingTestNgModalLabel" aria-hidden="true">-->
+<!--        <div class="modal-dialog">-->
+<!--            <div class="modal-content">-->
+<!--                <div class="modal-header">-->
+<!--                    <h5 class="modal-title" id="flyingTestNgModalLabel">Прохождение облёта</h5>-->
+<!--                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
+<!--                </div>-->
+<!--                <div class="modal-body">-->
+<!--                    <form id="flyingTestNgForm">-->
+<!--                        <div class="mb-3">-->
+<!--                            <h6>Вы уверены, что облёт не пройден?</h6>-->
+<!--                        </div>-->
+<!--                        <div class="d-flex mt-2 justify-content-end">-->
+<!--                            <button type="button" class="btn btn-success" id="applyFlyingTestNgButton">Подтвердить</button>-->
+<!--                        </div>-->
+<!--                    </form>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+        <!-- Модальное окно качество NG -->
     <div class="modal fade" id="flyingTestNgModal" tabindex="-1" aria-labelledby="flyingTestNgModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -168,6 +189,11 @@
                     <form id="flyingTestNgForm">
                         <div class="mb-3">
                             <h6>Вы уверены, что облёт не пройден?</h6>
+                            <label for="qc_comment" class="form-label">Комментарий</label>
+                            <input type="text" class="form-control" id="qc_comment" required maxlength="200">
+                            <div class="text-end text-muted small">
+                                <span id="qcCommentCharCount">0</span>/200 символов
+                            </div>
                         </div>
                         <div class="d-flex mt-2 justify-content-end">
                             <button type="button" class="btn btn-success" id="applyFlyingTestNgButton">Подтвердить</button>
